@@ -67,3 +67,26 @@ ARM64 is compiled into the APK, but no physical ARM64 device was available.
 Physical gamepad/TalkBack coverage, sustained performance, low-memory behavior,
 battery/audio-focus measurements and production signing remain unrun. The current
 app is silent. Original-vs-port behavior is an entirely separate research task.
+
+## Virtual-map accessibility increment
+
+The next suite adds read-only virtual player/wall/floor cells with coordinates,
+accessibility focus/search and explicit movement/WAIT/zoom actions. Instrumentation
+checks provider behavior and also retrieves the virtual player through Android's
+actual framework accessibility tree. Zoom hides offscreen cells from visible
+children, clears offscreen accessibility focus, and provides a full-map reset.
+These checks do not constitute a physical TalkBack speech/gesture usability test.
+
+The expanded **12-test suite passed on API 23 x86_64**, measured font scale 1.0,
+portrait, target SDK 35. An initial framework-tree attempt queried immediately
+after connecting UiAutomation and received no active window. Connecting before
+Activity launch and waiting for the accessibility window resolved the harness
+readiness failure; the focused check and subsequent complete suite passed.
+The provider checks had already passed as an 11-test intermediate suite.
+
+The final build passed `assembleDebug`, `assembleDebugAndroidTest`, `lintDebug`,
+`assembleRelease` and `bundleRelease`. A subsequent lifecycle run preserved turns
+across process death and three background cycles, with a clean app crash buffer.
+These new 12-test results cover normal portrait only; earlier 1.3×/landscape
+results remain seven-test historical checkpoints. Release outputs are unsigned;
+physical TalkBack/gamepad, ARM64, API 35 runtime and performance remain unverified.

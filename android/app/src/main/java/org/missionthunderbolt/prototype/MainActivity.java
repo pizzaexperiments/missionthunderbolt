@@ -97,7 +97,7 @@ public class MainActivity extends Activity {
  }
  private void step(int dx,int dy) {turns = move(dx,dy); refresh();}
  private void refresh() {turns = turnCount(); status.setText("Thunderbolt RESEARCH DEMO | " + (modern?"Modern":"Classic") + " | Turns: " + turns); board.setContentDescription("Synthetic demo board. " + (modern ? "Modern" : "Classic") +
-   " presentation. Turns " + turns + ". Use directional buttons or arrow keys to move."); board.invalidate();}
+   " presentation. Turns " + turns + ". Use directional buttons or arrow keys to move."); board.invalidate(); board.accessibility.changed();}
  private AtomicFile saveFile() { return new AtomicFile(new File(getFilesDir(), "demo-state.mt")); }
  private void restoreSavedState(Bundle bundle) {
   if (bundle != null && restore(bundle.getString("demo-state"))) return;
@@ -159,16 +159,40 @@ public class MainActivity extends Activity {
  class Board extends View {
   final Paint p = new Paint();
   final ScaleGestureDetector scaler;
+  final BoardAccessibility accessibility;
   boolean scaled = false;
   Board() {
    super(MainActivity.this); p.setAntiAlias(false); setFocusable(true); setFocusableInTouchMode(true);
+   setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+   accessibility=new BoardAccessibility(this,new BoardAccessibility.Model() {
+    public String[] rows() {return map().split("\\n");}
+    public android.graphics.Rect bounds(int x,int y,int columns,int rows) {return cellBounds(x,y,columns,rows);}
+    public void move(int dx,int dy) {step(dx,dy);}
+    public void waitTurn() {turns=MainActivity.waitTurn();refresh();}
+    public void zoom(int direction) {
+     zoom=direction==0 ? 1f : Math.max(1f,Math.min(4f,zoom*(direction>0 ? 1.25f : .8f)));
+     invalidate(); accessibility.changed();
+    }
+   });
    scaler = new ScaleGestureDetector(MainActivity.this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
     @Override public boolean onScaleBegin(ScaleGestureDetector detector) { scaled=true; return true; }
     @Override public boolean onScale(ScaleGestureDetector detector) {
-     zoom = Math.max(1f,Math.min(4f,zoom*detector.getScaleFactor())); invalidate(); return true;
+     zoom = Math.max(1f,Math.min(4f,zoom*detector.getScaleFactor())); invalidate(); accessibility.changed(); return true;
     }
    });
   }
+  private android.graphics.Rect cellBounds(int x,int y,int columns,int rows) {
+   if(rows==0 || columns==0)return new android.graphics.Rect();
+   float cell=Math.max(1f,(float)Math.floor(Math.min(getWidth()/(float)columns,getHeight()/(float)rows)))*zoom;
+   float x0=(getWidth()-cell*columns)/2f,y0=(getHeight()-cell*rows)/2f;
+   return new android.graphics.Rect((int)Math.floor(x0+x*cell),(int)Math.floor(y0+y*cell),
+    (int)Math.ceil(x0+(x+1)*cell),(int)Math.ceil(y0+(y+1)*cell));
+  }
+  @Override public android.view.accessibility.AccessibilityNodeProvider getAccessibilityNodeProvider() {return accessibility;}
+  @Override public boolean performAccessibilityAction(int action,Bundle args) {
+   return accessibility.hostAction(action) || super.performAccessibilityAction(action,args);
+  }
+  @Override public boolean dispatchHoverEvent(MotionEvent event) {return accessibility.hover(event) || super.dispatchHoverEvent(event);}
   @Override protected void onDraw(Canvas c) {super.onDraw(c);String[] rows = map().split("\\n");if(rows.length==0)return;
    float cell = Math.max(1f,(float)Math.floor(Math.min(getWidth()/(float)rows[0].length(),getHeight()/(float)rows.length)))*zoom;
    float x0 = (getWidth()-cell*rows[0].length())/2f, y0 = (getHeight()-cell*rows.length)/2f;

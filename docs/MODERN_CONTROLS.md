@@ -14,9 +14,18 @@ Switching skins preserves player/map/turns and does not change mechanics.
   not also trigger movement. Center taps have a dead zone. Zoom is app-private.
 - Restart is explicit and retains the presentation selection.
 
-The board description does not expose every cell as a virtual accessibility
-node; full map narration, physical gamepad coverage and broad device/font-scale
-validation remain work to do. No original graphics are packaged.
+The synthetic board now exposes virtual player/wall/floor cells with one-based
+column/row descriptions and collection coordinates. Accessibility focus and text
+search inspect cells without consuming a turn. The board offers named movement,
+WAIT, zoom-in/out and Show entire map actions. Zoomed-offscreen cells are excluded
+from visible children; zooming clears a cell focus that becomes offscreen.
+Touch-exploration hover events target the same cell geometry used by the renderer.
+No original graphics or recovered enemy/item semantics are packaged.
+
+Instrumentation checks the actual Android framework tree as well as provider
+queries, coordinates, read-only focus, shared movement/WAIT state, mode switching,
+zoom clipping and full-map reset. Physical TalkBack gesture/speech usability,
+physical gamepad coverage and broader device/font-scale validation remain open.
 
 Build test APKs with `cd android && gradle --no-daemon assembleDebug assembleDebugAndroidTest`.
 On a selected emulator/device:

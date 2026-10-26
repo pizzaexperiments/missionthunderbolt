@@ -9,4 +9,7 @@
     <item name="move_left" type="id" />
     <item name="move_right" type="id" />
     <item name="wait_turn" type="id" />
+ <item name="zoom_in" type="id"/>
+ <item name="zoom_out" type="id"/>
+ <item name="zoom_reset" type="id"/>
 </resources>
