@@ -1,7 +1,8 @@
 # Historical gameplay work — issues #8 through #12 and #16
 
-These issues require original behavior evidence from #6/#7. No archive, manual,
-reference captures or verified disassembly is available in this checkout. The
+These issues require original behavior evidence from #6/#7. The source archive, manual and extracted assets are now available locally, and
+validated jump-table-guided static call candidates have been generated. No original
+runtime captures or recovered gameplay semantics are available yet. The
 synthetic engine is useful for integration tests, not a source of historical
 rules. No guessed combat, inventory, AI, generation or UI has been added as if it
 were recovered behavior.
@@ -23,3 +24,8 @@ an observation, not an invented expected result. Compare original/port traces
 under controlled inputs and label modernization options separately. See
 REFERENCE_RESEARCH.md and 68K_ANALYSIS.md. These issues remain open until their
 original-specific acceptance criteria can be exercised.
+
+See [manual-backed research notes](MANUAL_EVIDENCE.md) for specific evidence and
+the important manual-1.0 / executable-2.0.g mismatch. The blocker is no longer
+absence of an archive; original execution traces and substantial semantic analysis
+remain outstanding.

@@ -1,8 +1,8 @@
 # Reference capture and evidence — issue #6
 
 Status: tooling/protocol prepared; **no original-game capture has been made**.
-Neither the historical application/archive nor a licensed reference machine/ROM
-has been supplied to this task. An Android synthetic-demo emulator is not an
+The historical application/archive and manual were later supplied. A licensed
+reference machine/ROM/OS or original-game runtime captures have not been supplied. An Android synthetic-demo emulator is not an
 original-game reference. Do not derive historical rules from its behavior.
 
 ## Capture protocol
@@ -37,3 +37,6 @@ python3 scripts/check_reference_trace.py local-generated/reference/run.json
 No original trace fixture is invented for public tests. Synthetic schema tests
 verify the interchange constraints only. Original-vs-port differential tests
 must wait for original observations with known inputs and comparable state.
+
+The manual says version 1.0 while executable version resources say 2.0.g.
+See MANUAL_EVIDENCE.md; do not conflate their behavior without validation.
