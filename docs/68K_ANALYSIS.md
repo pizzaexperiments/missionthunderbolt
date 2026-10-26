@@ -69,3 +69,33 @@ relocations are applied. Automatic analysis is deliberately disabled until valid
 entrypoints/segment layout are established. **No annotated gameplay call graph,
 original rule reconstruction or faithful behavior is claimed.** Those remain
 substantial #7 acceptance criteria, now unblocked for source-level research.
+
+## Jump-table-guided static calls
+
+`map_jump_table.py` validates the standard unloaded CODE-0 stub pattern, table
+bounds and per-segment entry-count/header agreement before emitting resource-
+relative targets. For this archive it found **788 entries** across CODE 1–14.
+The table is 6,304 bytes, at A5 displacement 32; above/below-A5 sizes are recorded
+as metadata. The segment-header high bit is masked for the observed index
+correlation; its compiler-specific meaning is **not** asserted. No CREL patching
+or runtime load-address reconstruction is silently applied.
+
+```sh
+python3 scripts/map_jump_table.py local-generated/original-resources/manifest.json --output local-generated/analysis/jumps
+"$GHIDRA_HOME/support/analyzeHeadless" local-generated/analysis/ghidra-project mt-code-segments \
+  -process 'CODE_*.bin' -noanalysis -max-cpu 2 -scriptPath scripts/ghidra \
+  -postScript ApplyJumpTable.java local-generated/analysis/jumps/jump-table.tsv local-generated/analysis/static-calls
+```
+
+The script disassembled all 788 candidate entrypoints and generated private
+instruction/function-offset call tables: **8,697 static call candidates**,
+including **7,028** resolved through validated A5 jump entries, **1,659** direct
+segment-relative candidates and **10** unresolved indirect calls. Function
+boundaries and call interpretation are generated hypotheses, not recovered source
+symbols. Reports include source function/instruction offsets, target segment/
+offset and confidence. Files remain under ignored local-generated/.
+
+This is a reproducible, structurally annotated static graph foundation. Identifying
+resource loaders, relocation semantics, traps, state fields, RNG, scheduler and
+gameplay routines still requires analysis and original behavior corroboration.
+Do not equate disassembly coverage or a call count with semantic fidelity.
