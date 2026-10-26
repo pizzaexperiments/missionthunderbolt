@@ -17,7 +17,7 @@ This repository begins with a **demonstration engine**, not a recreation of orig
 
 ## Build
 
-Open `android/` in Android Studio, install SDK platform 35 and NDK/CMake, and build `assembleDebug`. GitHub Actions is configured for automated build validation. The project has not yet been device-tested.
+See [Android development](docs/ANDROID_DEVELOPMENT.md) for pinned tools, build/install/launch commands and troubleshooting. Local APK builds have passed; [evidence and remaining checks](docs/verification/android-build.md) distinguish build, installation and gameplay validation. GitHub Actions is manual-only to conserve credits.
 
 ## Rights
 

@@ -25,3 +25,9 @@ Its detailed logs were unavailable without GitHub authentication. No new CI run
 was triggered and no green CI run or uploaded artifact is claimed. Those issue #1
 acceptance criteria remain pending; GitHub API access is currently blocked by
 environment policy. Device/emulator results are recorded separately when exercised.
+
+For #2, a fresh export of tracked source (`git archive HEAD`, without Gradle,
+CMake or APK outputs) also passed `gradle --no-daemon --console=plain assembleDebug`
+on Linux x86_64, with 41 tasks executed. Existing downloaded dependency caches were
+reused. This verifies the source build from clean project directories, not
+Windows/macOS, a cold dependency cache, or device execution.
