@@ -1,0 +1,14 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'org.missionthunderbolt.prototype'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'org.missionthunderbolt.prototype'
+        minSdk 23
+        targetSdk 28
+        versionCode 1
+        versionName '0.1-research'
+        externalNativeBuild { cmake { cppFlags '-std=c++17 -Wall -Wextra' } }
+    }
+    externalNativeBuild { cmake { path 'src/main/cpp/CMakeLists.txt' } }
+}
