@@ -20,6 +20,8 @@ const char* mt_error_message(int error);
 mt_game* mt_game_create(int width, int height, uint32_t seed);
 void mt_game_destroy(mt_game* game);
 int mt_game_move(mt_game* game, int dx, int dy);
+/* Explicit one-time-unit wait, not a zero-displacement move. */
+int mt_game_wait(mt_game* game);
 int mt_game_turns(const mt_game* game);
 /* Required bytes including NUL; if output is non-null, writes only if capacity suffices. */
 int mt_game_map(const mt_game* game, char* output, int capacity);

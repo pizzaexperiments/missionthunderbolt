@@ -75,6 +75,7 @@ public:
             if((e.key.keysym.mod&KMOD_CTRL) && key==SDLK_s) persist();
             else if((e.key.keysym.mod&KMOD_CTRL) && key==SDLK_l) game=mt::PrototypeGame::load(readSave(savePath));
             else if(key==SDLK_ESCAPE || key==SDLK_q) running=false;
+            else if(key==SDLK_SPACE || key==SDLK_KP_5) game.wait();
             else if(key==SDLK_TAB && !e.key.repeat) toggle();
             else if(key==SDLK_r && !e.key.repeat) restart();
             else if(key==SDLK_RIGHT || key==SDLK_d) game.move(1,0);
@@ -114,7 +115,7 @@ public:
     void draw() {
         const bool modern=game.presentation()==mt::Presentation::Modern;
         std::string title="Thunderbolt RESEARCH DEMO | ";title+=modern?"Modern":"Classic";
-        title+=" | Turns: "+std::to_string(game.turns())+" | WASD/arrows, Tab skin, R restart, Ctrl-S save";
+        title+=" | Turns: "+std::to_string(game.turns())+" | WASD/arrows, Space wait, Tab skin, R restart, Ctrl-S save";
         SDL_SetWindowTitle(window.get(),title.c_str());
         int width=0,height=0;SDL_GetRendererOutputSize(renderer.get(),&width,&height);
         SDL_SetRenderDrawColor(renderer.get(),modern?21:255,modern?28:255,modern?36:255,255);SDL_RenderClear(renderer.get());
@@ -141,6 +142,10 @@ void smoke(Host& host) {
     while(SDL_PollEvent(&e))host.event(e);
     require(host.game.turns()==2,"keyboard/controller moves missing");
     require(host.game.presentation()==mt::Presentation::Modern,"mode switch failed");
+    const auto beforeWait=host.game.asciiMap();
+    e={};e.type=SDL_KEYDOWN;e.key.keysym.sym=SDLK_SPACE;
+    require(SDL_PushEvent(&e)==1,"queue wait");while(SDL_PollEvent(&e))host.event(e);
+    require(host.game.turns()==3 && host.game.asciiMap()==beforeWait,"wait moved player or failed to advance one turn");
     host.draw();host.persist();
     require(mt::PrototypeGame::load(readSave(host.savePath)).save()==host.game.save(),"disk save round-trip failed");
     int pixelWidth=0,pixelHeight=0;

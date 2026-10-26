@@ -6,7 +6,7 @@ is bundled. The terminal host remains available without SDL2.
 
 ## Controls and storage
 
-WASD/arrows or controller D-pad move. Left stick has a dead zone and one action
+WASD/arrows or controller D-pad move. Space/keypad-5 waits one prototype time unit in place. Left stick has a dead zone and one action
 per direction change. Tab/controller Back switches skin without resetting state;
 R/controller Start restarts; Ctrl-S saves and Ctrl-L loads; Escape/Q quits.
 Controller hotplug is supported. The host redraws on input/window events rather

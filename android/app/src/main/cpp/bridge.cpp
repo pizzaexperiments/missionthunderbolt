@@ -46,3 +46,9 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_missionthunderbolt_prototype_Main
     env->ReleaseStringUTFChars(saved,text);
     return restored ? JNI_TRUE : JNI_FALSE;
 }
+
+extern "C" JNIEXPORT jint JNICALL Java_org_missionthunderbolt_prototype_MainActivity_waitTurn(JNIEnv*, jclass) {
+    std::lock_guard<std::mutex> guard(lock);
+    game.wait();
+    return game.turns();
+}

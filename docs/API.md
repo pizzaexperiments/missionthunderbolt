@@ -39,3 +39,10 @@ Linux CMake, core/API tests and a real C translation-unit ABI test passed locall
 A manual-only Windows/macOS/Linux matrix is provided; remote platform runs remain
 unexecuted. The Android JNI shared library continues to compile the portable
 sources alongside its host bridge.
+
+
+`mt_game_wait(game)` is an additive version-1 entry point: returns 1 when one
+prototype time unit was consumed in place, 0 for a null handle or saturated
+counter. Null sets INVALID_ARGUMENT; saturation is a normal rejected action.
+It implements the manual-1.0 WAIT model documented in MANUAL_RULES.md, without
+claiming original 2.0.g scheduler/RNG/actor behavior.

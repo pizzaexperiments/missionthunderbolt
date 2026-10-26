@@ -12,6 +12,8 @@ c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp android/app/src/
 ./dist/save_test
 c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp android/app/src/main/cpp/game.cpp android/app/src/main/cpp/api.cpp tests/fuzz_test.cpp -o dist/fuzz_test
 ./dist/fuzz_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp android/app/src/main/cpp/game.cpp android/app/src/main/cpp/api.cpp tests/manual_rules_test.cpp -o dist/manual_rules_test
+./dist/manual_rules_test
 c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp android/app/src/main/cpp/game.cpp desktop/main.cpp -o dist/mt_desktop_demo
 printf 'q\n' | ./dist/mt_desktop_demo >/dev/null
 echo "All local smoke tests passed"

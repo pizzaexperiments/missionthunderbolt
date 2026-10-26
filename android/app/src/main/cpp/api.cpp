@@ -24,6 +24,9 @@ void mt_game_destroy(mt_game* game) { delete game; last_error=MT_ERROR_NONE; }
 int mt_game_move(mt_game* game,int dx,int dy) {
     return protect([&] { require(game); return game->instance.move(dx,dy) ? 1 : 0; },0);
 }
+int mt_game_wait(mt_game* game) {
+    return protect([&] { require(game); return game->instance.wait() ? 1 : 0; },0);
+}
 int mt_game_turns(const mt_game* game) {
     return protect([&] { require(game); return game->instance.turns(); },-1);
 }

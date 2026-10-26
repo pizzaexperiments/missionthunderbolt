@@ -35,3 +35,6 @@ run was triggered. Physical ARM64/API 35 acceptance is not implied by this resul
 
 The expanded seven-test suite, measured 1.3× font scaling, lifecycle and current
 limitations are recorded in [Android runtime evidence](ANDROID_RUNTIME.md).
+
+WAIT, Space and keypad-5 now consume one prototype time unit in place; see
+[the manual-backed rule](MANUAL_RULES.md). Invalid zero-direction movement is unchanged.

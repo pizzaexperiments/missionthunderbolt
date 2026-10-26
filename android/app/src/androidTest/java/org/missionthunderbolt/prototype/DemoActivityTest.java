@@ -72,4 +72,12 @@ public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActiv
   getInstrumentation().sendStatus(0,report);
  }
 
+ public void testManualWaitButtonAndSpaceAdvanceOneTurn() throws Throwable {
+  MainActivity a=getActivity();click(a,R.id.restart);click(a,R.id.wait_turn);
+  assertTrue(status(a).contains("Turns: 1"));
+  getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_SPACE);
+  getInstrumentation().waitForIdleSync();assertTrue(status(a).contains("Turns: 2"));
+  click(a,R.id.mode);assertTrue(status(a).contains("Turns: 2"));
+ }
+
 }

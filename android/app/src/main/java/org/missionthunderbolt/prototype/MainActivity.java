@@ -29,6 +29,7 @@ public class MainActivity extends Activity {
  private static native int move(int dx, int dy);
  private static native void reset();
  private static native int turnCount();
+ private static native int waitTurn();
  private static native boolean isModern();
  private static native void setModern(boolean enabled);
  private static native String snapshot();
@@ -70,7 +71,9 @@ public class MainActivity extends Activity {
   controls.addView(tools);
   dpad = new LinearLayout(this); dpad.setOrientation(LinearLayout.VERTICAL);
   LinearLayout top = new LinearLayout(this); top.setGravity(android.view.Gravity.CENTER);
-  top.addView(direction("UP",0,-1,R.id.move_up)); dpad.addView(top);
+  top.addView(direction("UP",0,-1,R.id.move_up));
+  Button wait = button("WAIT",R.id.wait_turn); wait.setContentDescription("Wait one time unit in place");
+  wait.setOnClickListener(v -> {turns=waitTurn(); refresh();}); top.addView(wait); dpad.addView(top);
   LinearLayout bottom = new LinearLayout(this); bottom.setGravity(android.view.Gravity.CENTER);
   bottom.addView(direction("LEFT",-1,0,R.id.move_left)); bottom.addView(direction("DOWN",0,1,R.id.move_down));
   bottom.addView(direction("RIGHT",1,0,R.id.move_right)); dpad.addView(bottom);
@@ -128,6 +131,9 @@ public class MainActivity extends Activity {
  @Override public boolean dispatchKeyEvent(KeyEvent event) {
   int dx=0,dy=0;
   switch(event.getKeyCode()) {
+   case KeyEvent.KEYCODE_SPACE: case KeyEvent.KEYCODE_NUMPAD_5:
+    if(event.getAction()==KeyEvent.ACTION_DOWN) {turns=waitTurn(); refresh();}
+    return true;
    case KeyEvent.KEYCODE_DPAD_UP: case KeyEvent.KEYCODE_W: dy=-1; break;
    case KeyEvent.KEYCODE_DPAD_DOWN: case KeyEvent.KEYCODE_S: dy=1; break;
    case KeyEvent.KEYCODE_DPAD_LEFT: case KeyEvent.KEYCODE_A: dx=-1; break;

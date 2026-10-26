@@ -9,6 +9,7 @@ class PrototypeGame {
 public:
     PrototypeGame(int width = 20, int height = 12, uint32_t seed = 1);
     bool move(int dx, int dy);
+    bool wait(); // Manual v1.0 p.28: one action in the current location.
     void setPresentation(Presentation p) { presentation_ = p; }
     Presentation presentation() const { return presentation_; }
     Position player() const { return player_; }

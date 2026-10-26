@@ -16,6 +16,11 @@ bool PrototypeGame::move(int dx, int dy) {
     ++turns_;
     return true;
 }
+bool PrototypeGame::wait() {
+    if (turns_ == std::numeric_limits<int>::max()) return false;
+    ++turns_;
+    return true;
+}
 std::string PrototypeGame::asciiMap() const {
     auto grid = map_.cells();
     grid[player_.y][player_.x] = '@';

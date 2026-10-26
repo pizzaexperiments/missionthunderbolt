@@ -30,3 +30,10 @@ Next research steps: annotate jump-table-resolved routines/call candidates from
 reference environment; capture known inputs; identify exact version differences;
 then add native regression cases tied to those observations. Manual hypotheses
 must retain their confidence labels until corroborated.
+
+
+The user subsequently supplied a second PDF whose SHA256 is
+`a23265a09d414c51056a623b7c43bf2269d077cf63427a9424a1a0436aadf013`.
+It has the same extracted 43-page text, including the version 1.0 identification.
+[Manual-backed prototype rules](MANUAL_RULES.md) records the first implemented
+rule (M1-WAIT) with its page citation and explicit verification boundary.
