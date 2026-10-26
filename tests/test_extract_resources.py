@@ -41,3 +41,11 @@ class ExtractTests(unittest.TestCase):
             root=Path(d); source=root/'bad.rsrc'; source.write_bytes(sample()[:-1])
             with self.assertRaises(ValueError): extract(source,root/'out')
             self.assertFalse((root/'out').exists())
+
+    def test_unar_sidecar_directory(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);tree=root/'tree';tree.mkdir()
+            (tree/'._Game').write_bytes(double(sample(b'CODE',b'fixture',1)))
+            records=extract(tree,root/'out')
+            self.assertEqual(records[0]['fork'],'._Game')
+            self.assertEqual(records[0]['id'],1)

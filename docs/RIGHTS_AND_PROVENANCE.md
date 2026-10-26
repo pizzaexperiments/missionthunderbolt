@@ -2,16 +2,18 @@
 
 ## Confirmed repository facts and unknown rights
 
-The checked-in engine calls itself a synthetic demonstration. No historical
-archive is supplied to this checkout. The current task cannot confirm the
-original game's authorship, copyright owner, distribution license, manual rights,
-font/art/audio permissions, or the provenance of earlier reported extractions.
+The checked-in engine calls itself a synthetic demonstration. The user later supplied a conversion handoff containing the historical
+StuffIt archive and a manual; they remain in ignored local-original/. The manual credits Dave Scheifler (copyright 1987–1992) and John Calhoun
+(creature closeup art), and identifies MegaCorp International. Its restrictive
+notice does not grant public redistribution. Present ownership, any later
+license grants, font/art/audio permissions and earlier extraction provenance
+remain unverified.
 The issue's reference to `tb2.zip` is a lead, not possession or a license.
 
 | Material | Evidence available here | Distribution decision |
 | --- | --- | --- |
-| Original executable, CODE/CREL and resource forks | No source archive or rights document available | Local research only when lawfully supplied; no public redistribution |
-| PICT, sound, fonts, manual, captures/derivatives | No rights grant available | Do not include in public packages or upload to CI |
+| Original executable, CODE/CREL and resource forks | User-supplied archive and restrictive manual notice | Local research only when lawfully supplied; no public redistribution |
+| PICT, sound, fonts, manual, captures/derivatives | Manual and reference images supplied; no redistribution grant | Do not include in public packages or upload to CI |
 | Synthetic C++/Java/Python code and generated test fixtures | Source and synthetic fixture generators in Git | Authored for this prototype; repository-wide license selection remains a maintainer decision |
 | Android/Gradle/NDK and any desktop dependency | Installed build tools, separate upstream licenses | Retain upstream notices; packaging requires dependency/license review |
 

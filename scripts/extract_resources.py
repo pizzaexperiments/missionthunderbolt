@@ -40,6 +40,19 @@ def apple_resource_fork(data):
 
 
 def source_forks(path):
+    if path.is_dir():
+        members=sorted(path.rglob('*'))
+        if any(p.is_symlink() for p in members):
+            raise ValueError('symlinks in resource source tree are not supported')
+        files=[p for p in members if p.is_file() and (p.name.startswith('._') or p.suffix.lower()=='.rsrc')]
+        if len(files)>MAX_MEMBERS or sum(p.stat().st_size for p in files)>MAX_BYTES:
+            raise ValueError('resource source tree exceeds limits')
+        for member in files:
+            data=member.read_bytes()
+            if member.name.startswith('._') or data[:4] in (b'\x00\x05\x16\x07',b'\x00\x05\x16\x00'):
+                data=apple_resource_fork(data)
+            yield str(member.relative_to(path)),data
+        return
     if path.stat().st_size > MAX_BYTES:
         raise ValueError('input exceeds size limit')
     if zipfile.is_zipfile(path):
