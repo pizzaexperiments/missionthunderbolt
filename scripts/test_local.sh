@@ -1,6 +1,7 @@
 #!/bin/sh
 set -eu
 cd "$(dirname "$0")/.."
+python3 scripts/check_public_inputs.py
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 mkdir -p dist
 c++ -std=c++17 -Wall -Wextra -Werror android/app/src/main/cpp/game.cpp tests/core_test.cpp -o dist/core_test
