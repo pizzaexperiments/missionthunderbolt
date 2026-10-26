@@ -6,7 +6,7 @@ Research project for a **native** Android port of classic Macintosh *Mission: Th
 
 ## Current state
 
-This repository begins with a **demonstration engine**, not a recreation of original gameplay. Original Macintosh 68K CODE/CREL resources have been recovered separately; no game mechanics are claimed to be disassembled yet. No APK has been built or verified.
+This repository begins with a **demonstration engine**, not a recreation of original gameplay. The supplied historical archive is kept privately and has been extracted into a hash-linked resource inventory. Static 68K analysis and local graphics/audio conversion tools are available, but original gameplay semantics are not recovered. The synthetic Android APK builds and has passed emulator checks; see the evidence links below for exact scope.
 
 ## Goals
 
@@ -21,6 +21,6 @@ See [Android development](docs/ANDROID_DEVELOPMENT.md) for pinned tools, build/i
 
 ## Rights
 
-Original game binaries, art, sound, manuals and resource forks are **not included** pending rights review. Do not upload these to a public repo without authorization.
+New project code is licensed under [MIT](LICENSE). Original game binaries, art, sound, manuals and resource forks are **not included** in public source/packages; their rights remain separately restricted. See [license boundaries](THIRD_PARTY_NOTICES.md) and do not upload historical material without authorization.
 
 See `docs/ROADMAP.md` for progress and limitations.

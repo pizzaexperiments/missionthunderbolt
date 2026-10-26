@@ -25,3 +25,22 @@ Do not publish, commit, embed in releases, or attach commercial game binaries/re
 
 ## Release targeting
 Native Android first, Windows/macOS later, with a portable C++ engine and Classic/Modern UI. No Mac emulation at runtime. External HTTP API is optional; in-process C ABI already exists.
+
+## Verification and definition of done
+- Use the existing isolated checkout; do not create a Git worktree unless requested.
+- Read the selected issue and linked evidence; make an issue-sized plan before editing.
+- Run `sh scripts/test_local.sh`; use root CMake/CTest for C ABI, sanitizer and SDL checks.
+  Android uses Java 17, Gradle 8.7, SDK/target 35, build-tools 35.0.0,
+  NDK 27.2.12479018 and CMake 3.22.1; see docs/ANDROID_DEVELOPMENT.md.
+- Keep original inputs and derivatives ignored. Run `python3 scripts/check_public_inputs.py --staged`
+  and review staged paths/content before committing; path checks do not grant rights.
+- Add deterministic regressions for engine/parser changes, with no proprietary fixtures.
+  Never disable assertions, integrity checks or failing checks to claim readiness.
+- Record exact commands, test counts, platform/ABI, failures/skips/unrun checks and artifact
+  identity where relevant. Build, install, launch, gameplay fidelity and release signing
+  are separate claims. Manual 1.0 and executable 2.0.g are not assumed equivalent.
+- A reviewable commit/PR references its issue, explains behavior and validation, records
+  remaining gaps and includes only shareable evidence. Do not mark an issue complete
+  while original-specific acceptance is untested. Keep docs/ROADMAP.md current.
+- Only manually trigger Actions with an explicit reason consistent with available credits.
+  No automatic push/PR CI or release publication. Merge requires maintainer approval.
