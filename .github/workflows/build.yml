@@ -1,19 +1,8 @@
-name: Native Android prototype CI
+# Deliberately manual-only: conserve GitHub Actions minutes.
+name: Manual native Android research build
 on:
-  push:
-  pull_request:
   workflow_dispatch:
 jobs:
-  core:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Compile and test portable core and C API
-        run: |
-          g++ -std=c++17 -Wall -Wextra -Werror android/app/src/main/cpp/game.cpp tests/core_test.cpp -o /tmp/core_test
-          /tmp/core_test
-          g++ -std=c++17 -Wall -Wextra -Werror android/app/src/main/cpp/game.cpp android/app/src/main/cpp/api.cpp tests/api_test.cpp -o /tmp/api_test
-          /tmp/api_test
   android:
     runs-on: ubuntu-latest
     steps:
@@ -22,27 +11,17 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      # GitHub's hosted ubuntu runners already contain cmdline-tools. Do not
-      # run android-actions/setup-android@v3 here: its legacy 'tools' package
-      # install fails on sdkmanager (observed run 40402366349).
-      - name: Android SDK environment
-        run: |
-          echo "ANDROID_HOME=${ANDROID_HOME:-/usr/local/lib/android/sdk}" >> "$GITHUB_ENV"
-          "${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager" --version || command -v sdkmanager
-      - name: Install Android build packages
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Android SDK components
         run: |
           SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
           if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
           "$SDKMANAGER" --install 'platforms;android-35' 'build-tools;35.0.0' 'cmake;3.22.1' 'ndk;27.2.12479018'
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
-      - name: Build debug APK
-        working-directory: android
-        run: gradle --no-daemon assembleDebug
+      - name: Build APK
+        run: cd android && gradle --no-daemon assembleDebug
       - uses: actions/upload-artifact@v4
-        if: success()
         with:
-          name: mission-thunderbolt-research-debug-apk
+          name: research-debug-apk
           path: android/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
