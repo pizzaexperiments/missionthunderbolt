@@ -51,3 +51,48 @@ Seeding, table initialization, complete call-site roles, RNG consumption order,
 map generation and progression remain unknown. Matching isolated instructions is
 stronger evidence for these arithmetic routines; it is not a full original-game
 behavior comparison or completion of #7/#8.
+
+## Initializer and continued-draw verification
+
+The next static-reference pass found CODE 5 entry **31998**, jump 204. It sets
+local state to 1 and fills the table with **100 consecutive local-generator
+outputs**. It seeds the selector through CODE 12 entry 29884 (jump 618), which
+zero-extends a 16-bit argument. A nonzero 32-bit initializer argument contributes
+its **low 16 bits**; a zero argument instead uses the word at A5-0x8da. Thus a
+nonzero argument whose low word is zero differs from a zero argument. The stored
+last result is preserved. This replaces the earlier initialization unknown for
+this particular routine; it does not establish save/new-mission RNG lifecycle.
+
+`ShuffledLcgModel::initialized(argument, fallback, previous_result)` implements
+that behavior separately from active demo gameplay. The private oracle poisons
+old state/table values, runs the original initializer, then executes 64 mixed
+zero-/one-based draws without resetting the CPU between draws. It compares every
+seed, stored result, return value and all table slots against both the arithmetic
+specification and the actual native C++ model.
+
+```sh
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp \
+  tests/research/rng_sequence_driver.cpp -o dist/rng_sequence_driver
+python tests/research/verify_rng_initialization.py local-generated/original-resources/manifest.json \
+  --native-driver dist/rng_sequence_driver \
+  --output local-generated/analysis/rng-initialization-accessor-crosscheck.json
+```
+
+**37 initializer cases and 2,368 continued draws passed**, giving **2,405 complete
+native/original-instruction state comparisons**. Cases cover zero/nonzero arguments,
+high-word-only arguments, unsigned word edges, three fallback words and 16 seeded
+random argument/fallback pairs. Native public regressions freeze the table hash,
+final local seed, unchanged last result and a 12-draw trace from synthetic inputs,
+independently checked against original instructions.
+
+The static caller at CODE 13 entry 4 passes zero after calling CODE 12 entry
+30160 with A5-0x8dc. That accessor copies the long at low-memory address **0x20c**
+and returns it; the fallback occupies the low word of that copied long. Another
+**12 isolated accessor checks** passed for synthetic low-memory inputs and null/
+nonnull output pointers. The actual OS-provided value and its time semantics
+have not been verified. No Mac OS execution or full startup run is claimed.
+
+Static wrapper-call counts prioritize CODE 12 entry 3408, CODE 8 entry 8724,
+CODE 5 entry 12508 and CODE 4 entry 21742 for further analysis. Generated function
+boundaries and high RNG call counts alone do not identify a map generator.
+Map topology, progression, save lifecycle and full-game traces remain open.

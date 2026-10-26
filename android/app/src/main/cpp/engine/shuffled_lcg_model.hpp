@@ -14,6 +14,18 @@ public:
         for (uint32_t value : state_.table)
             if (value>32767u) throw std::invalid_argument("model requires a 15-bit shuffle table");
     }
+    // The original initializer takes a 32-bit argument but seeds the selector
+    // from its low word; a zero argument reads the supplied fallback word.
+    // The existing stored result survives initialization.
+    static ShuffledLcgModel initialized(uint32_t argument, uint16_t fallback,
+                                        uint32_t previous_result=0) {
+        State initial;
+        initial.local_seed=1;
+        initial.selector_seed=argument ? (argument & 65535u) : fallback;
+        initial.last_result=previous_result;
+        for (auto& value : initial.table) value=advance(initial.local_seed);
+        return ShuffledLcgModel(initial);
+    }
     const State& state() const { return state_; }
     uint32_t zeroBased(int bound) { return draw(bound,false); }
     uint32_t oneBased(int bound) { return draw(bound,true); }

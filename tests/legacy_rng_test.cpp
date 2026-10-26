@@ -23,6 +23,23 @@ int main() {
         try {model.zeroBased(bound);} catch(const std::invalid_argument&) {rejected=true;}
         assert(rejected && model.state().table==initial.table && model.state().local_seed==1);
     }
+    auto seeded=mt::ShuffledLcgModel::initialized(0,42,123);
+    assert(seeded.state().local_seed==3885567453u);
+    assert(seeded.state().selector_seed==42 && seeded.state().last_result==123);
+    uint32_t table_hash=2166136261u;
+    for(auto value:seeded.state().table)
+        for(int shift : {24,16,8,0}) table_hash=(table_hash^((value>>shift)&255u))*16777619u;
+    assert(table_hash==0xc9f69394u);
+    const std::array<uint32_t,12> expected{{22,3,6,84,22,45,25,39,59,55,38,26}};
+    for(unsigned i=0;i<expected.size();++i)
+        assert((i%2 ? seeded.oneBased(100) : seeded.zeroBased(100))==expected[i]);
+    auto explicit_seed=mt::ShuffledLcgModel::initialized(42,65535,123);
+    auto fallback_seed=mt::ShuffledLcgModel::initialized(0,42,123);
+    assert(explicit_seed.state().table==fallback_seed.state().table);
+    assert(explicit_seed.state().selector_seed==fallback_seed.state().selector_seed);
+    // Nonzero full-width argument uses its low word even when that word is zero.
+    assert(mt::ShuffledLcgModel::initialized(65536,42).state().selector_seed==0);
+    assert(mt::ShuffledLcgModel::initialized(0xffffffffu,0).state().selector_seed==65535);
     initial.table[0]=32768; bool rejected=false;
     try {mt::ShuffledLcgModel model(initial);} catch(const std::invalid_argument&) {rejected=true;}
     assert(rejected);
