@@ -2,6 +2,8 @@ plugins { id 'com.android.application' }
 android {
     namespace 'org.missionthunderbolt.prototype'
     compileSdk 35
+    buildToolsVersion '35.0.0'
+    ndkVersion '27.2.12479018'
     defaultConfig {
         applicationId 'org.missionthunderbolt.prototype'
         minSdk 23
@@ -10,5 +12,5 @@ android {
         versionName '0.1-research'
         externalNativeBuild { cmake { cppFlags '-std=c++17 -Wall -Wextra' } }
     }
-    externalNativeBuild { cmake { path 'src/main/cpp/CMakeLists.txt' } }
+    externalNativeBuild { cmake { path 'src/main/cpp/CMakeLists.txt'; version '3.22.1' } }
 }

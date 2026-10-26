@@ -3,6 +3,12 @@ name: Manual native Android research build
 on:
   workflow_dispatch:
 jobs:
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Local synthetic checks
+        run: sh scripts/test_local.sh
   android:
     runs-on: ubuntu-latest
     steps:
@@ -16,12 +22,25 @@ jobs:
           gradle-version: '8.7'
       - name: Android SDK components
         run: |
-          SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
-          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          curl --fail --location --retry 2 https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip --output "$RUNNER_TEMP/cmdline-tools.zip"
+          echo "5fdcc763663eefb86a5b8879697aa6088b041e70  $RUNNER_TEMP/cmdline-tools.zip" | sha1sum --check
+          unzip -q "$RUNNER_TEMP/cmdline-tools.zip" -d "$RUNNER_TEMP/android-tools"
+          mkdir -p "$ANDROID_HOME/cmdline-tools/19.0"
+          cp -R "$RUNNER_TEMP/android-tools/cmdline-tools/." "$ANDROID_HOME/cmdline-tools/19.0/"
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/19.0/bin/sdkmanager"
           "$SDKMANAGER" --install 'platforms;android-35' 'build-tools;35.0.0' 'cmake;3.22.1' 'ndk;27.2.12479018'
       - name: Build APK
         run: cd android && gradle --no-daemon assembleDebug
+      - name: Verify APK and record identity
+        run: |
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK"
+          sha256sum "$APK" > "$APK.sha256"
       - uses: actions/upload-artifact@v4
         with:
           name: research-debug-apk
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: |
+            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/apk/debug/*.sha256
+          if-no-files-found: error
