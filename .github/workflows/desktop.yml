@@ -34,3 +34,38 @@ jobs:
           name: windows-x64-research-demo
           path: dist/windows-x64-research.zip
           if-no-files-found: error
+  macos:
+    strategy:
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/vcpkg
+          ref: 0e5030f583a5427123cd3b714255e5ae62faa3ba
+          path: dist/vcpkg
+      - name: Prepare pinned vcpkg
+        run: |
+          ./dist/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+          echo "VCPKG_ROOT=$GITHUB_WORKSPACE/dist/vcpkg" >> "$GITHUB_ENV"
+      - run: cmake --preset desktop-macos-${{ matrix.arch }}
+      - run: cmake --build dist/macos-${{ matrix.arch }} --parallel 4
+      - run: ctest --test-dir dist/macos-${{ matrix.arch }} --output-on-failure
+      - run: cmake --install dist/macos-${{ matrix.arch }} --prefix dist/packages/macos-${{ matrix.arch }}
+      - name: Preserve notice and application modes
+        run: |
+          mkdir -p dist/packages/macos-${{ matrix.arch }}/licenses
+          cp dist/vcpkg_installed/${{ matrix.arch }}-osx/share/sdl2/copyright dist/packages/macos-${{ matrix.arch }}/licenses/SDL2.txt
+          cp docs/DESKTOP_DEVELOPMENT.md dist/packages/macos-${{ matrix.arch }}/README.md
+          tar -czf dist/macos-${{ matrix.arch }}-research.tar.gz -C dist/packages/macos-${{ matrix.arch }} .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.arch }}-research-demo
+          path: dist/macos-${{ matrix.arch }}-research.tar.gz
+          if-no-files-found: error
