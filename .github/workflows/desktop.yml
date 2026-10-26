@@ -1,0 +1,36 @@
+# Manual-only: conserve Actions credits. Produces review artifacts, not releases.
+name: Manual desktop research packages
+on:
+  workflow_dispatch:
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/vcpkg
+          ref: 0e5030f583a5427123cd3b714255e5ae62faa3ba
+          path: dist/vcpkg
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Prepare pinned vcpkg
+        shell: pwsh
+        run: |
+          & ./dist/vcpkg/bootstrap-vcpkg.bat -disableMetrics
+          "VCPKG_ROOT=$env:GITHUB_WORKSPACE/dist/vcpkg" >> $env:GITHUB_ENV
+      - run: cmake --preset desktop-windows
+      - run: cmake --build dist/windows --parallel 4
+      - run: ctest --test-dir dist/windows --output-on-failure
+      - run: cmake --install dist/windows --prefix dist/packages/windows-x64
+      - name: Preserve dependency notice and package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist/packages/windows-x64/licenses
+          Copy-Item dist/vcpkg_installed/x64-windows-static/share/sdl2/copyright dist/packages/windows-x64/licenses/SDL2.txt
+          Copy-Item docs/DESKTOP_DEVELOPMENT.md dist/packages/windows-x64/README.md
+          Compress-Archive -Path dist/packages/windows-x64/* -DestinationPath dist/windows-x64-research.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64-research-demo
+          path: dist/windows-x64-research.zip
+          if-no-files-found: error

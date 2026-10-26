@@ -26,3 +26,28 @@ if(BUILD_TESTING)
   target_link_libraries(mt_c_abi_test PRIVATE mt_core)
   add_test(NAME c_abi COMMAND mt_c_abi_test)
 endif()
+
+option(MT_BUILD_SDL_HOST "Build native SDL2 synthetic demo host" OFF)
+if(MT_BUILD_SDL_HOST)
+  find_package(SDL2 2.0.18 CONFIG REQUIRED)
+  add_executable(mission-thunderbolt-demo desktop/sdl_main.cpp)
+  target_link_libraries(mission-thunderbolt-demo PRIVATE mt_core SDL2::SDL2)
+  if(MSVC)
+    target_compile_options(mission-thunderbolt-demo PRIVATE /W4 /WX)
+  else()
+    target_compile_options(mission-thunderbolt-demo PRIVATE -Wall -Wextra -Werror)
+  endif()
+  if(APPLE)
+    set_target_properties(mission-thunderbolt-demo PROPERTIES
+      MACOSX_BUNDLE TRUE
+      MACOSX_BUNDLE_GUI_IDENTIFIER org.missionthunderbolt.prototype
+      MACOSX_BUNDLE_BUNDLE_NAME "Thunderbolt Research Demo"
+      MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
+      MACOSX_BUNDLE_BUNDLE_VERSION "1")
+  endif()
+  install(TARGETS mission-thunderbolt-demo RUNTIME DESTINATION . BUNDLE DESTINATION .)
+  if(BUILD_TESTING)
+    add_test(NAME sdl_smoke COMMAND mission-thunderbolt-demo --smoke-test --save-dir "${CMAKE_CURRENT_BINARY_DIR}/smoke-state")
+    set_tests_properties(sdl_smoke PROPERTIES ENVIRONMENT "SDL_VIDEODRIVER=dummy;SDL_AUDIODRIVER=dummy")
+  endif()
+endif()
