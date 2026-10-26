@@ -21,6 +21,7 @@ import android.content.res.Configuration;
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.ScrollView;
 
 public class MainActivity extends Activity {
  static { System.loadLibrary("thunderbolt"); }
@@ -74,8 +75,14 @@ public class MainActivity extends Activity {
   bottom.addView(direction("LEFT",-1,0,R.id.move_left)); bottom.addView(direction("DOWN",0,1,R.id.move_down));
   bottom.addView(direction("RIGHT",1,0,R.id.move_right)); dpad.addView(bottom);
   dpad.setVisibility(controlsVisible ? View.VISIBLE : View.GONE); controls.addView(dpad);
-  root.addView(controls,landscape ? new LinearLayout.LayoutParams(-2,-1) : new LinearLayout.LayoutParams(-1,-2));
-  setContentView(root); refresh();
+  ScrollView controlScroll = new ScrollView(this); controlScroll.setFillViewport(true); controlScroll.addView(controls);
+  root.addView(controlScroll,landscape ? new LinearLayout.LayoutParams(-2,-1) : new LinearLayout.LayoutParams(-1,-2));
+  root.setOnApplyWindowInsetsListener((view,insets) -> {
+   view.setPadding(insets.getSystemWindowInsetLeft(),insets.getSystemWindowInsetTop(),
+    insets.getSystemWindowInsetRight(),insets.getSystemWindowInsetBottom());
+   return insets.consumeSystemWindowInsets();
+  });
+  setContentView(root); board.requestFocus(); refresh();
  }
  private Button button(String label,int id) {
   Button b = new Button(this); b.setId(id); b.setText(label); b.setContentDescription(label);
@@ -118,12 +125,18 @@ public class MainActivity extends Activity {
   persistState(); getPreferences(MODE_PRIVATE).edit().putBoolean("controls",controlsVisible).putFloat("zoom",zoom).apply();
   joystickX = joystickY = 0; super.onPause();
  }
- @Override public boolean onKeyDown(int key,KeyEvent e) {switch(key) {
-  case KeyEvent.KEYCODE_DPAD_UP: case KeyEvent.KEYCODE_W: step(0,-1);return true;
-  case KeyEvent.KEYCODE_DPAD_DOWN: case KeyEvent.KEYCODE_S: step(0,1);return true;
-  case KeyEvent.KEYCODE_DPAD_LEFT: case KeyEvent.KEYCODE_A: step(-1,0);return true;
-  case KeyEvent.KEYCODE_DPAD_RIGHT: case KeyEvent.KEYCODE_D: step(1,0);return true;
- }return super.onKeyDown(key,e);}
+ @Override public boolean dispatchKeyEvent(KeyEvent event) {
+  int dx=0,dy=0;
+  switch(event.getKeyCode()) {
+   case KeyEvent.KEYCODE_DPAD_UP: case KeyEvent.KEYCODE_W: dy=-1; break;
+   case KeyEvent.KEYCODE_DPAD_DOWN: case KeyEvent.KEYCODE_S: dy=1; break;
+   case KeyEvent.KEYCODE_DPAD_LEFT: case KeyEvent.KEYCODE_A: dx=-1; break;
+   case KeyEvent.KEYCODE_DPAD_RIGHT: case KeyEvent.KEYCODE_D: dx=1; break;
+   default: return super.dispatchKeyEvent(event);
+  }
+  if (event.getAction()==KeyEvent.ACTION_DOWN) step(dx,dy);
+  return true;
+ }
  @Override public boolean onGenericMotionEvent(MotionEvent event) {
   if ((event.getSource() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK && event.getAction() == MotionEvent.ACTION_MOVE) {
    float x = event.getAxisValue(MotionEvent.AXIS_HAT_X), y = event.getAxisValue(MotionEvent.AXIS_HAT_Y);
@@ -142,7 +155,7 @@ public class MainActivity extends Activity {
   final ScaleGestureDetector scaler;
   boolean scaled = false;
   Board() {
-   super(MainActivity.this); p.setAntiAlias(false); setFocusable(true);
+   super(MainActivity.this); p.setAntiAlias(false); setFocusable(true); setFocusableInTouchMode(true);
    scaler = new ScaleGestureDetector(MainActivity.this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
     @Override public boolean onScaleBegin(ScaleGestureDetector detector) { scaled=true; return true; }
     @Override public boolean onScale(ScaleGestureDetector detector) {

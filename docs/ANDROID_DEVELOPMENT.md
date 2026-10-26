@@ -39,8 +39,8 @@ Android Studio can open `android/` and run the `app` debug configuration with th
 same SDK/NDK selections. SDK Manager installs additional components as needed.
 There are no original game assets, signing credentials or server dependencies
 required for the synthetic demo. Minimum runtime is **Android 6 / API 23**;
-compile API 35 does not imply a minimum of 35. Target API is currently **28**,
-so this project is not yet suitable for a current Play Store release.
+compile API 35 does not imply a minimum of 35. Target API is **35** after the release-lint fix. This alone does not establish
+Play Store eligibility, signed-release readiness or behavior on every API level.
 
 ## Install, launch and inspect
 

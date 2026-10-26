@@ -63,7 +63,7 @@ closed as a duplicate of #1; no separate implementation is needed.
 
 ## Evidence and development entry points
 
-- [Android workflow](ANDROID_DEVELOPMENT.md), [build evidence](verification/android-build.md), [controls](MODERN_CONTROLS.md).
+- [Android workflow](ANDROID_DEVELOPMENT.md), [build evidence](verification/android-build.md), [controls](MODERN_CONTROLS.md), [runtime evidence](ANDROID_RUNTIME.md).
 - [Portable API](API.md), [save format](SAVE_FORMAT.md), [desktop workflow](DESKTOP_DEVELOPMENT.md), [quality gates](QUALITY.md).
 - [Rights](RIGHTS_AND_PROVENANCE.md), [extraction](RESOURCE_EXTRACTION.md), [graphics](PICT_CATALOG.md), [sound](SOUND_CONVERSION.md).
 - [Reference capture](REFERENCE_RESEARCH.md), [manual evidence](MANUAL_EVIDENCE.md), [68K analysis](68K_ANALYSIS.md), [remaining fidelity gaps](GAMEPLAY_EVIDENCE_GAPS.md).

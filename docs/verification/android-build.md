@@ -1,6 +1,8 @@
 # Android build evidence — issue #1
 
-Local Linux x86_64 validation on 2026-10-26. Synthetic demo only.
+Initial Linux x86_64 validation on 2026-10-26, before later feature commits.
+Synthetic demo only. The initial artifact hash/target below are historical; see
+the final checkpoint at the end for the current build.
 
 - Java: Temurin 17.0.17+10; Gradle 8.7; Android plugin 8.6.1.
 - Platform 35; build-tools 35.0.0; NDK 27.2.12479018; CMake 3.22.1.
@@ -31,3 +33,14 @@ CMake or APK outputs) also passed `gradle --no-daemon --console=plain assembleDe
 on Linux x86_64, with 41 tasks executed. Existing downloaded dependency caches were
 reused. This verifies the source build from clean project directories, not
 Windows/macOS, a cold dependency cache, or device execution.
+
+## Current feature checkpoint
+
+The current debug APK targets API 35, is 4335329 bytes, and has
+SHA256 `e7220b1441970ec92af6acec2076c7e87ca435bd6f5bc47cdc6e58e0b23cd43a`. A local review copy is
+`dist/mission-thunderbolt-research-debug.apk`. Native ELF machine headers confirm
+all four listed ABIs. No original asset directory is packaged. Debug-signature
+verification passes. Unsigned `assembleRelease bundleRelease` also passes release
+lint after the target-35 fix. These are local artifacts, not an Actions upload or
+a signed public release. See [runtime evidence](../ANDROID_RUNTIME.md) for measured
+API 23 tests and the failed API 35 environment checks.

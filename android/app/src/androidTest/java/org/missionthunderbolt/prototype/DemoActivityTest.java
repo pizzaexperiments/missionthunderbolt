@@ -38,4 +38,38 @@ public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActiv
    assertEquals(before,status(recreated));
   } finally { getInstrumentation().removeMonitor(monitor); }
  }
+ public void testKeyboardMovementWhenAButtonHasFocus() throws Throwable {
+  MainActivity a=getActivity(); click(a,R.id.restart);
+  runTestOnUiThread(() -> a.findViewById(R.id.mode).requestFocus());
+  getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_DPAD_RIGHT);
+  getInstrumentation().waitForIdleSync(); assertTrue(status(a).contains("Turns: 1"));
+ }
+ public void testJoystickHoldDoesNotRepeat() throws Throwable {
+  MainActivity a=getActivity();click(a,R.id.restart);
+  runTestOnUiThread(() -> {
+   long now=android.os.SystemClock.uptimeMillis();
+   android.view.MotionEvent event=android.view.MotionEvent.obtain(now,now,android.view.MotionEvent.ACTION_MOVE,1,0,0);
+   event.setSource(android.view.InputDevice.SOURCE_JOYSTICK);
+   a.onGenericMotionEvent(event);a.onGenericMotionEvent(event);event.recycle();
+  });
+  assertTrue(status(a).contains("Turns: 1"));
+ }
+
+ public void testFirstDirectionAfterTouchModeIsMovement() throws Throwable {
+  MainActivity a=getActivity();click(a,R.id.restart);
+  getInstrumentation().setInTouchMode(true);
+  runTestOnUiThread(() -> a.findViewById(R.id.board).requestFocus());
+  getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_DPAD_RIGHT);
+  getInstrumentation().waitForIdleSync();assertTrue(status(a).contains("Turns: 1"));
+ }
+
+ public void testStatusFontUsesScaleAndReportsConfiguration() {
+  MainActivity a=getActivity();TextView text=a.findViewById(R.id.status);
+  assertEquals(17f*a.getResources().getDisplayMetrics().scaledDensity,text.getTextSize(),.5f);
+  android.os.Bundle report=new android.os.Bundle();
+  report.putString("stream","\nMT_CONFIG font_scale="+a.getResources().getConfiguration().fontScale+
+   " orientation="+a.getResources().getConfiguration().orientation+" target_sdk="+a.getApplicationInfo().targetSdkVersion+"\n");
+  getInstrumentation().sendStatus(0,report);
+ }
+
 }

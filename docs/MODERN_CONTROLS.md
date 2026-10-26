@@ -27,8 +27,11 @@ adb -s SERIAL install -r android/app/build/outputs/apk/androidTest/debug/app-deb
 adb -s SERIAL shell am instrument -w org.missionthunderbolt.prototype.test/android.test.InstrumentationTestRunner
 ```
 
-The three platform instrumentation tests passed on a Linux software-emulated
+The initial three platform instrumentation tests passed on a Linux software-emulated
 Android API 23 x86_64 image: mode/turn preservation, accessible target labels/sizes,
 and Activity recreation. App install and `am start -W` also succeeded. APK tests
 use Android's platform test runner without third-party test dependencies; no CI
 run was triggered. Physical ARM64/API 35 acceptance is not implied by this result.
+
+The expanded seven-test suite, measured 1.3× font scaling, lifecycle and current
+limitations are recorded in [Android runtime evidence](ANDROID_RUNTIME.md).
