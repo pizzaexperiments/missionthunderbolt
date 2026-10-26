@@ -16,4 +16,6 @@ c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp android/app/src/
 ./dist/manual_rules_test
 c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp android/app/src/main/cpp/game.cpp desktop/main.cpp -o dist/mt_desktop_demo
 printf 'q\n' | ./dist/mt_desktop_demo >/dev/null
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/legacy_rng_test.cpp -o dist/legacy_rng_test
+./dist/legacy_rng_test
 echo "All local smoke tests passed"
