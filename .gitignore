@@ -1,0 +1,14 @@
+# Original historical game media and all potentially copyrighted derivatives
+local-original/
+local-generated/
+dist/
+*.sit
+*.hqx
+*.bin
+# Local build and tooling
+.gradle/
+**/build/
+.idea/
+*.iml
+local.properties
+.DS_Store

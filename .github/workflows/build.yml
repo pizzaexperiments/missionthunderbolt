@@ -2,6 +2,7 @@ name: Native Android prototype CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
 jobs:
   core:
     runs-on: ubuntu-latest
@@ -21,10 +22,18 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
-      - name: Install Android dependencies
+      # GitHub's hosted ubuntu runners already contain cmdline-tools. Do not
+      # run android-actions/setup-android@v3 here: its legacy 'tools' package
+      # install fails on sdkmanager (observed run 40402366349).
+      - name: Android SDK environment
         run: |
-          sdkmanager --install 'platforms;android-35' 'build-tools;35.0.0' 'cmake;3.22.1' 'ndk;27.2.12479018'
+          echo "ANDROID_HOME=${ANDROID_HOME:-/usr/local/lib/android/sdk}" >> "$GITHUB_ENV"
+          "${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager" --version || command -v sdkmanager
+      - name: Install Android build packages
+        run: |
+          SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          "$SDKMANAGER" --install 'platforms;android-35' 'build-tools;35.0.0' 'cmake;3.22.1' 'ndk;27.2.12479018'
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
@@ -32,6 +41,8 @@ jobs:
         working-directory: android
         run: gradle --no-daemon assembleDebug
       - uses: actions/upload-artifact@v4
+        if: success()
         with:
           name: mission-thunderbolt-research-debug-apk
           path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
