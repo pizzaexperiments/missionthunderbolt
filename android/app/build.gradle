@@ -1,10 +1,13 @@
 plugins { id 'com.android.application' }
 android {
+    useLibrary 'android.test.runner'
+    useLibrary 'android.test.base'
     namespace 'org.missionthunderbolt.prototype'
     compileSdk 35
     buildToolsVersion '35.0.0'
     ndkVersion '27.2.12479018'
     defaultConfig {
+        testInstrumentationRunner 'android.test.InstrumentationTestRunner'
         applicationId 'org.missionthunderbolt.prototype'
         minSdk 23
         targetSdk 28

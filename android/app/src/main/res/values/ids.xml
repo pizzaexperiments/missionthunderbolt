@@ -1,0 +1,11 @@
+<resources>
+    <item name="status" type="id" />
+    <item name="board" type="id" />
+    <item name="mode" type="id" />
+    <item name="restart" type="id" />
+    <item name="controls" type="id" />
+    <item name="move_up" type="id" />
+    <item name="move_down" type="id" />
+    <item name="move_left" type="id" />
+    <item name="move_right" type="id" />
+</resources>
