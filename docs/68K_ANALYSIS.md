@@ -100,3 +100,32 @@ This is a reproducible, structurally annotated static graph foundation. Identify
 resource loaders, relocation semantics, traps, state fields, RNG, scheduler and
 gameplay routines still requires analysis and original behavior corroboration.
 Do not equate disassembly coverage or a call count with semantic fidelity.
+
+## Trap frontiers and bounded hypotheses
+
+`prepare_trap_reference.py` indexes an externally supplied A-line enum header with
+SHA256 provenance and exact-word aliases. The private Apple Universal Interfaces
+header identifies 2.1/System 7.5 (the mirror directory says 2.2); it is not bundled
+or asserted to match the executable's OS. The index contains 813 exact words.
+
+`ExportStaticEvidence.java` takes a reference TSV, private output root and maximum
+decompiler attempts per segment. Generic 68000 Sleigh does **not** decode Macintosh
+A-line instructions. The script therefore labels undecoded words at fallthrough,
+flow or function-entry boundaries as candidates; it does not call a raw-word scan
+instruction evidence. The 14-segment run found 407 boundary candidates, with 398
+exact reference matches and nine unmapped words; zero decoded A-line instructions.
+Of eight prioritized function candidates, six were attempted: four incomplete
+`partial-undecoded-hypothesis` fragments and two failures; two were not requested.
+Those fragments retain `halt_baddata` and are not recovered source.
+
+The authored fixture in `tests/ghidra/` exercises this exact decoder limitation
+without game bytes: the real Ghidra run found its single synthetic frontier and
+marked the C fragment partial. Headless exit status alone is insufficient: inspect
+compiler diagnostics and expected JSON outcomes.
+
+`InspectStaticOffsets.java` takes a TSV (`segment`, `offset`, `label`) and private
+output root, producing bounded instruction windows and decompiler hypotheses.
+Both scripts reject public repository output paths and existing segment outputs.
+Their RNG leads were checked with isolated original instructions; see
+[RNG_RESEARCH.md](RNG_RESEARCH.md) for results and limits. CREL, complete scheduling,
+state layout and original gameplay comparisons remain open.
