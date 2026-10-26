@@ -7,10 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Compile and test portable core
+      - name: Compile and test portable core and C API
         run: |
           g++ -std=c++17 -Wall -Wextra -Werror android/app/src/main/cpp/game.cpp tests/core_test.cpp -o /tmp/core_test
           /tmp/core_test
+          g++ -std=c++17 -Wall -Wextra -Werror android/app/src/main/cpp/game.cpp android/app/src/main/cpp/api.cpp tests/api_test.cpp -o /tmp/api_test
+          /tmp/api_test
   android:
     runs-on: ubuntu-latest
     steps:
@@ -23,7 +25,6 @@ jobs:
       - name: Install Android dependencies
         run: |
           sdkmanager --install 'platforms;android-35' 'build-tools;35.0.0' 'cmake;3.22.1' 'ndk;27.2.12479018'
-          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
