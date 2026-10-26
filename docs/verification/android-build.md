@@ -44,3 +44,27 @@ verification passes. Unsigned `assembleRelease bundleRelease` also passes releas
 lint after the target-35 fix. These are local artifacts, not an Actions upload or
 a signed public release. See [runtime evidence](../ANDROID_RUNTIME.md) for measured
 API 23 tests and the failed API 35 environment checks.
+
+## Remote clean-clone verification
+
+After pushing the feature branch, a real shallow clone of
+`feature/offline-research-tooling` at commit
+`24f705839898c27863caf49cfb2fc84a61ac9dfd` was verified in a separate temporary
+checkout. It contained only committed public source, with no original archives
+or previous project build outputs. Existing tool/dependency caches were reused.
+
+```sh
+git clone --depth 1 --branch feature/offline-research-tooling https://github.com/pizzaexperiments/missionthunderbolt.git CLEAN_DIRECTORY
+cd CLEAN_DIRECTORY
+sh scripts/test_local.sh
+cmake -S . -B dist/cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake --build dist/cmake --parallel 4
+ctest --test-dir dist/cmake --output-on-failure
+cd android && gradle --no-daemon --console=plain assembleDebug
+```
+
+All 38 Python tests, native/script checks and five portable CTest tests passed;
+Android executed 41 tasks and reported BUILD SUCCESSFUL. The clone's tracked and
+untracked Git status remained clean after generated outputs were ignored. This
+establishes remote source reproducibility with the prepared toolchain/caches,
+not a cold-machine install or a CI/physical-device result.
