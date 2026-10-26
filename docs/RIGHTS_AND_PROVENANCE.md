@@ -14,7 +14,7 @@ The issue's reference to `tb2.zip` is a lead, not possession or a license.
 | --- | --- | --- |
 | Original executable, CODE/CREL and resource forks | User-supplied archive and restrictive manual notice | Local research only when lawfully supplied; no public redistribution |
 | PICT, sound, fonts, manual, captures/derivatives | Manual and reference images supplied; no redistribution grant | Do not include in public packages or upload to CI |
-| Synthetic C++/Java/Python code and generated test fixtures | Source and synthetic fixture generators in Git | Authored for this prototype; repository-wide license selection remains a maintainer decision |
+| Synthetic C++/Java/Python code and generated test fixtures | Source and synthetic fixture generators in Git | MIT selected by the maintainer for newly written code; see LICENSE and THIRD_PARTY_NOTICES.md |
 | Android/Gradle/NDK and any desktop dependency | Installed build tools, separate upstream licenses | Retain upstream notices; packaging requires dependency/license review |
 
 This records what is known; it does not establish legal permission or silently
@@ -56,8 +56,8 @@ Ship only synthetic content until an explicit rights record authorizes each
 historical input and its derivatives. Future permission must identify the
 material, allowed distribution channels and attribution/license obligations.
 Rights to analyze a private copy do not imply rights to publish it or to bundle
-it in an APK. Any change to this boundary requires maintainer review. No original
-assets were imported, extracted or published by this issue's implementation.
+it in an APK. Any change to this boundary requires maintainer review. Original inputs were later imported and extracted locally for research; none
+were added to public Git history or packages.
 
 Rights verification against an owner/source and permission for original content
 remain **unresolved**, so #3 is not represented as fully complete.

@@ -1,0 +1,104 @@
+# Manual, reviewed preparation only. Never creates/publishes a GitHub Release.
+name: Manual signed Android release preparation
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing reviewed tag (not a branch)
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  android:
+    environment: release-preparation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+      - name: Verify tag and public-source boundary
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          git check-ref-format "refs/tags/$RELEASE_TAG"
+          test "$(git rev-parse --verify --end-of-options "refs/tags/$RELEASE_TAG^{commit}")" = "$(git rev-parse HEAD)"
+          python3 scripts/check_public_inputs.py
+          test -f LICENSE
+      - name: Check signing prerequisite names before installing/building
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then echo "Required signing binding missing: $name"; exit 1; fi
+          done
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Install pinned SDK components
+        run: |
+          curl --fail --location --retry 2 https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip --output "$RUNNER_TEMP/cmdline-tools.zip"
+          echo "5fdcc763663eefb86a5b8879697aa6088b041e70  $RUNNER_TEMP/cmdline-tools.zip" | sha1sum --check
+          unzip -q "$RUNNER_TEMP/cmdline-tools.zip" -d "$RUNNER_TEMP/android-tools"
+          mkdir -p "$ANDROID_HOME/cmdline-tools/19.0"
+          cp -R "$RUNNER_TEMP/android-tools/cmdline-tools/." "$ANDROID_HOME/cmdline-tools/19.0/"
+          "$ANDROID_HOME/cmdline-tools/19.0/bin/sdkmanager" --install 'platforms;android-35' 'build-tools;35.0.0' 'cmake;3.22.1' 'ndk;27.2.12479018'
+      - name: Verify and build unsigned release inputs
+        run: |
+          sh scripts/test_local.sh
+          cd android
+          gradle --no-daemon assembleRelease bundleRelease
+      - name: Sign and verify review artifacts
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -eo pipefail
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then echo "Required signing binding missing: $name"; exit 1; fi
+          done
+          umask 077
+          KEYSTORE="$RUNNER_TEMP/mt-release-keystore.jks"
+          trap 'rm -f "$KEYSTORE"' EXIT
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+          mkdir -p dist/release-artifacts
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign --ks "$KEYSTORE" --ks-key-alias "$ANDROID_KEY_ALIAS" --ks-pass env:ANDROID_KEYSTORE_PASSWORD --key-pass env:ANDROID_KEY_PASSWORD --out dist/release-artifacts/mission-thunderbolt.apk android/app/build/outputs/apk/release/app-release-unsigned.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose dist/release-artifacts/mission-thunderbolt.apk
+          jarsigner -keystore "$KEYSTORE" -storepass:env ANDROID_KEYSTORE_PASSWORD -keypass:env ANDROID_KEY_PASSWORD -signedjar dist/release-artifacts/mission-thunderbolt.aab android/app/build/outputs/bundle/release/app-release.aab "$ANDROID_KEY_ALIAS"
+          jarsigner -J-Duser.language=en -J-Duser.country=US -verify dist/release-artifacts/mission-thunderbolt.aab | tee "$RUNNER_TEMP/aab-verify.log"
+          grep -q '^jar verified\.' "$RUNNER_TEMP/aab-verify.log"
+      - name: Prepare review-only hashes and SPDX inventory
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          python3 scripts/prepare_release.py --version "$RELEASE_TAG" --artifact dist/release-artifacts/mission-thunderbolt.apk --artifact dist/release-artifacts/mission-thunderbolt.aab --output dist/release-review --apksigner "$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          cp CHANGELOG.md dist/release-review/
+          mkdir -p dist/release-review/licenses
+          cp "$ANDROID_HOME/ndk/27.2.12479018/NOTICE" dist/release-review/licenses/Android-NDK-NOTICE.txt
+          cp "$ANDROID_HOME/ndk/27.2.12479018/NOTICE.toolchain" dist/release-review/licenses/LLVM-toolchain-NOTICE.txt
+          cp -R dist/release-artifacts dist/release-review/artifacts
+      - name: Validate SPDX inventory against the official 2.3 schema
+        run: |
+          python3 -m pip install jsonschema==4.25.1
+          curl --fail --location https://raw.githubusercontent.com/spdx/spdx-spec/v2.3/schemas/spdx-schema.json --output "$RUNNER_TEMP/spdx-schema.json"
+          python3 - <<'PYSPDX'
+          import json, os, pathlib, jsonschema
+          schema = json.loads((pathlib.Path(os.environ['RUNNER_TEMP'])/'spdx-schema.json').read_text())
+          document = json.loads(pathlib.Path('dist/release-review/sbom.spdx.json').read_text())
+          jsonschema.Draft7Validator(schema).validate(document)
+          PYSPDX
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signed-android-review-bundle
+          path: dist/release-review/
+          if-no-files-found: error

@@ -2,11 +2,27 @@
 name: Manual desktop research packages
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Optional existing reviewed tag; empty uses selected workflow ref
+        required: false
+        type: string
 jobs:
   windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+      - name: Verify requested release tag
+        if: inputs.tag != ''
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          git check-ref-format "refs/tags/$RELEASE_TAG"
+          test "$(git rev-parse --verify --end-of-options "refs/tags/$RELEASE_TAG^{commit}")" = "$(git rev-parse HEAD)"
       - uses: actions/checkout@v4
         with:
           repository: microsoft/vcpkg
@@ -45,6 +61,17 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+      - name: Verify requested release tag
+        if: inputs.tag != ''
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          git check-ref-format "refs/tags/$RELEASE_TAG"
+          test "$(git rev-parse --verify --end-of-options "refs/tags/$RELEASE_TAG^{commit}")" = "$(git rev-parse HEAD)"
       - uses: actions/checkout@v4
         with:
           repository: microsoft/vcpkg
