@@ -42,3 +42,30 @@ repeatable Ghidra session must import them; segmentation/relocation assumptions
 must be documented; and actual annotated call graph/evidence notes must exist.
 This protocol does not substitute for those results. The source archive, licensed
 reference environment and original-specific analysis are external prerequisites.
+
+## Supplied-source import verification (2026-10-26)
+
+The source later became available and yielded 15 CODE / 13 CREL resources.
+`scripts/prepare_ghidra_segments.py` validates extraction hashes and prepares
+separate private binary files plus segment-ID provenance. It supplies **no**
+guessed runtime addresses. Ghidra **12.2 PUBLIC (2026-10-16)**, distribution SHA256
+`2c2cd776db3c1f6a097ba418922378ac3649cadd5e844a6f5f088ae628a7be67`, was run with
+Temurin JDK **25.0.1+8** (Ghidra 12.2 requires JDK 25).
+
+```sh
+python3 scripts/prepare_ghidra_segments.py local-generated/original-resources/manifest.json --output local-generated/analysis/segments
+# GHIDRA_HOME is your verified installation; use its required JDK.
+"$GHIDRA_HOME/support/analyzeHeadless" local-generated/analysis/ghidra-project mt-code-segments \
+  -import local-generated/analysis/segments/*.bin -loader BinaryLoader \
+  -processor 68000:BE:32:default -noanalysis -max-cpu 2 \
+  -scriptPath scripts/ghidra -postScript RecordImport.java local-generated/analysis/verified-imports
+```
+
+All **28 raw imports succeeded**, and program language, byte length and SHA256
+matched the prepared segments. `RecordImport.java` emits metadata only. Files,
+projects and reports remain ignored/local. Base zero is an offset coordinate,
+not a discovered runtime load address. CREL is imported as opaque data; no
+relocations are applied. Automatic analysis is deliberately disabled until valid
+entrypoints/segment layout are established. **No annotated gameplay call graph,
+original rule reconstruction or faithful behavior is claimed.** Those remain
+substantial #7 acceptance criteria, now unblocked for source-level research.
