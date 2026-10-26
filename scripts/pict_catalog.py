@@ -53,7 +53,10 @@ def decode(data):
         if op==0xff:
             if not painted: raise Unsupported('no supported raster drawing found')
             return width,height,bytes(pixels)
-        if op==0: continue
+        if op in (0,0x1e): continue
+        if op==0xa0: r.read(2); continue
+        if op==0xa1:
+            r.read(2); size=r.u16(); r.read(size); continue
         if op==0x0c00 and word: r.read(24); continue
         if op==1:
             if r.u16()!=10: raise Unsupported('nonrectangular clipping region')
@@ -142,17 +145,22 @@ def catalog(manifest, output):
             row.update(status='unsupported' if isinstance(e,Unsupported) else 'malformed',reason=str(e))
         report.append(row)
     if images:
-        # Stable cells, never guess semantic sprite names. Large images downsample by nearest neighbor.
-        cell=128; cols=min(8,len(images)); rows=(len(images)+cols-1)//cols
-        if cell*cell*cols*rows>MAX_PIXELS: raise ValueError('contact sheet exceeds pixel limit')
-        sheet=bytearray(b'\xcc\xcc\xcc'*(cell*cell*cols*rows)); sw=cols*cell
-        for i,(w,h,pixels) in enumerate(images):
-            scale=min(cell/w,cell/h,1); tw,th=max(1,int(w*scale)),max(1,int(h*scale))
-            for y in range(th):
-                for x in range(tw):
-                    src=((y*h//th)*w+x*w//tw)*3; dst=(((i//cols)*cell+y)*sw+(i%cols)*cell+x)*3
-                    sheet[dst:dst+3]=pixels[src:src+3]
-        (output/'contact-sheet.png').write_bytes(png(sw,rows*cell,bytes(sheet)))
+        # Bounded sheets: 128 images/page, stable cells linked by resource ID.
+        cell=128
+        for page,begin in enumerate(range(0,len(images),128)):
+            group=images[begin:begin+128]; cols=min(8,len(group)); rows=(len(group)+cols-1)//cols
+            sheet=bytearray(b'\xcc\xcc\xcc'*(cell*cell*cols*rows)); sw=cols*cell
+            for i,(w,h,pixels) in enumerate(group):
+                scale=min(cell/w,cell/h,1); tw,th=max(1,int(w*scale)),max(1,int(h*scale))
+                for y in range(th):
+                    for x in range(tw):
+                        src=((y*h//th)*w+x*w//tw)*3; dst=(((i//cols)*cell+y)*sw+(i%cols)*cell+x)*3
+                        sheet[dst:dst+3]=pixels[src:src+3]
+            name='contact-sheet.png' if page==0 else f'contact-sheet-{page:03d}.png'
+            (output/name).write_bytes(png(sw,rows*cell,bytes(sheet)))
+        for row in report:
+            if row['status']=='decoded':
+                index=row['cell']; row['sheet']=index//128; row['cell']=index%128
     (output/'report.json').write_text(json.dumps({'schema':1,'resources':report},indent=2)+'\n')
     return report
 

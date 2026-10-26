@@ -24,3 +24,13 @@ resource-ID mapping. No original PICT is available here. Visual comparison,
 full opcode coverage actually encountered in the game and original-asset
 attribution remain pending; this is a tested decoder subset, not completion of
 original artwork recovery.
+
+## Original-input validation
+
+After recognizing non-drawing QuickDraw comments and DefHilite state, all **908
+PICT resources** from the supplied source passed this decoder and generated local
+PNG previews. Contact sheets paginate at 128 images per sheet (eight sheets),
+avoiding unbounded sheet allocation. Report fields identify `sheet` and `cell`.
+One generated sheet was visually inspected: palettes, sprite strips, window art,
+text and dialog images are recognizable. This is not an independent pixel-perfect
+comparison with original runtime rendering. Full original outputs remain ignored.

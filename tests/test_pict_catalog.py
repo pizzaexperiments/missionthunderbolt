@@ -51,3 +51,8 @@ class PictTests(unittest.TestCase):
             self.assertEqual(report[0]['id'],-23)
             self.assertTrue((root/'catalog/contact-sheet.png').is_file())
             self.assertEqual(json.loads((root/'catalog/report.json').read_text())['resources'],report)
+
+    def test_long_comment_and_default_highlight(self):
+        data=pict(4)
+        comment=b'\0\xa1'+struct.pack('>HH',1,3)+b'abc'+b'\0'
+        self.assertEqual(decode(data[:14]+comment+b'\0\x1e'+data[14:]),decode(data))

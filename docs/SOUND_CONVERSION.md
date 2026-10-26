@@ -22,3 +22,12 @@ has been supplied for auditory comparison. The application remains silent (safe
 no-audio fallback); original event/cue mapping, native playback controls and
 audio-focus/device verification are pending. This converter does not complete
 #13's original-audio or Android playback acceptance criteria.
+
+## Original-input validation
+
+From the supplied archive, **137 of 138** sound resources converted to local WAV
+with hash-linked reports. Resource ID 9015 uses a sampled sound plus frequency/
+duration/rest commands; it is explicitly unsupported rather than flattened into
+an inaccurate single-buffer preview. PCM conversion does not establish the full
+Sound Manager sequence, cue mapping or auditory equivalence. No original audio
+was publicly redistributed; native playback/device validation remains pending.
