@@ -32,3 +32,32 @@ duration/rest commands; it is explicitly unsupported rather than flattened into
 an inaccurate single-buffer preview. PCM conversion does not establish the full
 Sound Manager sequence, cue mapping or auditory equivalence. No original audio
 was publicly redistributed; native playback/device validation remains pending.
+
+## Timed-sequence audit and sample-only previews
+
+The command inspector now preserves format, synthesizer initialization, command
+order, raw command words, offset flags, signed param1 and raw 32-bit param2 values.
+Names for `soundCmd`/`bufferCmd`, `freqDurationCmd` and `restCmd` were checked
+against an externally supplied Apple Universal Interfaces `Sound.h`; the header
+is private and is not bundled. These names identify commands, not a recovered
+pitch/duration renderer or original-game cue mapping.
+
+The supplied resource 9015 contains one offset-based sample, two
+`freqDurationCmd` commands and one `restCmd`. A new private catalog run writes its
+underlying PCM as a **sample-only** preview and retains the complete command list
+in the resource-ID/hash-linked report. The result is **137 converted single-buffer
+resources, one sample-only resource, zero malformed/unsupported resources**.
+This does not mean 138 complete original sound sequences were rendered.
+
+`decode_sound(data)` still refuses timed sequences by default. Explicit
+`sample_only=True` allows extracting the one embedded sample when the remaining
+commands are the recognized timed pair. Catalog rows distinguish `sample-only`
+from `converted`; CLI exit status remains **2** when any row is sample-only,
+unsupported or malformed. Unknown commands, external pointers, multiple buffers,
+unsupported synthesizers/encodings and invalid offsets remain rejected. Original
+WAVs/reports remain ignored, and the app remains silent.
+
+Eight synthetic sound tests pass, including exact sample bytes, retained command
+order/parameters, signed param1, sample-only status, malformed offsets and unknown
+commands. Native scheduling, pitch/loop semantics, audio focus, cue mapping and
+auditory/device comparisons still block completion of #13.

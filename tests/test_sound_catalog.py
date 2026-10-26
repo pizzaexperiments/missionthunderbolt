@@ -37,3 +37,45 @@ class SoundTests(unittest.TestCase):
             root=Path(d);source=root/'synthetic.rsrc';source.write_bytes(sample(b'snd ',snd(),7))
             extract(source,root/'extract');report=catalog(root/'extract/manifest.json',root/'audio')
             self.assertEqual(report[0]['id'],7);self.assertEqual(report[0]['status'],'converted')
+
+class SoundSequenceTests(unittest.TestCase):
+    @staticmethod
+    def sequence():
+        # Authored sequence: one offset sample followed by two timed commands.
+        header=struct.pack('>HHHI',1,1,5,0)
+        commands=struct.pack('>H',3)+struct.pack('>HhI',0x8050,0,36)
+        commands+=struct.pack('>HhI',40,120,64)+struct.pack('>HhI',41,15,0)
+        sample_header=struct.pack('>IIIIIBB',0,3,11025<<16,0,3,0,64)
+        return header+commands+sample_header+b'\x10\x80\xf0'
+    def test_sample_preview_preserves_sequence(self):
+        from sound_catalog import inspect_commands
+        data=self.sequence();listing=inspect_commands(data)
+        self.assertEqual([c['name'] for c in listing['commands']],['soundCmd','freqDurationCmd','restCmd'])
+        self.assertEqual(listing['commands'][1]['param1'],120)
+        self.assertEqual(listing['commands'][1]['param2'],64)
+        self.assertTrue(listing['commands'][0]['data_offset'])
+        self.assertEqual(listing['modifiers'],[{'synthesizer':5,'initialization':0}])
+        with self.assertRaises(Unsupported):decode_sound(data)
+        wav,meta=decode_sound(data,sample_only=True)
+        self.assertEqual(meta['playback_scope'],'sample-only')
+        with wave.open(io.BytesIO(wav),'rb') as w:self.assertEqual(w.readframes(3),b'\x10\x80\xf0')
+    def test_catalog_distinguishes_sample_from_sequence(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);source=root/'synthetic.rsrc';source.write_bytes(sample(b'snd ',self.sequence(),11))
+            extract(source,root/'extract');report=catalog(root/'extract/manifest.json',root/'audio')
+            self.assertEqual(report[0]['status'],'sample-only')
+            self.assertEqual(len(report[0]['command_list']['commands']),3)
+    def test_unknown_commands_and_bad_offsets_still_fail(self):
+        from sound_catalog import inspect_commands
+        data=bytearray(self.sequence());struct.pack_into('>H',data,20,99)
+        self.assertEqual(inspect_commands(data)['commands'][1]['name'],'unknown')
+        with self.assertRaises(Unsupported):decode_sound(data,sample_only=True)
+        data=bytearray(self.sequence());struct.pack_into('>I',data,16,12)
+        with self.assertRaises(ValueError):decode_sound(data,sample_only=True)
+        with self.assertRaises(ValueError):inspect_commands(self.sequence()[:30])
+    def test_signed_param1_and_unsupported_synthesizer(self):
+        from sound_catalog import inspect_commands
+        data=bytearray(self.sequence());struct.pack_into('>h',data,22,-1)
+        self.assertEqual(inspect_commands(data)['commands'][1]['param1'],-1)
+        data=bytearray(self.sequence());struct.pack_into('>H',data,4,3)
+        with self.assertRaises(Unsupported):decode_sound(data,sample_only=True)
