@@ -1,6 +1,14 @@
 package org.missionthunderbolt.prototype;
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.AtomicFile;
+import android.util.Log;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -16,18 +24,24 @@ public class MainActivity extends Activity {
  private static native String map();
  private static native int move(int dx, int dy);
  private static native void reset();
+ private static native int turnCount();
+ private static native boolean isModern();
+ private static native void setModern(boolean enabled);
+ private static native String snapshot();
+ private static native boolean restore(String saved);
  private boolean modern = false;
  private TextView status;
  private Board board;
  private int turns = 0;
  @Override public void onCreate(Bundle b) {
   super.onCreate(b);
+  restoreSavedState(b); modern = isModern();
   LinearLayout root = new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL);
   status = new TextView(this); status.setTextSize(17); status.setPadding(16,12,8,12); root.addView(status);
   board = new Board(); root.addView(board,new LinearLayout.LayoutParams(-1,0,1));
   LinearLayout tools = new LinearLayout(this);
-  Button mode = new Button(this); mode.setText("Classic / Modern"); mode.setOnClickListener(v -> {modern = !modern; refresh();}); tools.addView(mode,new LinearLayout.LayoutParams(0,-2,1));
-  Button restart = new Button(this); restart.setText("Restart"); restart.setOnClickListener(v -> {reset(); turns = 0; refresh();}); tools.addView(restart,new LinearLayout.LayoutParams(0,-2,1)); root.addView(tools);
+  Button mode = new Button(this); mode.setText("Classic / Modern"); mode.setOnClickListener(v -> {modern = !modern; setModern(modern); refresh();}); tools.addView(mode,new LinearLayout.LayoutParams(0,-2,1));
+  Button restart = new Button(this); restart.setText("Restart"); restart.setOnClickListener(v -> {reset(); setModern(modern); turns = 0; refresh();}); tools.addView(restart,new LinearLayout.LayoutParams(0,-2,1)); root.addView(tools);
   LinearLayout top = new LinearLayout(this); top.setGravity(android.view.Gravity.CENTER);
   top.addView(direction("UP",0,-1)); root.addView(top);
   LinearLayout bottom = new LinearLayout(this); bottom.setGravity(android.view.Gravity.CENTER);
@@ -36,7 +50,34 @@ public class MainActivity extends Activity {
  }
  private Button direction(String label,int dx,int dy) {Button b = new Button(this); b.setText(label); b.setOnClickListener(v -> step(dx,dy)); return b;}
  private void step(int dx,int dy) {turns = move(dx,dy); refresh();}
- private void refresh() {status.setText("Thunderbolt RESEARCH DEMO | " + (modern?"Modern":"Classic") + " | Turns: " + turns); board.invalidate();}
+ private void refresh() {turns = turnCount(); status.setText("Thunderbolt RESEARCH DEMO | " + (modern?"Modern":"Classic") + " | Turns: " + turns); board.invalidate();}
+ private AtomicFile saveFile() { return new AtomicFile(new File(getFilesDir(), "demo-state.mt")); }
+ private void restoreSavedState(Bundle bundle) {
+  if (bundle != null && restore(bundle.getString("demo-state"))) return;
+  try (FileInputStream input = saveFile().openRead(); ByteArrayOutputStream data = new ByteArrayOutputStream()) {
+   byte[] buffer = new byte[4096]; int count;
+   while ((count = input.read(buffer)) != -1) {
+    if (data.size() + count > 1024 * 1024) throw new IOException("Oversized demo save");
+    data.write(buffer, 0, count);
+   }
+   if (!restore(new String(data.toByteArray(), StandardCharsets.UTF_8))) Log.w("Thunderbolt", "Invalid demo save ignored");
+  } catch (java.io.FileNotFoundException expected) { /* New installation. */ }
+    catch (IOException error) { Log.w("Thunderbolt", "Could not read demo save", error); }
+ }
+ private void persistState() {
+  String data = snapshot(); if (data == null) return;
+  AtomicFile file = saveFile(); FileOutputStream output = null;
+  try {
+   output = file.startWrite(); output.write(data.getBytes(StandardCharsets.UTF_8)); file.finishWrite(output);
+  } catch (IOException error) {
+   if (output != null) file.failWrite(output);
+   Log.w("Thunderbolt", "Could not write demo save", error);
+  }
+ }
+ @Override protected void onSaveInstanceState(Bundle state) {
+  state.putString("demo-state", snapshot()); super.onSaveInstanceState(state);
+ }
+ @Override protected void onPause() { persistState(); super.onPause(); }
  @Override public boolean onKeyDown(int key,KeyEvent e) {switch(key) {
   case KeyEvent.KEYCODE_DPAD_UP: case KeyEvent.KEYCODE_W: step(0,-1);return true;
   case KeyEvent.KEYCODE_DPAD_DOWN: case KeyEvent.KEYCODE_S: step(0,1);return true;

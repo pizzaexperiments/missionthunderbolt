@@ -18,6 +18,8 @@ public:
     uint32_t seed() const { return seed_; }
     uint32_t rngState() const { return map_.rngState(); }
     std::string asciiMap() const;
+    std::string save() const;
+    static PrototypeGame load(const std::string& data);
 private:
     DemoMap map_;
     uint32_t seed_;

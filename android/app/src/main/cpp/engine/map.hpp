@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <utility>
 namespace mt {
 class DemoMap {
 public:
@@ -18,6 +19,20 @@ public:
             const int x = 2 + static_cast<int>(rng_.next() % static_cast<uint32_t>(width - 3));
             const int y = 2 + static_cast<int>(rng_.next() % static_cast<uint32_t>(height - 3));
             cells_[y][x] = '#';
+        }
+    }
+    DemoMap(std::vector<std::string> cells, uint32_t rng_state)
+        : width_(static_cast<int>(cells.empty() ? 0 : cells.front().size())),
+          height_(static_cast<int>(cells.size())), rng_(rng_state), cells_(std::move(cells)) {
+        if (width_ < 5 || height_ < 5 || width_ > max_dimension || height_ > max_dimension)
+            throw std::invalid_argument("invalid saved dimensions");
+        for (int y=0; y<height_; ++y) {
+            if (cells_[y].size()!=static_cast<size_t>(width_)) throw std::invalid_argument("ragged saved map");
+            for (int x=0; x<width_; ++x) {
+                const char cell=cells_[y][x];
+                if ((cell!='.' && cell!='#') || ((x==0 || y==0 || x==width_-1 || y==height_-1) && cell!='#'))
+                    throw std::invalid_argument("invalid saved cell/boundary");
+            }
         }
     }
     bool walkable(int x, int y) const {

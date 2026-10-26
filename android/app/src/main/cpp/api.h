@@ -25,6 +25,10 @@ int mt_game_turns(const mt_game* game);
 int mt_game_map(const mt_game* game, char* output, int capacity);
 void mt_game_set_modern(mt_game* game, int enabled);
 int mt_game_is_modern(const mt_game* game);
+/* Versioned synthetic save text, same buffer contract as mt_game_map. */
+int mt_game_save(const mt_game* game, char* output, int capacity);
+/* Atomic in-memory replacement: invalid data leaves the game unchanged. */
+int mt_game_load(mt_game* game, const char* input, int length);
 int mt_api_version(void);
 #ifdef __cplusplus
 }

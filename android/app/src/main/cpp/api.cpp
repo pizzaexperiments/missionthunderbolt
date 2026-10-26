@@ -44,6 +44,24 @@ void mt_game_set_modern(mt_game* game,int enabled) {
 int mt_game_is_modern(const mt_game* game) {
     return protect([&] { require(game); return game->instance.presentation()==mt::Presentation::Modern ? 1 : 0; },0);
 }
+int mt_game_save(const mt_game* game,char* output,int capacity) {
+    return protect([&] {
+        require(game);
+        if (capacity<0) throw std::invalid_argument("negative capacity");
+        const auto saved=game->instance.save(); const int required=static_cast<int>(saved.size()+1);
+        if (output && capacity>=required) std::memcpy(output,saved.c_str(),static_cast<size_t>(required));
+        else if (output) last_error=MT_ERROR_BUFFER_TOO_SMALL;
+        return required;
+    },0);
+}
+int mt_game_load(mt_game* game,const char* input,int length) {
+    return protect([&] {
+        require(game);
+        if (!input || length<=0 || length>1024*1024) throw std::invalid_argument("invalid save input");
+        auto restored=mt::PrototypeGame::load(std::string(input,static_cast<size_t>(length)));
+        game->instance=std::move(restored); return 1;
+    },0);
+}
 int mt_api_version(void) { return MT_API_VERSION; }
 int mt_game_last_error(void) { return last_error; }
 const char* mt_error_message(int error) {
