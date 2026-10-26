@@ -21,7 +21,8 @@ instructions, supports this arithmetic:
   generator or the table. Multiplication/remainder helpers are in CODE 1.
 
 `engine/shuffled_lcg_model.hpp` implements a separate research model. It accepts
-explicit state and a 100-entry 15-bit table; it does **not** invent initialization.
+explicit state and a 100-entry 15-bit table, plus the instruction-corroborated
+initializer described below.
 The existing demo RNG and generation remain unchanged. Generic Ghidra compiler
 assumptions can misstate return widths; instruction-level checks explicitly mask
 the CODE-12 primitive to its 16-bit return.
@@ -47,8 +48,9 @@ the isolated instruction outputs for all 54 wrapper cases. Public native tests
 freeze an independently cross-checked synthetic-input case and reject unsupported
 bounds/table values.
 
-Seeding, table initialization, complete call-site roles, RNG consumption order,
-map generation and progression remain unknown. Matching isolated instructions is
+The first checkpoint left seeding/table initialization unknown; the next section
+records their subsequent recovery for one routine. Complete call-site roles, RNG
+consumption order, map generation and progression remain unknown. Matching isolated instructions is
 stronger evidence for these arithmetic routines; it is not a full original-game
 behavior comparison or completion of #7/#8.
 

@@ -45,3 +45,28 @@ and [isolated RNG evidence](RNG_RESEARCH.md) for scope and unresolved fidelity.
 The current WAIT-enabled debug APK is `dist/mission-thunderbolt-research-debug.apk`,
 SHA256 `0a43671dbd1b0a3a3e1bdb7ecc3490c87e40eb0feccfe5be058e32d30d9df48f`.
 It is a debug-signed synthetic research demo, not a release build.
+
+## RNG initialization, timed sound and map accessibility increment
+
+The private initializer oracle passed **37 initializers, 2,368 continued draws
+and 12 low-memory accessor cases**; **2,405 complete C++/68000 state comparisons**
+matched. The normal test script and sanitizer/SDL suites passed (45 Python,
+7 ASan/UBSan, 8 SDL). Python statement coverage is **86%**, above the 80% gate.
+The sound catalog returned expected exit 2: 137 single-buffer conversions and
+one explicitly sample-only preview with retained timed commands; no malformed
+resources. Complete timed playback is still unimplemented.
+
+Android debug/test APK builds, debug lint and unsigned release APK/AAB builds
+passed. The current **12 Android instrumentation tests** and subsequent lifecycle
+process-death/three-background-cycle smoke passed on API 23 x86_64, normal font,
+portrait, target SDK 35. The framework accessibility-tree readiness failure and
+its tested harness correction are recorded in ANDROID_RUNTIME.md. This is not
+physical TalkBack usability, API 35 runtime or original-game verification.
+
+Updated accessibility-enabled debug demo: `dist/mission-thunderbolt-research-debug.apk`,
+SHA256 `c591ca1bf008af08d086ab48f7d96073457baa4d1f2e9ff049970789035123fe`.
+The earlier WAIT-only APK hash above describes the earlier checkpoint.
+
+The optional Atheris 3.1.0 synthetic parser campaign completed 1,722,666 executions
+in 121 seconds, with no failure artifacts and 71 MB peak RSS. Reproduction and
+limits are recorded in QUALITY.md; this is not original-game differential coverage.

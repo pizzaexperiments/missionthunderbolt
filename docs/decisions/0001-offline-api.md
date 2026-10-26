@@ -34,3 +34,12 @@ requirements that the local ABI/files cannot meet. A future proposal must define
 engine-session ownership, authentication/authorization, binding/exposure, input
 limits, lifecycle, API versioning, replay determinism and a threat model, with
 implementation/contract tests. Even then the native game must work offline.
+
+## Offline implementation evidence
+
+The accessibility-enabled debug APK was inspected with SDK 35 `aapt2 dump
+permissions`: it lists the application package and no requested permissions,
+including no INTERNET permission. Current Android/native sources contain no
+HTTP client or listener. Emulator movement, WAIT, save restoration and lifecycle
+checks passed with the in-process engine. This supports the current offline
+prototype decision; full original gameplay remains a separate workstream.
