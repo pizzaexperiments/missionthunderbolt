@@ -1,7 +1,8 @@
 # 68000 CODE/CREL analysis protocol — issue #7
 
-Status: manual protocol prepared; original segments and an annotated original
-call graph are **not available**. No disassembly results or addresses are claimed.
+Status: private segment imports, validated jump entries and confidence-labeled
+static call candidates are available. Runtime addresses, relocation semantics and
+verified gameplay symbols remain unresolved; see the measured results below.
 
 ## Reproducible import protocol
 

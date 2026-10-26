@@ -66,11 +66,11 @@ An **emulator may be used to inspect the original** and collect reference observ
 
 ## Current verified state and limitations
 
-As of **October 26, 2026**, the repository contains a **synthetic C++ demonstration engine**, Android/JNI project source, a versioned C API, smoke tests, and a research roadmap. The synthetic map and movement code are **not** recovered *Mission: Thunderbolt* game rules.
+As of **October 26, 2026**, the feature branch contains a **synthetic C++ demonstration engine**, versioned C API, portable CMake builds, saves, Android host, optional SDL desktop host and tested local research tooling. The synthetic rules are not recovered *Mission: Thunderbolt* mechanics.
 
-Historical files supplied in the conversation have been inspected outside this public repository; reported recovery includes classic Macintosh CODE/CREL, PICT, and sound resources. Resource presence is **not** equivalent to completed disassembly, successfully decoded artwork, or a playable original game.
+The supplied historical archive remains private. Verified extraction yielded 15 CODE / 13 CREL resources; jump-table-guided Ghidra analysis generated structurally annotated static call candidates. All 908 resource PICTs plus 26 standalone slides decoded locally; 137/138 sounds converted to PCM previews. These counts do not prove recovered behavior or original-runtime visual/audio fidelity. The manual identifies version 1.0 while executable resources identify 2.0.g.
 
-Portable C++ and API checks have passed in earlier validation. An Android GitHub Actions run failed during Android SDK setup before APK compilation; a subsequent workflow change was made. **No APK should be described as successfully built, installable, or device-tested until a build artifact and a test result demonstrate that.** The environment used for portions of this research may lack Android SDK/NDK and cannot validate an APK locally.
+Local Android builds now produce debug and unsigned release APK/AAB artifacts. The synthetic app installed/launched on an API 23 software emulator and passed measured UI/lifecycle checks. API 35 image instability and physical ARM64/Windows/macOS checks remain separate limitations. CI is manual-only and no new Actions run, signed public release or faithful game reconstruction is claimed. See [runtime evidence](ANDROID_RUNTIME.md), [build evidence](verification/android-build.md) and [the issue roadmap](ROADMAP.md) for exact validation and remaining acceptance.
 
 The project does **not** currently claim:
 - a complete decompilation or reconstruction of the original engine;
@@ -102,7 +102,7 @@ We should distinguish **LLM-generated output** from **LLM-verified behavior**. A
 - **Human maintainers:** supply legitimately obtained reference material, decide on design/rights matters, test on hardware, review fidelity, and accept releases.
 - **GitHub:** source-of-truth for code, issues, discussions, PRs, and documented decisions—not the default place to publish copyrighted input files.
 
-Work proceeds in **bounded sessions**, not as an unattended agent that continues indefinitely after a conversation ends. Each session should leave a concrete checkpoint (commit, test report, annotated finding, or updated issue) so another session can continue safely.
+Work proceeds continuously within the active session, with concrete checkpoints (commits, test reports and annotated findings). External prerequisites and uncertainty are recorded explicitly. Work does not continue unattended after a conversation ends; saved checkpoints allow safe resumption.
 
 ## Local testing and GitHub Actions credits
 

@@ -77,7 +77,7 @@ have **not** run in this Linux task. Native launch, platform save paths, physica
 input and both architecture packages still require Mac verification.
 
 Unsigned local research bundles are not notarized public releases. For a reviewed
-release, decide the project license and asset rights, obtain a Developer ID
+release, confirm the MIT/third-party license boundary and asset rights, obtain a Developer ID
 certificate, sign the final bundle with the hardened runtime, inspect its linked
 libraries (`otool -L`) and entitlements, submit a distribution archive with
 `xcrun notarytool` using a private keychain profile, staple and validate the ticket,

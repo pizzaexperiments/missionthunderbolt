@@ -17,8 +17,9 @@ synthesizers/commands and layouts are reported explicitly. Exit status 2 means
 not every resource converted. Existing output directories are preserved.
 
 Synthetic tests verify exact PCM bytes/rates/channels, 16-bit byte ordering,
-truncation, compressed-format refusal and manifest identity. No original audio
-has been supplied for auditory comparison. The application remains silent (safe
+truncation, compressed-format refusal and manifest identity. Original audio was
+later supplied and converted as recorded below; auditory comparison remains
+unperformed. The application remains silent (safe
 no-audio fallback); original event/cue mapping, native playback controls and
 audio-focus/device verification are pending. This converter does not complete
 #13's original-audio or Android playback acceptance criteria.

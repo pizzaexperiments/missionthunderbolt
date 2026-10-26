@@ -1,8 +1,9 @@
 # Local resource extraction — issue #4
 
 Only analyze inputs you legitimately possess; see RIGHTS_AND_PROVENANCE.md.
-No `tb2.zip` or historical resource fork is available in this task, so the issue's
-reported **15 CODE / 13 CREL** counts remain unverified.
+The supplied StuffIt archive has been extracted and its **15 CODE / 13 CREL**
+counts verified. The earlier issue's `tb2.zip` was not supplied and is not assumed
+byte-identical; source hash and measured counts are recorded below.
 
 ```sh
 python3 scripts/extract_resources.py /path/to/tb2.zip --output local-generated/extracted
@@ -35,7 +36,7 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 
 Synthetic tests cover extraction, exact bytes/hash metadata, signed IDs, empty
 forks, deterministic manifests, malformed inputs, traversal and failure cleanup.
-Original archive validation remains pending until supplied locally. The metadata
+Original archive validation results are recorded below. The metadata
 CSV auditor remains available for already-decoded `.rsrc` directories.
 
 ## Validation against the supplied archive (2026-10-26)

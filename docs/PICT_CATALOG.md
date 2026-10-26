@@ -20,10 +20,10 @@ unsupported/malformed, retaining a per-resource reason and success counts.
 
 Synthetic tests check exact dimensions/pixels/palette values at 1/4/8-bit depth,
 PackBits runs and malformed rows, unsupported opcodes, PNG output and catalog
-resource-ID mapping. No original PICT is available here. Visual comparison,
-full opcode coverage actually encountered in the game and original-asset
-attribution remain pending; this is a tested decoder subset, not completion of
-original artwork recovery.
+resource-ID mapping. The supplied original picture payloads have now passed
+the supported subset as recorded below. Independent runtime visual comparison
+and semantic attribution remain pending; decoding is not proof of faithful
+original presentation.
 
 ## Original-input validation
 
