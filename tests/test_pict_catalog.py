@@ -3,7 +3,7 @@ import struct
 import tempfile
 import unittest
 from test_audit_resources import sample
-from pict_catalog import decode, png, unpackbits, Unsupported, catalog
+from pict_catalog import decode, png, unpackbits, Unsupported, catalog, catalog_files
 from extract_resources import extract
 
 
@@ -56,3 +56,15 @@ class PictTests(unittest.TestCase):
         data=pict(4)
         comment=b'\0\xa1'+struct.pack('>HH',1,3)+b'abc'+b'\0'
         self.assertEqual(decode(data[:14]+comment+b'\0\x1e'+data[14:]),decode(data))
+
+    def test_bitmap_foreground_background_and_standalone_file(self):
+        rect=struct.pack('>hhhh',0,0,1,8)
+        colors=b'\0\x1a'+struct.pack('>HHH',65535,0,0)+b'\0\x1b'+struct.pack('>HHH',0,0,65535)
+        data=b'\0\0'+rect+b'\0\x11\x02\xff'+colors+b'\0\x90'+struct.pack('>H',1)+rect+rect+rect+b'\0\0'+b'\x55'+b'\0'+b'\0\xff'
+        width,height,pixels=decode(data)
+        self.assertEqual((width,height),(8,1));self.assertEqual(pixels[:6],bytes((0,0,255,255,0,0)))
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);source=root/'synthetic.pict';source.write_bytes(bytes(512)+data)
+            report=catalog_files([source],root/'catalog')
+            self.assertEqual(report[0]['status'],'decoded');self.assertIsNone(report[0]['id'])
+            self.assertEqual(report[0]['source_kind'],'standalone-pict-file')

@@ -40,6 +40,7 @@ def decode(data):
     top,left,bottom,right=frame; width,height=right-left,bottom-top
     if width*height > MAX_PIXELS: raise ValueError('PICT exceeds pixel limit')
     pixels=bytearray(b'\xff\xff\xff'*(width*height)); clip=frame
+    foreground=(0,0,0); background=(255,255,255)
     version=r.read(2)
     if version==b'\x00\x11':
         if r.read(2)!=b'\x02\xff': raise Unsupported('unsupported PICT version')
@@ -54,6 +55,11 @@ def decode(data):
             if not painted: raise Unsupported('no supported raster drawing found')
             return width,height,bytes(pixels)
         if op in (0,0x1e): continue
+        if op in (0x1a,0x1b):
+            color=tuple(value>>8 for value in struct.unpack('>HHH',r.read(6)))
+            if op==0x1a: foreground=color
+            else: background=color
+            continue
         if op==0xa0: r.read(2); continue
         if op==0xa1:
             r.read(2); size=r.u16(); r.read(size); continue
@@ -65,7 +71,7 @@ def decode(data):
         row_field=r.u16(); row_bytes=row_field&0x3fff; bounds=r.rect()
         bt,bl,bb,br=bounds; bw,bh=br-bl,bb-bt
         if bw*bh>MAX_PIXELS or row_bytes==0: raise ValueError('invalid raster size')
-        palette={0:(255,255,255),1:(0,0,0)}; depth=1; pack_type=0
+        palette={0:background,1:foreground}; depth=1; pack_type=0
         if row_field&0x8000:
             pm=struct.unpack('>HHIIIHHHHIII',r.read(36))
             _,pack_type,_,_,_,pixel_type,depth,components,component_bits,_,_,_=pm
@@ -128,17 +134,31 @@ def manifest_inputs(manifest, resource_type):
 
 
 def catalog(manifest, output):
+    return render_catalog(list(manifest_inputs(manifest,'PICT')),output)
+
+
+def catalog_files(paths,output):
+    inputs=[]
+    for path in paths:
+        data=path.read_bytes()
+        if len(data)<522: raise ValueError('truncated standalone PICT file/header')
+        inputs.append(({'fork':path.name,'id':None,'sha256':hashlib.sha256(data).hexdigest(),
+                        'source_kind':'standalone-pict-file'},data[512:]))
+    return render_catalog(inputs,output)
+
+
+def render_catalog(inputs, output):
     if output.exists(): raise ValueError('refusing to overwrite catalog')
-    inputs=list(manifest_inputs(manifest,'PICT'))
     if not inputs: raise ValueError('manifest contains no PICT resources')
     repo=Path(__file__).resolve().parents[1]; resolved=output.resolve()
     if resolved.is_relative_to(repo) and not resolved.is_relative_to(repo/'local-generated'):
         raise ValueError('catalog must remain under local-generated/ or outside checkout')
     output.mkdir(parents=True); report=[]; images=[]
     for i,(record,data) in enumerate(inputs):
-        row={'fork':record['fork'],'id':record['id'],'sha256':record['sha256']}
+        row={'fork':record['fork'],'id':record['id'],'sha256':record['sha256'],
+             'source_kind':record.get('source_kind','resource-fork')}
         try:
-            w,h,pixels=decode(data); name=f'{i:04d}_PICT_{record["id"]}.png'
+            w,h,pixels=decode(data); name=f'{i:04d}_PICT_{record["id"]}.png' if record['id'] is not None else f'{i:04d}_PICT.png'
             (output/name).write_bytes(png(w,h,pixels))
             row.update(status='decoded',width=w,height=h,output=name,cell=len(images)); images.append((w,h,pixels))
         except (Unsupported,ValueError) as e:
@@ -166,8 +186,10 @@ def catalog(manifest, output):
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__); p.add_argument('manifest',type=Path); p.add_argument('--output',type=Path,required=True); a=p.parse_args()
-    try: report=catalog(a.manifest,a.output)
+    p=argparse.ArgumentParser(description=__doc__); p.add_argument('manifest',type=Path,nargs='?')
+    p.add_argument('--standalone',type=Path,nargs='+'); p.add_argument('--output',type=Path,required=True); a=p.parse_args()
+    if bool(a.manifest)==bool(a.standalone): p.error('choose an extraction manifest or --standalone PICT files')
+    try: report=catalog_files(a.standalone,a.output) if a.standalone else catalog(a.manifest,a.output)
     except (ValueError,OSError,KeyError) as e: p.error(str(e))
     counts={s:sum(r['status']==s for r in report) for s in ('decoded','unsupported','malformed')}
     print(json.dumps(counts)); return 0 if counts['decoded']==len(report) else 2
