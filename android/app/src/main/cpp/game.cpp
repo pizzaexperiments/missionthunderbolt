@@ -1,5 +1,6 @@
 #include "game.hpp"
 #include <limits>
+#include <locale>
 #include <algorithm>
 #include <iomanip>
 #include <sstream>
@@ -37,7 +38,7 @@ uint32_t crc32(const std::string& data) {
 }
 }
 std::string PrototypeGame::save() const {
-    std::ostringstream out;
+    std::ostringstream out; out.imbue(std::locale::classic());
     out << "MTDEMO 1\n" << width() << ' ' << height() << ' ' << seed_ << ' ' << rngState()
         << ' ' << turns_ << ' ' << player_.x << ' ' << player_.y << ' '
         << (presentation_==Presentation::Modern ? 1 : 0) << '\n';
@@ -55,12 +56,12 @@ PrototypeGame PrototypeGame::load(const std::string& data) {
     const auto digits=data.substr(trailer+6,8);
     if (!std::all_of(digits.begin(),digits.end(),[](char ch) { return (ch>='0' && ch<='9') || (ch>='a' && ch<='f'); }))
         throw std::invalid_argument("invalid checksum digits");
-    std::istringstream checksum(digits);
+    std::istringstream checksum(digits); checksum.imbue(std::locale::classic());
     uint64_t expected=0;
     checksum >> std::hex >> expected;
     if (!checksum || expected>0xffffffffu || crc32(data.substr(0,trailer))!=expected)
         throw std::invalid_argument("save checksum mismatch");
-    std::istringstream input(data.substr(0,trailer));
+    std::istringstream input(data.substr(0,trailer)); input.imbue(std::locale::classic());
     std::string magic; int version=0,w=0,h=0,turns=0,x=0,y=0,modern=0;
     uint64_t seed=0,rng=0;
     input >> magic >> version;

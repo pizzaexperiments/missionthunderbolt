@@ -1,0 +1,8 @@
+[run]
+source = scripts
+patch = subprocess
+parallel = True
+
+[report]
+fail_under = 80
+show_missing = True
