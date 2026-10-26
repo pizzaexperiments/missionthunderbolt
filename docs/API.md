@@ -10,3 +10,32 @@ Header: `android/app/src/main/cpp/api.h`. ABI version: `mt_api_version() == 1`.
 - `mt_game_destroy` releases an instance.
 
 **Important:** these functions model a tiny synthetic prototype, not authentic Mission Thunderbolt mechanics. This is an in-process library API (not an HTTP service). No Macintosh emulator is involved.
+
+## Portable core and error contract (#14)
+
+The existing ABI version remains 1; additions preserve the existing function
+signatures. `mt_game_last_error()` returns a per-thread enum for the most recent
+game operation; `mt_error_message(code)` returns a static string that callers
+must not free. Invalid arguments, allocation failure, insufficient buffers and
+internal exceptions are distinguished. Blocked demo movement is a normal result,
+not an error. No C++ exception crosses the C boundary. Null destruction is safe.
+All game instances are caller-owned and require `mt_game_destroy`; callers must
+serialize concurrent access to an individual instance. Error state is thread-local.
+The buffer sizing call allocates no caller buffer: a NULL output queries bytes;
+a short non-NULL buffer is left unchanged and the required length is returned.
+
+Demo map dimensions are bounded to 5–512 per axis, preventing unbounded allocation
+and signed multiplication overflow. The map and explicitly seeded portable demo
+RNG are separate modules with no Android includes. Items, AI and original game
+rules are not fabricated merely to populate the architecture.
+
+```sh
+cmake -S . -B dist/cmake -DCMAKE_BUILD_TYPE=Debug
+cmake --build dist/cmake --parallel 4
+ctest --test-dir dist/cmake --output-on-failure
+```
+
+Linux CMake, core/API tests and a real C translation-unit ABI test passed locally.
+A manual-only Windows/macOS/Linux matrix is provided; remote platform runs remain
+unexecuted. The Android JNI shared library continues to compile the portable
+sources alongside its host bridge.

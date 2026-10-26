@@ -7,6 +7,16 @@ extern "C" {
 /* Versioned C API for research demo, NOT recovered game logic. */
 #define MT_API_VERSION 1
 typedef struct mt_game mt_game;
+enum mt_error {
+    MT_ERROR_NONE = 0,
+    MT_ERROR_INVALID_ARGUMENT = 1,
+    MT_ERROR_OUT_OF_MEMORY = 2,
+    MT_ERROR_BUFFER_TOO_SMALL = 3,
+    MT_ERROR_INTERNAL = 4
+};
+/* Per-thread last operation error; message strings are static and not owned. */
+int mt_game_last_error(void);
+const char* mt_error_message(int error);
 mt_game* mt_game_create(int width, int height, uint32_t seed);
 void mt_game_destroy(mt_game* game);
 int mt_game_move(mt_game* game, int dx, int dy);

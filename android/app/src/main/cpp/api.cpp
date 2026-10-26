@@ -1,31 +1,58 @@
 #include "api.h"
 #include "game.hpp"
 #include <cstring>
-#include <exception>
+#include <new>
+#include <stdexcept>
 struct mt_game { mt::PrototypeGame instance; mt_game(int w,int h,uint32_t seed):instance(w,h,seed){} };
+namespace {
+thread_local int last_error = MT_ERROR_NONE;
+template<typename F, typename R> R protect(F fn, R failure) noexcept {
+    last_error = MT_ERROR_NONE;
+    try { return fn(); }
+    catch (const std::invalid_argument&) { last_error = MT_ERROR_INVALID_ARGUMENT; }
+    catch (const std::bad_alloc&) { last_error = MT_ERROR_OUT_OF_MEMORY; }
+    catch (...) { last_error = MT_ERROR_INTERNAL; }
+    return failure;
+}
+void require(const mt_game* game) { if (!game) throw std::invalid_argument("null game"); }
+}
 extern "C" {
-mt_game* mt_game_create(int width,int height,uint32_t seed) {
-    try { return new mt_game(width,height,seed); }
-    catch (const std::exception&) { return nullptr; }
-    catch (...) { return nullptr; }
+mt_game* mt_game_create(int w,int h,uint32_t seed) {
+    return protect([&] { return new mt_game(w,h,seed); }, static_cast<mt_game*>(nullptr));
 }
-void mt_game_destroy(mt_game* game) { delete game; }
+void mt_game_destroy(mt_game* game) { delete game; last_error=MT_ERROR_NONE; }
 int mt_game_move(mt_game* game,int dx,int dy) {
-    return game && game->instance.move(dx,dy) ? 1 : 0;
+    return protect([&] { require(game); return game->instance.move(dx,dy) ? 1 : 0; },0);
 }
-int mt_game_turns(const mt_game* game) { return game ? game->instance.turns() : -1; }
+int mt_game_turns(const mt_game* game) {
+    return protect([&] { require(game); return game->instance.turns(); },-1);
+}
 int mt_game_map(const mt_game* game,char* output,int capacity) {
-    if(!game || capacity<0) return 0;
-    const auto map=game->instance.asciiMap();
-    const int required=static_cast<int>(map.size()+1);
-    if(output && capacity>=required) std::memcpy(output,map.c_str(),static_cast<size_t>(required));
-    return required;
+    return protect([&] {
+        require(game);
+        if (capacity<0) throw std::invalid_argument("negative capacity");
+        const auto map=game->instance.asciiMap();
+        const int required=static_cast<int>(map.size()+1);
+        if (output && capacity>=required) std::memcpy(output,map.c_str(),static_cast<size_t>(required));
+        else if (output) last_error=MT_ERROR_BUFFER_TOO_SMALL;
+        return required;
+    },0);
 }
 void mt_game_set_modern(mt_game* game,int enabled) {
-    if(game) game->instance.setPresentation(enabled?mt::Presentation::Modern:mt::Presentation::Classic);
+    protect([&] { require(game); game->instance.setPresentation(enabled?mt::Presentation::Modern:mt::Presentation::Classic); return 0; },0);
 }
 int mt_game_is_modern(const mt_game* game) {
-    return game && game->instance.presentation()==mt::Presentation::Modern ? 1 : 0;
+    return protect([&] { require(game); return game->instance.presentation()==mt::Presentation::Modern ? 1 : 0; },0);
 }
 int mt_api_version(void) { return MT_API_VERSION; }
+int mt_game_last_error(void) { return last_error; }
+const char* mt_error_message(int error) {
+    switch(error) {
+    case MT_ERROR_NONE: return "no error";
+    case MT_ERROR_INVALID_ARGUMENT: return "invalid argument";
+    case MT_ERROR_OUT_OF_MEMORY: return "out of memory";
+    case MT_ERROR_BUFFER_TOO_SMALL: return "buffer too small";
+    default: return "internal error";
+    }
+}
 }
