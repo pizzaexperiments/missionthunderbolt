@@ -2,6 +2,8 @@
 
 Research project for a **native** Android port of classic Macintosh *Mission: Thunderbolt*, with portable C++ core and optional Classic / Modern presentation modes.
 
+**[How we're building this — an LLM capability experiment](docs/HOW_WE_ARE_BUILDING_THIS.md)** explains the restoration strategy, test methodology, human/AI responsibilities, and verified limitations.
+
 ## Current state
 
 This repository begins with a **demonstration engine**, not a recreation of original gameplay. Original Macintosh 68K CODE/CREL resources have been recovered separately; no game mechanics are claimed to be disassembled yet. No APK has been built or verified.
