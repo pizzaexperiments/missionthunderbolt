@@ -143,8 +143,11 @@ void smoke(Host& host) {
     require(host.game.presentation()==mt::Presentation::Modern,"mode switch failed");
     host.draw();host.persist();
     require(mt::PrototypeGame::load(readSave(host.savePath)).save()==host.game.save(),"disk save round-trip failed");
-    std::vector<uint32_t> pixels(640*480);
-    require(SDL_RenderReadPixels(host.renderer.get(),nullptr,SDL_PIXELFORMAT_ARGB8888,pixels.data(),640*4)==0,SDL_GetError());
+    int pixelWidth=0,pixelHeight=0;
+    require(SDL_GetRendererOutputSize(host.renderer.get(),&pixelWidth,&pixelHeight)==0,SDL_GetError());
+    require(pixelWidth>0 && pixelHeight>0 && pixelWidth<=8192 && pixelHeight<=8192,"invalid smoke-test drawable dimensions");
+    std::vector<uint32_t> pixels(static_cast<size_t>(pixelWidth)*static_cast<size_t>(pixelHeight));
+    require(SDL_RenderReadPixels(host.renderer.get(),nullptr,SDL_PIXELFORMAT_ARGB8888,pixels.data(),pixelWidth*4)==0,SDL_GetError());
     require(std::any_of(pixels.begin(),pixels.end(),[&](uint32_t v){return v!=pixels.front();}),"board rendering is blank");
     std::cout<<"SDL keyboard/controller, shared state, rendered pixels and atomic disk save checks passed\n";
 }
