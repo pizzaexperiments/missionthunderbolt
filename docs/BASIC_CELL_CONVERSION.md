@@ -6,7 +6,7 @@ implement the entire glyph dispatch table. Unmodeled glyphs reject before native
 state changes; some need creation/RNG services, while others are unmodeled
 default paths. A rejection is a model capability contract, not original behavior.
 
-The original comparison enters at **0x14b8**, after an unresolved coordinate
+The original comparison enters at **0x14b8**, after a coordinate
 helper has stored the seed word at cell +2, and stops at **0x2b40**, before the
 next-column increment. The six-byte argument cleanup still executes and is
 checked. Cell pointer, source glyph/row pointers, header bytes, raw caller word
@@ -74,3 +74,8 @@ python tests/research/verify_basic_cell_conversion.py local-generated/original-r
 Use a fresh private report path. Original code, dispatch bytes, disassembly and
 detailed results stay ignored. Active demo maps are unchanged. This is partial
 conversion evidence, not a full generator or an original-game runtime comparison.
+
+The following [connected grid conversion](DIRECT_GRID_CONVERSION.md) increment
+recovers that helper and executes the complete 19×67 traversal for these same
+43 branches. The single-cell oracle above remains a separate bounded check;
+creation/RNG branches and full generator integration remain unfinished.

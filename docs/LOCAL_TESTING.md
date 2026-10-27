@@ -372,3 +372,19 @@ The lifecycle helper with `--check-control-placement --send-memory-trim` also
 passed: Classic/turn 2 and Left placement survived process death and three
 background cycles; COMPLETE trim commands were accepted and the app crash buffer
 was clean. This does not simulate or measure an actual Android OOM kill.
+
+## Connected direct-grid traversal — 2026-10-27
+
+PR #36 was verified merged as `b3f97741b9b45749f2a6896f331d35b835f5c67b`
+before syncing the feature branch. The connected CODE 12 traversal and CODE 6
+base-word helper match the native model on **131,072 helper probes** and **111
+authored 19×67 maps / 141,303 cells**, including complete output record bytes,
+call order/arguments, loop counters, stack and guards. Commands and limitations:
+DIRECT_GRID_CONVERSION.md. All private source/derived evidence remains ignored.
+
+`sh scripts/test_local.sh` passed **56 Python tests** and native regressions with
+both optional graphics decoders. With the activated SDK CMake on PATH, configure/
+build/CTest passed **17/17 ASan/UBSan** and **18/18 SDL** checks. The driver initially
+failed a misleading-indentation warning; formatting was corrected with `-Werror`
+retained. Production Python scripts are unchanged (last measured coverage 82%).
+No Android build/runtime, Actions run, original boot or release was performed.
