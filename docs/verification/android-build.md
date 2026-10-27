@@ -25,8 +25,8 @@ native checks and upload the APK plus SHA256 after signature and package checks.
 The historical failed CI run is [40402366349](https://github.com/pizzaexperiments/missionthunderbolt/actions/runs/40402366349).
 Its detailed logs were unavailable without GitHub authentication. No new CI run
 was triggered and no green CI run or uploaded artifact is claimed. Those issue #1
-acceptance criteria remain pending; GitHub API access is currently blocked by
-environment policy. Device/emulator results are recorded separately when exercised.
+acceptance criteria remain pending. Authenticated GitHub API access was later
+verified working; the earlier policy snapshot was stale. Device/emulator results are recorded separately when exercised.
 
 For #2, a fresh export of tracked source (`git archive HEAD`, without Gradle,
 CMake or APK outputs) also passed `gradle --no-daemon --console=plain assembleDebug`
