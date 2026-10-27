@@ -28,4 +28,6 @@ c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/linked_rec
 ./dist/linked_record_test
 c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/record_release_test.cpp -o dist/record_release_test
 ./dist/record_release_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/selector_lifecycle_test.cpp -o dist/selector_lifecycle_test
+./dist/selector_lifecycle_test
 echo "All local smoke tests passed"

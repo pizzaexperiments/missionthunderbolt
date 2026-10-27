@@ -27,7 +27,8 @@ public:
     static Result release16(Nodes& nodes,uint32_t root,uint32_t limit,const Dispose& dispose) {
         Budget budget{limit,0};return {walk(nodes,root,budget,dispose),budget.steps};
     }
-    static Result release12(Nodes& nodes,Parent& parent,uint32_t identity,uint32_t limit,const Dispose& dispose) {
+    static Result release12(Nodes& nodes,Parent& parent,uint32_t identity,uint32_t limit,const Dispose& dispose,
+                            const Dispose& child_entry=Dispose{}) {
         // Original signed-byte indices outside this domain can read/write before
         // the slot array. Refuse that unsupported input without changing state.
         if(parent.count51>127)throw std::out_of_range("unsupported parent child count");
@@ -36,6 +37,7 @@ public:
         while(parent.count51) {
             if(!budget.take())return {Status::budget_exhausted,budget.steps};
             --parent.count51;
+            if(child_entry)child_entry(parent.slots60[parent.count51]);
             const auto status=walk(nodes,parent.slots60[parent.count51],budget,dispose);
             if(status!=Status::complete)return {status,budget.steps};
             parent.slots60[parent.count51]=0;

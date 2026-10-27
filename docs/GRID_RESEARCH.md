@@ -322,3 +322,76 @@ Use Unicorn 2.1.4 and new private output paths. None of these research models
 change active demo gameplay, implement pickup/equip/effects or complete #8/#11.
 Original allocation, full callback/selector composition, directions, generation
 and progression remain unfinished.
+
+## Connected original selector/lifecycle comparison — 2026-10-27
+
+The previous isolated and native-only composition checkpoints are now extended
+by an original-instruction run through the RNG initializer, bounded selector,
+fallback, query, unlink, both release walkers and prefix wrapper. The seven
+hash-checked CODE segments are **1, 5, 7, 9, 11, 12 and 13**. Original instructions
+execute all recovered callbacks; the **DisposePtr trap alone** is observed/skipped.
+Synthetic jump stubs and analytical addresses still do not constitute a Classic
+Mac runtime, complete relocation reconstruction or original game boot.
+
+The connected oracle matched **486 authored worlds**, comparing the native
+composition against the original chain for every tested final grid byte, complete
+RNG state/table, header count/head, every linked-record byte, allocation-prefix
+word, coordinates, selection path and callback/disposal-event order. Original
+grid/header/coordinate and record-boundary guards are checked. Normal returns
+must have balanced stacks. Disposal events record the actual prefix address.
+
+| Observed path | Cases |
+| --- | ---: |
+| First fallback scan | 54 |
+| Second fallback scan | 30 |
+| Random fallback acceptance | 84 |
+| Random research-budget stop | 210 |
+| Direct bounded selection | 72 |
+| Neighbor bounded selection | 36 |
+
+Inputs combine seeds 0/42/0xffffffff, three supplied direction tables, nine world
+profiles, two acyclic record shapes, prefix words 0xffff/0/0x1234, conditional
+filter values/flags, 0–3 child slots and head/middle/tail parent removal. Profiles
+include protected records/children, type-word 73, later protected-kind rejection,
+first/second scans, and direct/neighbor choices. Fixtures retain shared references
+after an observed disposal: the non-reclaiming trap hook deliberately keeps their
+bytes accessible. This tests control flow under that condition; it does not
+establish valid heap ownership or allocator behavior during original play.
+
+Target-cell coordinates are authored using an original baseline run on an
+all-rejected map. They are input data, not expected results. Changes that allow
+earlier selection still change the compared path/RNG state; the native and
+original implementations must agree for the actual world. The historical
+direction values/order remain unknown: each of the three tables is explicitly
+synthetic. The fallback retry budget is one; rejection stops at the original
+next-retry boundary, preserving all prior mutations. No result is accepted on
+budget exhaustion. Release graphs are acyclic and complete for this combined
+run; the earlier isolated walkers cover bounded cyclic cases.
+
+The first combined comparison found matching final state but a different callback
+count. Native parent release walked children internally without exposing their
+A5 service-entry events. An optional non-mutating child-entry observer now records
+that boundary after decrementing count and before child release. Default release
+semantics are unchanged; the 1,730-case isolated release oracle was rerun and
+passed. A regression checks count/slot state at child entry.
+
+Public C++ tests freeze connected authored-world traces for nested release order,
+child-slot entry order, prefix-controlled DisposePtr observation, header/list
+updates, partial mutation through rejection, second-scan queries and direct
+selection. The fixture adapter and drivers live under `tests/research/`; active
+Android/desktop gameplay does not use this test world or claim historical rules.
+
+```sh
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp \
+  tests/research/selector_lifecycle_driver.cpp -o dist/selector_lifecycle_driver
+python tests/research/verify_selector_lifecycle.py local-generated/original-resources/manifest.json \
+  --native-driver dist/selector_lifecycle_driver \
+  --output local-generated/analysis/selector-lifecycle-crosscheck.json
+```
+
+Use Unicorn 2.1.4 and a fresh private report path. The report records source
+fingerprints, every input/outcome and result SHA256; mismatch diagnostics identify
+the first differing output field. This supersedes the earlier claim that only
+shimmed callbacks had been run with the original selector. Full generator/mission
+progression, allocation/reclamation, historical directions and gameplay reference
+comparisons remain open for #7–#12.
