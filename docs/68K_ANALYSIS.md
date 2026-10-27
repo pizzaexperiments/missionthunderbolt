@@ -129,3 +129,32 @@ Both scripts reject public repository output paths and existing segment outputs.
 Their RNG leads were checked with isolated original instructions; see
 [RNG_RESEARCH.md](RNG_RESEARCH.md) for results and limits. CREL, complete scheduling,
 state layout and original gameplay comparisons remain open.
+
+## Exact A5 operand references
+
+`ExportA5References.java` takes comma-separated signed 16-bit displacements and a
+private output directory. It exports decoded instruction/function offsets, operand
+access type and source hash only when the operand contains exactly one A5 register
+and one matching scalar. Indexed operands and aliases through other registers are
+excluded. This is a focused reference index, not complete pointer/alias analysis.
+
+```sh
+"$GHIDRA_HOME/support/analyzeHeadless" local-generated/analysis/ghidra-project mt-code-segments \
+  -process 'CODE_*.bin' -noanalysis -max-cpu 2 -scriptPath scripts/ghidra \
+  -postScript ExportA5References.java -0x6a6,-0x6aa,-0x7f1,-0x7f2 \
+  local-generated/analysis/map-state-references
+```
+
+The recorded 15-CODE-program run produced **866** exact references: 786 READ,
+53 WRITE, nine READ_WRITE and 18 DATA. These displacement names/roles began as
+hypotheses; the grid pointer builder and bounded selector were subsequently
+checked against original instructions, as recorded in [GRID_RESEARCH.md](GRID_RESEARCH.md).
+Other state roles and complete call graphs remain unverified.
+
+`create_synthetic_fixture.py --a5-references` generates an authored 68000 fixture
+with two direct A5 references, one A0 alias and one indexed A5 operand. A real
+Ghidra run produced exactly the expected direct WRITE at offset 6 and READ at 10;
+the alias/indexed operands were excluded. `PrepareSyntheticEntry.java` accepts only
+the two authored fixture names. Headless exit status alone is insufficient;
+inspect compiler diagnostics and the expected output rows. Original reports stay
+under ignored local-generated/, and existing segment reports are never overwritten.

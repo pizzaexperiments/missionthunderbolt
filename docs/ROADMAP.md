@@ -39,9 +39,9 @@ flowchart TD
 | [#4](https://github.com/pizzaexperiments/missionthunderbolt/issues/4) | StuffIt decoded locally; AppleDouble/resource parser produced 1,571 hash-linked entries, including 15 CODE/13 CREL | Implementation acceptance covered on supplied `.sit`; document input difference and review feature PR |
 | [#5](https://github.com/pizzaexperiments/missionthunderbolt/issues/5) | 908 resource PICTs + 26 standalone slides decoded; PNG catalogs/contact sheets, indexed 1/4/8-bit fixtures | Independent original-runtime visual comparison and semantic sprite attribution |
 | [#6](https://github.com/pizzaexperiments/missionthunderbolt/issues/6) | Evidence-labeled trace validator, capture protocol, manual evidence notes | Lawful original reference environment/recordings; executable 2.0.g differs from manual 1.0 |
-| [#7](https://github.com/pizzaexperiments/missionthunderbolt/issues/7) | 28 Ghidra imports; 788 jump entries; 8,697 static call candidates; trap-frontier hypotheses; isolated RNG instruction/model checks | CREL/runtime addressing, full trap/state/scheduler roles, RNG lifecycle and gameplay corroboration |
-| [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) | RNG initializer and continued draws modeled; 2,405 complete native/original-instruction state comparisons | Recover and implement original generator/progression with golden traces |
-| [#9](https://github.com/pizzaexperiments/missionthunderbolt/issues/9) | Manual action/movement distinctions documented; explicit WAIT implemented/tested as a manual-1.0 prototype rule | Original turn/FOV/collision/running implementation and differential tests |
+| [#7](https://github.com/pizzaexperiments/missionthunderbolt/issues/7) | 28 Ghidra imports; 788 jump entries; 8,697 static call candidates; trap-frontier hypotheses; isolated RNG/grid-helper/selector instruction checks | CREL/runtime addressing, full trap/state/scheduler roles, RNG lifecycle and gameplay corroboration |
+| [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) | RNG initializer, 67×19 record layout and bounded candidate selector modeled; 105 selector/RNG instruction comparisons | Recover and implement original generator/progression with golden traces |
+| [#9](https://github.com/pizzaexperiments/missionthunderbolt/issues/9) | Manual-backed WAIT; signed-byte coordinate clip and candidate gate checked against original instructions | Original turn/FOV/collision/running implementation and differential tests |
 | [#10](https://github.com/pizzaexperiments/missionthunderbolt/issues/10) | Manual combat/wield/exchange evidence recorded | Damage/hit/RNG/weapon rules and original comparisons |
 | [#11](https://github.com/pizzaexperiments/missionthunderbolt/issues/11) | Manual quantity/container/equipment evidence recorded | Original schemas, constraints, effects and verified transitions |
 | [#12](https://github.com/pizzaexperiments/missionthunderbolt/issues/12) | AI/spawning evidence gaps documented | Controlled original traces, recovered entity/AI/pathfinding logic |
@@ -66,7 +66,7 @@ closed as a duplicate of #1; no separate implementation is needed.
 - [Android workflow](ANDROID_DEVELOPMENT.md), [build evidence](verification/android-build.md), [controls](MODERN_CONTROLS.md), [runtime evidence](ANDROID_RUNTIME.md).
 - [Portable API](API.md), [save format](SAVE_FORMAT.md), [desktop workflow](DESKTOP_DEVELOPMENT.md), [quality gates](QUALITY.md).
 - [Rights](RIGHTS_AND_PROVENANCE.md), [extraction](RESOURCE_EXTRACTION.md), [graphics](PICT_CATALOG.md), [sound](SOUND_CONVERSION.md).
-- [Reference capture](REFERENCE_RESEARCH.md), [manual evidence](MANUAL_EVIDENCE.md), [68K analysis](68K_ANALYSIS.md), [remaining fidelity gaps](GAMEPLAY_EVIDENCE_GAPS.md).
+- [Reference capture](REFERENCE_RESEARCH.md), [manual evidence](MANUAL_EVIDENCE.md), [68K analysis](68K_ANALYSIS.md), [grid research](GRID_RESEARCH.md), [remaining fidelity gaps](GAMEPLAY_EVIDENCE_GAPS.md).
 - [Release preparation](RELEASE_PREPARATION.md), [offline API decision](decisions/0001-offline-api.md), [closeout review](ISSUE_CLOSEOUT_REVIEW.md).
 
 Original inputs stay in ignored `local-original/`, research derivatives in

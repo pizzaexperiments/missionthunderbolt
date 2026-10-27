@@ -18,4 +18,8 @@ c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp android/app/src/
 printf 'q\n' | ./dist/mt_desktop_demo >/dev/null
 c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/legacy_rng_test.cpp -o dist/legacy_rng_test
 ./dist/legacy_rng_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/grid_layout_test.cpp -o dist/grid_layout_test
+./dist/grid_layout_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/grid_selector_test.cpp -o dist/grid_selector_test
+./dist/grid_selector_test
 echo "All local smoke tests passed"
