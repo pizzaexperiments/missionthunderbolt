@@ -352,3 +352,23 @@ See ANDROID_RUNTIME.md for artifact identity, harness fixes and unrun checks.
 Android-only changes do not alter the preceding 16/16 sanitizer and 17/17 SDL
 results; those suites were not rerun for this UI increment. No Actions or release
 was triggered.
+
+## Android memory-pressure callbacks — 2026-10-27
+
+PR #34 was verified merged as `d43379155a2dfa21028f323cf585e65e9844d306`
+before syncing the feature branch. The new audio cache-release callbacks and two
+regressions passed all **19 instrumentation tests** on API 23 x86_64, measured
+**1.3× font/portrait**, target SDK 35. The runner's requested-1.0 check failed
+afterward because the live configuration remained 1.3; no 1.0 result is claimed.
+See ANDROID_RUNTIME.md for the recorded failure, commands and artifact identity.
+
+`sh scripts/test_local.sh` passed **56 Python tests** and native regressions with
+both optional external graphics decoders present. Debug/test APK and debug lint,
+unsigned release APK/AAB and release lint passed. Android-only changes do not
+alter the preceding 16/16 sanitizer and 17/17 SDL results; those suites were not
+rerun. No original game boot, Actions run, production signing or release is claimed.
+
+The lifecycle helper with `--check-control-placement --send-memory-trim` also
+passed: Classic/turn 2 and Left placement survived process death and three
+background cycles; COMPLETE trim commands were accepted and the app crash buffer
+was clean. This does not simulate or measure an actual Android OOM kill.

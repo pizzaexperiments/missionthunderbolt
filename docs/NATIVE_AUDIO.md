@@ -23,7 +23,12 @@ playback and abandons focus; no continuous playback timer or wake lock is added.
 
 Mute releases the track. Pause/Activity destruction cancels completion callbacks,
 stops output, abandons focus and releases resources. Resume does not replay an old
-cue. Focus loss stops output; ducking applies a 0.2 gain factor, and focus gain
+cue. Activity memory callbacks at `TRIM_MEMORY_RUNNING_LOW` or higher, plus
+`onLowMemory`, also cancel completion, abandon focus and release the cached track.
+The lower `RUNNING_MODERATE` hint keeps the cache. Trimming retains enabled/volume
+settings and the foreground active flag: no cue is replayed automatically, and
+the next explicit cue can lazily recreate output. Paused/closed output stays
+inactive after trimming. Focus loss stops output; ducking applies a 0.2 gain factor, and focus gain
 restores the selected gain without automatically replaying. Hardware routing,
 headphone changes and real focus competition still need broader device testing.
 
@@ -52,3 +57,9 @@ and measured **528 consumed PCM frames**. The following lifecycle run preserved
 state across process death and three background cycles. Debug/release builds and
 lint passed. Physical output, API 35 runtime and original-audio fidelity remain
 open acceptance items.
+
+The following memory-pressure increment passed the complete **19-test suite**
+on API 23 x86_64, measured 1.3× font/portrait, target SDK 35. Callback tests verify
+track release/lazy recreation and unchanged complete native game serialization.
+This is injected callback coverage, not an actual memory-exhaustion measurement;
+see ANDROID_RUNTIME.md for the configuration-check failure and exact limits.

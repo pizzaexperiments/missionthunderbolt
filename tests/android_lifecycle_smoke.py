@@ -25,7 +25,7 @@ class DirectEmulatorTransport:
     def pull(self,source,dest):self.adb.pull(source,str(dest),transport_timeout_s=90)
 
 
-def run(transport,output,check_control_placement=False):
+def run(transport,output,check_control_placement=False,send_memory_trim=False):
     output.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory() as temporary:
         xml=Path(temporary)/'ui.xml'
@@ -39,6 +39,11 @@ def run(transport,output,check_control_placement=False):
             x1,y1,x2,y2=map(int,re.findall(r'\d+',node.attrib['bounds']))
             transport.shell('input','tap',str((x1+x2)//2),str((y1+y2)//2))
         def placement():return next(n.attrib['text'] for n in nodes() if n.attrib.get('resource-id','').endswith(':id/controls_position'))
+        def background():
+            transport.shell('input','keyevent','3');nodes()  # Wait for Home UI / onPause.
+            if send_memory_trim:
+                result=transport.shell('am','send-trim-memory',PACKAGE,'COMPLETE')
+                assert not result.strip(),'memory trim command failed: '+result
         transport.shell('am','force-stop',PACKAGE)  # Start with a fresh view/scroll position; demo is reset below.
         transport.shell('am','start','-W','-n',PACKAGE+'/.MainActivity')
         tap('restart')
@@ -53,13 +58,13 @@ def run(transport,output,check_control_placement=False):
                 tap('controls_position')
             assert placement()=='Controls: Left','could not select left controls'
             assert status()==before,'placement changed simulation'
-        transport.shell('input','keyevent','3');nodes()  # Wait for Home UI / onPause.
+        background()
         transport.shell('am','force-stop',PACKAGE)
         launch=transport.shell('am','start','-W','-n',PACKAGE+'/.MainActivity')
         after=status();assert before==after,'state lost across background/process death'
         if check_control_placement:assert placement()=='Controls: Left','control setting lost across process death'
         for _ in range(3):
-            transport.shell('input','keyevent','3');nodes()
+            background()
             transport.shell('am','start','-W','-n',PACKAGE+'/.MainActivity')
             assert status()==before,'state lost across background/foreground'
             if check_control_placement:assert placement()=='Controls: Left','control setting lost across background/foreground'
@@ -71,6 +76,7 @@ def run(transport,output,check_control_placement=False):
                 'abi':transport.shell('getprop','ro.product.cpu.abi').strip(),'before':before,'after':after,
                 'background_cycles':3,'app_crash_buffer_clean':True,'launch':launch}
         if check_control_placement:report['control_placement']='Controls: Left'
+        if send_memory_trim:report['requested_background_memory_trim']='COMPLETE'
         (output/'android-lifecycle.json').write_text(json.dumps(report,indent=2)+'\n')
         transport.shell('screencap','-p','/data/local/tmp/mt-demo.png')
         transport.pull('/data/local/tmp/mt-demo.png',output/'android-demo.png')
@@ -81,9 +87,11 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);selection=p.add_mutually_exclusive_group(required=True)
     selection.add_argument('--serial');selection.add_argument('--direct-emulator',type=int,metavar='LOCAL_ADBD_PORT')
     p.add_argument('--output',type=Path,default=Path('dist/verification'))
-    p.add_argument('--check-control-placement',action='store_true');a=p.parse_args()
+    p.add_argument('--check-control-placement',action='store_true')
+    p.add_argument('--send-memory-trim',action='store_true',help='Request COMPLETE memory trim while backgrounded; does not simulate an OOM kill')
+    a=p.parse_args()
     transport=CliTransport(a.serial) if a.serial else DirectEmulatorTransport(a.direct_emulator)
-    report=run(transport,a.output,a.check_control_placement)
+    report=run(transport,a.output,a.check_control_placement,a.send_memory_trim)
     print(f'Lifecycle smoke passed on API {report["api"]} {report["abi"]}; report and synthetic screenshot saved')
 
 if __name__=='__main__':main()

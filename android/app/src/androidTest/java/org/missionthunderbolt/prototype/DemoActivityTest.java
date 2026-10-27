@@ -284,6 +284,61 @@ public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActiv
    assertTrue(silent.isUnavailable());assertFalse(silent.playCue());assertFalse(silent.hasTrack());silent.close();
   });
  }
+ public void testAudioMemoryReleaseKeepsSettingsAndActiveState() throws Throwable {
+  MainActivity a=getActivity();
+  runTestOnUiThread(() -> {
+   DemoAudio audio=new DemoAudio(a);
+   try {
+    audio.resume();audio.setEnabled(true);audio.setVolumePercent(37);
+    assertTrue(audio.playCue());assertTrue(audio.hasTrack());int played=audio.getPlayCount();
+    audio.trimMemory();audio.trimMemory();
+    assertFalse(audio.hasTrack());assertEquals(0,audio.getConsumedFrames());
+    assertTrue(audio.isEnabled());assertEquals(37,audio.getVolumePercent());assertFalse(audio.isUnavailable());
+    assertEquals(played,audio.getPlayCount()); // Releasing memory must not replay a cue.
+    assertTrue(audio.playCue());assertTrue(audio.hasTrack());assertEquals(played+1,audio.getPlayCount());
+    audio.pause();audio.trimMemory();assertFalse(audio.playCue());assertFalse(audio.hasTrack());
+    audio.resume();assertFalse(audio.hasTrack());assertEquals(played+1,audio.getPlayCount());
+    assertTrue(audio.playCue());audio.close();audio.trimMemory();assertFalse(audio.playCue());assertFalse(audio.hasTrack());
+   } finally {audio.close();}
+  });
+ }
+ public void testActivityMemoryCallbacksPreserveCompleteState() throws Throwable {
+  MainActivity a=getActivity();click(a,R.id.restart);click(a,R.id.move_right);
+  java.lang.reflect.Field field=MainActivity.class.getDeclaredField("audio");field.setAccessible(true);
+  DemoAudio audio=(DemoAudio)field.get(a);
+  java.lang.reflect.Method snapshot=MainActivity.class.getDeclaredMethod("snapshot");snapshot.setAccessible(true);
+  runTestOnUiThread(() -> {
+   android.widget.Button toggle=a.findViewById(R.id.sound_toggle);
+   if(toggle.getText().toString().equals("Sound: Off"))toggle.performClick();
+   ((android.widget.SeekBar)a.findViewById(R.id.sound_volume)).setProgress(37);
+  });
+  String before=(String)snapshot.invoke(null),label=status(a);
+  try {
+   runTestOnUiThread(() -> {
+    assertTrue(audio.playCue());
+    a.onTrimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE);
+    assertTrue(audio.hasTrack()); // A hint below our release threshold keeps the cache.
+   });
+   for(int level:new int[]{android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW,
+     android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL,android.content.ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN,
+     android.content.ComponentCallbacks2.TRIM_MEMORY_BACKGROUND,android.content.ComponentCallbacks2.TRIM_MEMORY_MODERATE,
+     android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE}) {
+    runTestOnUiThread(() -> {
+     assertTrue(audio.playCue());int played=audio.getPlayCount();a.onTrimMemory(level);
+     assertFalse(audio.hasTrack());assertEquals(played,audio.getPlayCount());
+     assertTrue(audio.isEnabled());assertEquals(37,audio.getVolumePercent());assertFalse(audio.isUnavailable());
+    });
+    assertEquals(before,(String)snapshot.invoke(null));assertEquals(label,status(a));
+   }
+   runTestOnUiThread(() -> {assertTrue(audio.playCue());a.onLowMemory();a.onLowMemory();assertFalse(audio.hasTrack());
+    assertTrue(audio.playCue());assertTrue(audio.hasTrack());});
+   assertEquals(before,(String)snapshot.invoke(null));assertEquals(label,status(a));
+  } finally {
+   runTestOnUiThread(() -> {android.widget.Button toggle=a.findViewById(R.id.sound_toggle);
+    if(toggle.getText().toString().equals("Sound: On"))toggle.performClick();
+    ((android.widget.SeekBar)a.findViewById(R.id.sound_volume)).setProgress(30);});
+  }
+ }
  public void testAudioControlsDoNotAdvanceTurns() throws Throwable {
   MainActivity a=getActivity();click(a,R.id.restart);
   runTestOnUiThread(() -> {
