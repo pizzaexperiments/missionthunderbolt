@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 
 public class MainActivity extends Activity {
  static { System.loadLibrary("thunderbolt"); }
@@ -42,10 +43,15 @@ public class MainActivity extends Activity {
  private boolean controlsVisible = true;
  private float zoom = 1f;
  private int joystickX = 0, joystickY = 0;
+ private DemoAudio audio;
+ private Button soundToggle;
  private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
  @Override public void onCreate(Bundle b) {
   super.onCreate(b);
   restoreSavedState(b); modern = isModern();
+  audio=new DemoAudio(this);
+  audio.setEnabled(getPreferences(MODE_PRIVATE).getBoolean("sound_enabled",false));
+  audio.setVolumePercent(getPreferences(MODE_PRIVATE).getInt("sound_volume",30));
   controlsVisible = getPreferences(MODE_PRIVATE).getBoolean("controls", true);
   zoom = Math.max(1f, Math.min(4f, getPreferences(MODE_PRIVATE).getFloat("zoom", 1f)));
   boolean landscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
@@ -69,11 +75,23 @@ public class MainActivity extends Activity {
   for (Button tool : new Button[]{mode,restart,toggle})
    tools.addView(tool,landscape ? new LinearLayout.LayoutParams(-1,-2) : new LinearLayout.LayoutParams(0,-2,1));
   controls.addView(tools);
+  LinearLayout soundRow=new LinearLayout(this);soundRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+  soundToggle=button("Sound: Off",R.id.sound_toggle);
+  soundToggle.setOnClickListener(v -> {audio.setEnabled(!audio.isEnabled());refreshSound();});soundRow.addView(soundToggle);
+  SeekBar volume=new SeekBar(this);volume.setId(R.id.sound_volume);volume.setMax(100);volume.setProgress(audio.getVolumePercent());volume.setMinimumHeight(dp(48));
+  volume.setContentDescription("Demo sound volume "+audio.getVolumePercent()+" percent");
+  volume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+   public void onProgressChanged(SeekBar bar,int value,boolean fromUser) {audio.setVolumePercent(value);bar.setContentDescription("Demo sound volume "+value+" percent");}
+   public void onStartTrackingTouch(SeekBar bar) {}
+   public void onStopTrackingTouch(SeekBar bar) {}
+  });
+  soundRow.addView(volume,new LinearLayout.LayoutParams(0,dp(48),1));controls.addView(soundRow);
+  refreshSound();
   dpad = new LinearLayout(this); dpad.setOrientation(LinearLayout.VERTICAL);
   LinearLayout top = new LinearLayout(this); top.setGravity(android.view.Gravity.CENTER);
   top.addView(direction("UP",0,-1,R.id.move_up));
   Button wait = button("WAIT",R.id.wait_turn); wait.setContentDescription("Wait one time unit in place");
-  wait.setOnClickListener(v -> {turns=waitTurn(); refresh();}); top.addView(wait); dpad.addView(top);
+  wait.setOnClickListener(v -> waitAction()); top.addView(wait); dpad.addView(top);
   LinearLayout bottom = new LinearLayout(this); bottom.setGravity(android.view.Gravity.CENTER);
   bottom.addView(direction("LEFT",-1,0,R.id.move_left)); bottom.addView(direction("DOWN",0,1,R.id.move_down));
   bottom.addView(direction("RIGHT",1,0,R.id.move_right)); dpad.addView(bottom);
@@ -95,7 +113,15 @@ public class MainActivity extends Activity {
   Button b = button(label,id); b.setContentDescription("Move " + label.toLowerCase(java.util.Locale.ROOT));
   b.setOnClickListener(v -> step(dx,dy)); return b;
  }
- private void step(int dx,int dy) {turns = move(dx,dy); refresh();}
+ private void step(int dx,int dy) {int before=turns;turns=move(dx,dy);refresh();if(turns>before)playDemoCue();}
+ private void waitAction() {int before=turns;turns=waitTurn();refresh();if(turns>before)playDemoCue();}
+ private void playDemoCue() {audio.playCue();refreshSound();}
+ private void refreshSound() {
+  if(soundToggle==null)return;
+  soundToggle.setText(audio.isUnavailable() ? "Sound unavailable" : audio.isEnabled() ? "Sound: On" : "Sound: Off");
+  soundToggle.setContentDescription(audio.isUnavailable() ? "Demo sound unavailable" : audio.isEnabled() ? "Mute demo sound" : "Enable demo sound");
+  soundToggle.setEnabled(!audio.isUnavailable());
+ }
  private void refresh() {turns = turnCount(); status.setText("Thunderbolt RESEARCH DEMO | " + (modern?"Modern":"Classic") + " | Turns: " + turns); board.setContentDescription("Synthetic demo board. " + (modern ? "Modern" : "Classic") +
    " presentation. Turns " + turns + ". Use directional buttons or arrow keys to move."); board.invalidate(); board.accessibility.changed();}
  private AtomicFile saveFile() { return new AtomicFile(new File(getFilesDir(), "demo-state.mt")); }
@@ -124,15 +150,19 @@ public class MainActivity extends Activity {
  @Override protected void onSaveInstanceState(Bundle state) {
   state.putString("demo-state", snapshot()); super.onSaveInstanceState(state);
  }
+ @Override protected void onResume() {super.onResume();if(audio!=null)audio.resume();}
+ @Override protected void onDestroy() {if(audio!=null)audio.close();super.onDestroy();}
  @Override protected void onPause() {
   persistState(); getPreferences(MODE_PRIVATE).edit().putBoolean("controls",controlsVisible).putFloat("zoom",zoom).apply();
-  joystickX = joystickY = 0; super.onPause();
+  getPreferences(MODE_PRIVATE).edit().putBoolean("sound_enabled",audio.isEnabled()).putInt("sound_volume",audio.getVolumePercent()).apply();
+  audio.pause();joystickX = joystickY = 0; super.onPause();
  }
  @Override public boolean dispatchKeyEvent(KeyEvent event) {
+  if(getCurrentFocus() instanceof SeekBar && (event.getKeyCode()==KeyEvent.KEYCODE_DPAD_LEFT || event.getKeyCode()==KeyEvent.KEYCODE_DPAD_RIGHT))return super.dispatchKeyEvent(event);
   int dx=0,dy=0;
   switch(event.getKeyCode()) {
    case KeyEvent.KEYCODE_SPACE: case KeyEvent.KEYCODE_NUMPAD_5:
-    if(event.getAction()==KeyEvent.ACTION_DOWN) {turns=waitTurn(); refresh();}
+    if(event.getAction()==KeyEvent.ACTION_DOWN) waitAction();
     return true;
    case KeyEvent.KEYCODE_DPAD_UP: case KeyEvent.KEYCODE_W: dy=-1; break;
    case KeyEvent.KEYCODE_DPAD_DOWN: case KeyEvent.KEYCODE_S: dy=1; break;
@@ -168,7 +198,7 @@ public class MainActivity extends Activity {
     public String[] rows() {return map().split("\\n");}
     public android.graphics.Rect bounds(int x,int y,int columns,int rows) {return cellBounds(x,y,columns,rows);}
     public void move(int dx,int dy) {step(dx,dy);}
-    public void waitTurn() {turns=MainActivity.waitTurn();refresh();}
+    public void waitTurn() {waitAction();}
     public void zoom(int direction) {
      zoom=direction==0 ? 1f : Math.max(1f,Math.min(4f,zoom*(direction>0 ? 1.25f : .8f)));
      invalidate(); accessibility.changed();

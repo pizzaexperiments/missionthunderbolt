@@ -19,9 +19,10 @@ not every resource converted. Existing output directories are preserved.
 Synthetic tests verify exact PCM bytes/rates/channels, 16-bit byte ordering,
 truncation, compressed-format refusal and manifest identity. Original audio was
 later supplied and converted as recorded below; auditory comparison remains
-unperformed. The application remains silent (safe
-no-audio fallback); original event/cue mapping, native playback controls and
-audio-focus/device verification are pending. This converter does not complete
+unperformed. An opt-in authored PCM cue now exercises Android output and controls; see
+[NATIVE_AUDIO.md](NATIVE_AUDIO.md). Original event/cue mapping, historical sample
+playback, auditory equivalence and physical audio-focus/device verification remain
+pending. This converter does not complete
 #13's original-audio or Android playback acceptance criteria.
 
 ## Original-input validation
@@ -55,7 +56,8 @@ commands are the recognized timed pair. Catalog rows distinguish `sample-only`
 from `converted`; CLI exit status remains **2** when any row is sample-only,
 unsupported or malformed. Unknown commands, external pointers, multiple buffers,
 unsupported synthesizers/encodings and invalid offsets remain rejected. Original
-WAVs/reports remain ignored, and the app remains silent.
+WAVs/reports remain ignored. Opt-in app audio uses an authored cue, not these
+original samples; see NATIVE_AUDIO.md.
 
 Eight synthetic sound tests pass, including exact sample bytes, retained command
 order/parameters, signed param1, sample-only status, malformed offsets and unknown

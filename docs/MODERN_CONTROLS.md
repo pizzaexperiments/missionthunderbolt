@@ -47,3 +47,8 @@ limitations are recorded in [Android runtime evidence](ANDROID_RUNTIME.md).
 
 WAIT, Space and keypad-5 now consume one prototype time unit in place; see
 [the manual-backed rule](MANUAL_RULES.md). Invalid zero-direction movement is unchanged.
+
+Sound is opt-in and muted by default. The authored demo cue, volume slider, focus
+and lifecycle behavior are documented in [native demo audio](NATIVE_AUDIO.md).
+Left/right adjust volume while its slider has keyboard focus; otherwise the
+existing game-direction shortcuts apply. Sound controls do not consume turns.

@@ -183,4 +183,76 @@ public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActiv
   player.recycle();root.recycle();
  }
 
+ public void testAudioTrackMuteVolumeFocusAndLifecycle() throws Throwable {
+  MainActivity activity=getActivity();
+  runTestOnUiThread(() -> {
+   DemoAudio audio=new DemoAudio(activity);
+   try {
+    audio.resume();assertFalse(audio.playCue());assertFalse(audio.hasTrack());
+    audio.setEnabled(true);audio.setVolumePercent(40);
+    assertTrue("Authored PCM cue must initialize, write and start through AudioTrack",audio.playCue());
+    assertTrue(audio.hasTrack());assertEquals(1,audio.getPlayCount());assertEquals(.4f,audio.getAppliedVolume(),.001f);
+    for(int retry=0;retry<50 && audio.getConsumedFrames()==0;++retry)android.os.SystemClock.sleep(20);
+    int consumed=audio.getConsumedFrames();assertTrue("Platform AudioTrack must consume authored PCM frames",consumed>0);
+    android.os.Bundle report=new android.os.Bundle();report.putString("stream","\nMT_AUDIO consumed_frames="+consumed+" sample_rate=22050 authored_pcm=true\n");getInstrumentation().sendStatus(0,report);
+    audio.onAudioFocusChange(android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK);
+    assertEquals(.08f,audio.getAppliedVolume(),.001f);
+    audio.onAudioFocusChange(android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT);
+    audio.onAudioFocusChange(android.media.AudioManager.AUDIOFOCUS_GAIN);
+    assertEquals(1,audio.getPlayCount());assertEquals(.4f,audio.getAppliedVolume(),.001f);
+    audio.setVolumePercent(0);assertFalse(audio.playCue());
+    audio.setVolumePercent(40);assertTrue(audio.playCue());assertEquals(2,audio.getPlayCount());
+    audio.pause();assertFalse(audio.hasTrack());assertFalse(audio.playCue());
+    audio.resume();assertEquals(2,audio.getPlayCount());
+    audio.setEnabled(false);assertFalse(audio.playCue());assertEquals(0f,audio.getAppliedVolume(),.001f);
+    audio.close();audio.close();assertFalse(audio.playCue());
+   } finally {audio.close();}
+   android.content.Context noAudio=new android.content.ContextWrapper(activity) {
+    @Override public Object getSystemService(String name) {return android.content.Context.AUDIO_SERVICE.equals(name) ? null : super.getSystemService(name);}
+   };
+   DemoAudio silent=new DemoAudio(noAudio);silent.resume();silent.setEnabled(true);
+   assertTrue(silent.isUnavailable());assertFalse(silent.playCue());assertFalse(silent.hasTrack());silent.close();
+  });
+ }
+ public void testAudioControlsDoNotAdvanceTurns() throws Throwable {
+  MainActivity a=getActivity();click(a,R.id.restart);
+  runTestOnUiThread(() -> {
+   android.widget.SeekBar volume=a.findViewById(R.id.sound_volume);
+   assertTrue(volume.getHeight()>=Math.round(48*a.getResources().getDisplayMetrics().density));
+   volume.setProgress(0);
+   android.widget.Button toggle=a.findViewById(R.id.sound_toggle);
+   if(toggle.getText().toString().equals("Sound: On"))toggle.performClick();
+   toggle.performClick();assertEquals("Sound: On",toggle.getText().toString());
+   assertTrue(status(a).contains("Turns: 0"));
+   a.findViewById(R.id.wait_turn).performClick();assertTrue(status(a).contains("Turns: 1"));
+   toggle.performClick();assertEquals("Sound: Off",toggle.getText().toString());
+   assertTrue(status(a).contains("Turns: 1"));volume.setProgress(30);
+   assertTrue(volume.getContentDescription().toString().contains("30 percent"));
+  });
+  getInstrumentation().setInTouchMode(false);
+  runTestOnUiThread(() -> {assertTrue(a.findViewById(R.id.sound_volume).requestFocus());});
+  getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_DPAD_RIGHT);getInstrumentation().waitForIdleSync();
+  assertTrue(((android.widget.SeekBar)a.findViewById(R.id.sound_volume)).getProgress()>30);
+  assertTrue(status(a).contains("Turns: 1"));
+  runTestOnUiThread(() -> {((android.widget.SeekBar)a.findViewById(R.id.sound_volume)).setProgress(30);a.findViewById(R.id.board).requestFocus();});
+ }
+ public void testAudioPreferencesSurviveRecreation() throws Throwable {
+  MainActivity a=getActivity();click(a,R.id.restart);
+  runTestOnUiThread(() -> {
+   android.widget.Button toggle=a.findViewById(R.id.sound_toggle);
+   if(toggle.getText().toString().equals("Sound: Off"))toggle.performClick();
+   ((android.widget.SeekBar)a.findViewById(R.id.sound_volume)).setProgress(37);
+  });
+  Instrumentation.ActivityMonitor monitor=getInstrumentation().addMonitor(MainActivity.class.getName(),null,false);
+  try {
+   runTestOnUiThread(() -> a.recreate());
+   MainActivity recreated=(MainActivity)monitor.waitForActivityWithTimeout(20000);
+   assertNotNull(recreated);getInstrumentation().waitForIdleSync();
+   assertEquals("Sound: On",((android.widget.Button)recreated.findViewById(R.id.sound_toggle)).getText().toString());
+   assertEquals(37,((android.widget.SeekBar)recreated.findViewById(R.id.sound_volume)).getProgress());
+   assertTrue(status(recreated).contains("Turns: 0"));
+   runTestOnUiThread(() -> {recreated.findViewById(R.id.sound_toggle).performClick();((android.widget.SeekBar)recreated.findViewById(R.id.sound_volume)).setProgress(30);});
+  } finally {getInstrumentation().removeMonitor(monitor);}
+ }
+
 }
