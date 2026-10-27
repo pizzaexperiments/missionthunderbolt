@@ -306,3 +306,49 @@ Capstone 5.0.6 was installed locally for bounded static inspection; test executi
 still uses Unicorn 2.1.4, and Capstone is not bundled or a test prerequisite.
 Production Python tools are unchanged (last measured coverage 82%). No new
 Android runtime/build, original game boot, CREL or release claim is made.
+
+## Generator byte preparation — 2026-10-27
+
+PR #33 was verified merged as `17802cb028d2f857e248ac57b59428fce8c14e3f`; the feature branch was
+fast-forwarded. Bounded CODE 12 offsets 4866–5238 matched the native model on
+**1,600 authored byte maps**, comparing final map bytes, complete RNG state,
+attempt counters, **151,788 RNG calls** and **33,766 byte writes** in exact order.
+Original header/metadata/context/frame/map guards and stack checks passed.
+The original RNG initializer and helpers execute directly. Commands, raw gates,
+variable final-pass loop bound and limits are in MAP_BYTE_PREPARATION.md.
+
+`sh scripts/test_local.sh` passed **56 Python tests** and native regressions with
+both optional picture decoders present. CMake/CTest passed **15/15 ASan/UBSan**
+and **16/16 SDL** checks. Production Python scripts are unchanged (last measured
+coverage 82%). No new Android build/runtime, full generator, tile semantics,
+original game boot or release is claimed. Original outputs stay ignored.
+
+## Direct-write cell conversion — 2026-10-27
+
+PR #34 was refreshed and was still open, ready for review; no merge was assumed.
+The same workstream branch now includes a separate conversion increment.
+Original CODE 12 matched the native model on **268,288 subtype-tail probes**
+and **23,822 direct-write conversion probes** over 43 supported glyphs. Source
+byte/header/tuning/frame and cell guards plus stack checks passed; every final
+cell byte matched. The first run exposed missing P-branch flag and p-branch kind
+writes in the draft model. The model was corrected against the instructions and
+full probes rerun with checks intact. Scope/commands: BASIC_CELL_CONVERSION.md.
+
+`sh scripts/test_local.sh` passed **56 Python tests** and native regressions with
+both optional external graphics decoders present. CMake/CTest passed
+**16/16 ASan/UBSan** and **17/17 SDL** checks. Production Python scripts are
+unchanged (last measured coverage 82%). Unresolved glyphs remain unsupported;
+no full generator, new APK/runtime, original boot, CI run or release is claimed.
+
+## Android control placement — 2026-10-27
+
+`sh scripts/test_local.sh` passed **56 Python tests** and native regressions
+with both optional graphics decoders present. Debug/test APK and debug lint,
+unsigned release APK/AAB and release lint passed. All **17 instrumentation tests**
+passed on API 23 x86_64 at measured 1.0/portrait and 1.3/landscape, target SDK 35.
+The independent lifecycle helper also preserved Left placement and turn 2 across
+process death and three background cycles, with a clean app crash buffer.
+See ANDROID_RUNTIME.md for artifact identity, harness fixes and unrun checks.
+Android-only changes do not alter the preceding 16/16 sanitizer and 17/17 SDL
+results; those suites were not rerun for this UI increment. No Actions or release
+was triggered.

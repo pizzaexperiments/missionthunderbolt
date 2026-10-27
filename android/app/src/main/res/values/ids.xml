@@ -4,6 +4,11 @@
     <item name="mode" type="id" />
     <item name="restart" type="id" />
     <item name="controls" type="id" />
+    <item name="controls_position" type="id" />
+    <item name="layout_root" type="id" />
+    <item name="scene" type="id" />
+    <item name="control_panel" type="id" />
+    <item name="dpad" type="id" />
     <item name="move_up" type="id" />
     <item name="move_down" type="id" />
     <item name="move_left" type="id" />

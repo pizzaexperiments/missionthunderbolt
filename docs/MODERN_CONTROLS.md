@@ -8,6 +8,10 @@ Switching skins preserves player/map/turns and does not change mechanics.
 - Status uses scalable `sp` text; TalkBack can focus the labeled board and buttons.
 - Portrait places controls below the board; landscape places them beside it.
 - `Controls` shows/hides the virtual D-pad; the setting stays app-private.
+- `Controls: Auto → Left → Right` selects persistent placement. Auto centers the
+  portrait D-pad and uses the right landscape panel. Left/Right align the portrait
+  directional rows and move the landscape panel to that side. Placement preserves
+  game state, zoom and D-pad visibility; it consumes no turn.
 - Arrow keys/WASD move; joystick/hat directions use a dead zone and one action
   per direction change, preventing continuous duplicate steps from held axes.
 - Pinch zoom is bounded to 1–4× with nearest-neighbor cell drawing. A pinch does
@@ -42,7 +46,7 @@ and Activity recreation. App install and `am start -W` also succeeded. APK tests
 use Android's platform test runner without third-party test dependencies; no CI
 run was triggered. Physical ARM64/API 35 acceptance is not implied by this result.
 
-The expanded seven-test suite, measured 1.3× font scaling, lifecycle and current
+The expanded 17-test suite, measured 1.3× font scaling, lifecycle and current
 limitations are recorded in [Android runtime evidence](ANDROID_RUNTIME.md).
 
 WAIT, Space and keypad-5 now consume one prototype time unit in place; see

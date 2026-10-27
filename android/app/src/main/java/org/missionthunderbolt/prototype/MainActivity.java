@@ -40,6 +40,10 @@ public class MainActivity extends Activity {
  private Board board;
  private int turns = 0;
  private LinearLayout dpad;
+ private LinearLayout root, scene;
+ private ScrollView controlScroll;
+ private Button placementToggle;
+ private int controlPlacement = 0; // Automatic, left, right.
  private boolean controlsVisible = true;
  private float zoom = 1f;
  private int joystickX = 0, joystickY = 0;
@@ -53,11 +57,13 @@ public class MainActivity extends Activity {
   audio.setEnabled(getPreferences(MODE_PRIVATE).getBoolean("sound_enabled",false));
   audio.setVolumePercent(getPreferences(MODE_PRIVATE).getInt("sound_volume",30));
   controlsVisible = getPreferences(MODE_PRIVATE).getBoolean("controls", true);
+  controlPlacement = getPreferences(MODE_PRIVATE).getInt("controls_position",0);
+  if(controlPlacement<0 || controlPlacement>2)controlPlacement=0;
   zoom = Math.max(1f, Math.min(4f, getPreferences(MODE_PRIVATE).getFloat("zoom", 1f)));
   boolean landscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
-  LinearLayout root = new LinearLayout(this);
+  root = new LinearLayout(this); root.setId(R.id.layout_root);
   root.setOrientation(landscape ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
-  LinearLayout scene = new LinearLayout(this); scene.setOrientation(LinearLayout.VERTICAL);
+  scene = new LinearLayout(this); scene.setId(R.id.scene); scene.setOrientation(LinearLayout.VERTICAL);
   status = new TextView(this); status.setId(R.id.status); status.setTextSize(17);
   status.setPadding(dp(12),dp(8),dp(8),dp(8)); scene.addView(status);
   board = new Board(); board.setId(R.id.board); scene.addView(board,new LinearLayout.LayoutParams(-1,0,1));
@@ -75,6 +81,12 @@ public class MainActivity extends Activity {
   for (Button tool : new Button[]{mode,restart,toggle})
    tools.addView(tool,landscape ? new LinearLayout.LayoutParams(-1,-2) : new LinearLayout.LayoutParams(0,-2,1));
   controls.addView(tools);
+  placementToggle=button("Controls: Auto",R.id.controls_position);
+  placementToggle.setOnClickListener(v -> {
+   controlPlacement=(controlPlacement+1)%3;
+   getPreferences(MODE_PRIVATE).edit().putInt("controls_position",controlPlacement).apply();
+   applyControlPlacement();
+  });controls.addView(placementToggle);
   LinearLayout soundRow=new LinearLayout(this);soundRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
   soundToggle=button("Sound: Off",R.id.sound_toggle);
   soundToggle.setOnClickListener(v -> {audio.setEnabled(!audio.isEnabled());refreshSound();});soundRow.addView(soundToggle);
@@ -87,7 +99,7 @@ public class MainActivity extends Activity {
   });
   soundRow.addView(volume,new LinearLayout.LayoutParams(0,dp(48),1));controls.addView(soundRow);
   refreshSound();
-  dpad = new LinearLayout(this); dpad.setOrientation(LinearLayout.VERTICAL);
+  dpad = new LinearLayout(this); dpad.setId(R.id.dpad); dpad.setOrientation(LinearLayout.VERTICAL);
   LinearLayout top = new LinearLayout(this); top.setGravity(android.view.Gravity.CENTER);
   top.addView(direction("UP",0,-1,R.id.move_up));
   Button wait = button("WAIT",R.id.wait_turn); wait.setContentDescription("Wait one time unit in place");
@@ -96,14 +108,27 @@ public class MainActivity extends Activity {
   bottom.addView(direction("LEFT",-1,0,R.id.move_left)); bottom.addView(direction("DOWN",0,1,R.id.move_down));
   bottom.addView(direction("RIGHT",1,0,R.id.move_right)); dpad.addView(bottom);
   dpad.setVisibility(controlsVisible ? View.VISIBLE : View.GONE); controls.addView(dpad);
-  ScrollView controlScroll = new ScrollView(this); controlScroll.setFillViewport(true); controlScroll.addView(controls);
+  controlScroll = new ScrollView(this); controlScroll.setId(R.id.control_panel); controlScroll.setFillViewport(true); controlScroll.addView(controls);
   root.addView(controlScroll,landscape ? new LinearLayout.LayoutParams(-2,-1) : new LinearLayout.LayoutParams(-1,-2));
+  applyControlPlacement();
   root.setOnApplyWindowInsetsListener((view,insets) -> {
    view.setPadding(insets.getSystemWindowInsetLeft(),insets.getSystemWindowInsetTop(),
     insets.getSystemWindowInsetRight(),insets.getSystemWindowInsetBottom());
    return insets.consumeSystemWindowInsets();
   });
   setContentView(root); board.requestFocus(); refresh();
+ }
+ private void applyControlPlacement() {
+  if(root.getOrientation()==LinearLayout.HORIZONTAL)
+   root.bringChildToFront(controlPlacement==1 ? scene : controlScroll);
+  int gravity=controlPlacement==0 ? android.view.Gravity.CENTER_HORIZONTAL :
+   controlPlacement==1 ? android.view.Gravity.LEFT : android.view.Gravity.RIGHT;
+  gravity|=android.view.Gravity.CENTER_VERTICAL;
+  for(int i=0;i<dpad.getChildCount();++i)((LinearLayout)dpad.getChildAt(i)).setGravity(gravity);
+  String[] labels={"Auto","Left","Right"},names={"automatic","left","right"};
+  placementToggle.setText("Controls: "+labels[controlPlacement]);
+  placementToggle.setContentDescription("Control placement "+names[controlPlacement]+". Switch to "+names[(controlPlacement+1)%3]+" placement");
+  root.requestLayout();root.invalidate();
  }
  private Button button(String label,int id) {
   Button b = new Button(this); b.setId(id); b.setText(label); b.setContentDescription(label);

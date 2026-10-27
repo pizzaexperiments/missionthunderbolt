@@ -406,3 +406,20 @@ connected worlds using values produced by original startup instructions. These
 are initial values; subsequent table mutation is still unverified. This extends
 the earlier explicit synthetic-table evidence without claiming full map
 generation or execution of the Macintosh application loader.
+
+## Generator caller: bounded byte preparation
+
+Tracing callers of the recovered selector led to CODE 12's jump 629. A bounded
+three-pass byte-map editing stage now has original/native comparisons on 1,600
+authored maps, including full RNG and write-event traces. See
+[map-byte preparation](MAP_BYTE_PREPARATION.md) for the separate byte-map layout,
+exact gates, changing loop bound, source context and unfinished conversion into
+20-byte records. This does not establish full level construction or tile meanings.
+
+## Partial glyph-to-record conversion
+
+[Direct-write cell conversion](BASIC_CELL_CONVERSION.md) now corroborates 43
+branches plus the shared subtype adjustment, with 23,822 conversion and 268,288
+tail probes. The tests seed the word produced by an unresolved coordinate helper
+and stop before advancing the outer map loop. Creation/RNG branches, allocation
+and complete conversion remain unmodeled; unsupported glyphs are explicit.

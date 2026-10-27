@@ -32,4 +32,8 @@ c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/selector_l
 ./dist/selector_lifecycle_test
 c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/a5_initialization_test.cpp -o dist/a5_initialization_test
 ./dist/a5_initialization_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/glyph_preparation_test.cpp -o dist/glyph_preparation_test
+./dist/glyph_preparation_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/basic_cell_conversion_test.cpp -o dist/basic_cell_conversion_test
+./dist/basic_cell_conversion_test
 echo "All local smoke tests passed"
