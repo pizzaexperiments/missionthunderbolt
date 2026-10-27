@@ -90,6 +90,79 @@ indexed decoding when ImageMagick is installed; absence skips that optional test
 explicitly. Dimension/pixel mismatches and timeouts have deterministic regressions.
 ImageMagick is a development-only comparison dependency and is not packaged.
 
-Issue #5 remains open for this discrepancy, original-runtime comparisons and
-semantic role attribution; contact sheets/resource IDs alone do not establish
-faithful Classic presentation for #16.
+At this checkpoint #5 remained open for the discrepancy and semantic role
+attribution. The follow-up below resolves the decoder/catalog scope; runtime
+presentation remains #16.
+
+## Third-decoder follow-up and catalog closeout — 2026-10-27
+
+[PR #28](https://github.com/pizzaexperiments/missionthunderbolt/pull/28) merged
+as `b1388131976492c6ce978fc48d920bb2afaea9e4`. GraphicsMagick from Debian's signed
+package index (`1.4+really1.3.45+hg17696-1`, runtime reports
+**1.4 snapshot-20250331 Q16**) was extracted locally as a research tool. It is
+not a new runtime/package dependency of the game. Its PICT implementation shares
+historical ancestry with ImageMagick, so these are not wholly unrelated oracles.
+
+```sh
+python3 scripts/verify_pict_independently.py --backend graphicsmagick --tool /path/to/gm \
+  --manifest local-generated/original-resources/manifest.json \
+  --output local-generated/graphicsmagick-pict-resources.json
+python3 scripts/verify_pict_independently.py --backend graphicsmagick --tool /path/to/gm \
+  --standalone /path/to/Slides/INTRO* /path/to/Slides/END* \
+  --output local-generated/graphicsmagick-pict-slides.json
+```
+
+Use the normal vendor installation or supply its required library search path
+for a privately extracted binary. GraphicsMagick uses separate bounded convert/
+identify commands; both have a 20-second process timeout and cache limits. The
+ImageMagick command and old `--imagemagick` option remain supported. Reports name
+the backend as well as its version.
+
+| Input group | ImageMagick | GraphicsMagick | Exact with at least one external decoder |
+| --- | --- | --- | --- |
+| 908 resource pictures | 907 exact, 1 pixel mismatch | 808 exact, 100 failed | 908 |
+| 26 standalone slides | 26 exact | 26 exact | 26 |
+
+Reports were joined by **fork, resource ID and source SHA256**, checking identical
+resource sets. There are 807 resource pictures matching both external decoders;
+100 match only ImageMagick and one only GraphicsMagick. GraphicsMagick's resource
+command deliberately exits **2** because of the 100 failures. An inspected failed
+sample reports `Scanline length too small`; failed samples are not counted as
+successful or assigned tolerance. No production decoder code changed.
+
+The disputed **Black & White / PICT 361** matches GraphicsMagick exactly at 30×65
+pixels, with RGB SHA256
+`67d5f3326f08a78b612bc1bd53529e26886142ebea5fc6811049fe915e424c42`.
+Closer inspection identifies it as an **indexed one-bit PixMap**, rather than
+a plain BitMap. The earlier plain-BitMap fixture did not reproduce that exact
+format. A new authored 30×4 indexed PixMap, with one known black pixel per row
+and two nonzero padding bits, matches GraphicsMagick exactly and differs from
+ImageMagick by **6/120** pixels. Its expected pixels also match the authored
+BitMap's native output. This corroborates the native result for the disputed
+format without changing either the output or tolerance. The original
+ImageMagick mismatch report and earlier BitMap evidence remain preserved.
+
+### Visually attributed catalog entries
+
+These labels follow inspection of the private contact sheet and full-size
+previews, with resource identities read from the catalog report. They describe
+visible graphics, not recovered event handlers or game rules.
+
+| Resource fork / ID | Dimensions | Observed role | Private preview / sheet cell |
+| --- | --- | --- | --- |
+| 16 Colors / 934 | 167×177 | Legend for selection, wielded/reserved weapons, worn and activated items | `0080_PICT_934.png`, sheet 0 cell 80 |
+| 16 Colors / 964 | 343×227 | Game title and credits panel | `0083_PICT_964.png`, sheet 0 cell 83 |
+| 16 Colors / 984 | 328×289 | Display/sound options, gender and difficulty panel | `0085_PICT_984.png`, sheet 0 cell 85 |
+| 16 Colors / 994 | 328×289 | Character creation panel with attributes, hit points and difficulty | `0086_PICT_994.png`, sheet 0 cell 86 |
+
+Other tile/item/entity strips retain neutral resource-ID names until supported
+by further visual or executable evidence. The complete catalog already maps all
+908 resources and 26 slides, with paginated contact sheets and explicit source
+IDs/hashes. Newly identified panels do not establish that their depicted controls
+work, nor do they establish the runtime layout.
+
+Issue #5's stated decoder/catalog acceptance is satisfied: authored 1/4/8-bit
+fixtures, externally corroborated pixels/dimensions for every supplied picture,
+conversion success/unsupported reports, contact sheets/resource-ID mappings and
+ignored original outputs. Broader Classic runtime screenshot/menu/layout
+verification belongs to #16; asset redistribution permission remains #3.

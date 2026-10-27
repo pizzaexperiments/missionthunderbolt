@@ -32,7 +32,8 @@ original-game fidelity or completion of other issues.
 - #14 needs native platform verification; #19/#20 need their actual OS builds.
 - #2 was subsequently closed against its stated one-machine acceptance; see below.
 - #3 still lacks historical redistribution permission.
-- #5/#6/#16 need original reference evidence and faithful resource/layout mapping.
+- #6/#16 need original reference evidence and faithful runtime resource/layout mapping.
+- #5 was subsequently closed against its decoder/catalog criteria; see below.
 - #7–#12 have research progress, including instruction-corroborated RNG routines,
   but full state/relocation, map/progression, scheduling, combat, inventory and AI
   acceptance remains incomplete. Standalone routine checks are not game traces.
@@ -46,7 +47,7 @@ original-game fidelity or completion of other issues.
 - #23 needs signing/review/dependency inventory and target platform artifacts.
 
 #21 was also confirmed closed in the refreshed live issue list; it is tracked
-as a duplicate of #1. All other issues above except #2 remain open. Recheck live acceptance
+as a duplicate of #1. All other issues above except #2 and #5 remain open. Recheck live acceptance
 and comments before subsequent closures.
 
 ## Follow-up closeout — Android development instructions
@@ -66,3 +67,22 @@ to #18–#20 and do not change its one-machine requirement.
 [Closeout evidence](https://github.com/pizzaexperiments/missionthunderbolt/issues/2#issuecomment-6431707124).
 No CI run, merge, tag, production signing or release publication was performed
 by this increment.
+
+## Follow-up closeout — PICT decoder/catalog
+
+Issue [#5](https://github.com/pizzaexperiments/missionthunderbolt/issues/5) was
+closed as completed after checking its live criteria and corroborating the
+previously disputed original picture through GraphicsMagick.
+[PR #29](https://github.com/pizzaexperiments/missionthunderbolt/pull/29) contains
+the comparison adapter, authored indexed-row-padding regression and detailed
+[graphics evidence](PICT_CATALOG.md). Every supplied picture (934 total) matches
+at least one external decoder. GraphicsMagick's 100 resource failures remain
+visible; original-runtime verification is not inferred from decoder agreement.
+Four panel roles have direct visual attribution, while other sprites retain
+neutral resource-ID names. The five stated decoder/catalog criteria are met;
+faithful runtime screenshots, menu interaction and exhaustive role mapping remain
+#16 work. Historical redistribution permission remains #3.
+
+[Closeout evidence](https://github.com/pizzaexperiments/missionthunderbolt/issues/5#issuecomment-6431905666).
+The live API confirmed `closed` with reason `completed`. This does not claim
+that PR #29 is merged or that the original game has been booted.
