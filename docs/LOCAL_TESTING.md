@@ -153,3 +153,22 @@ device/runtime test, audible output test, Windows/macOS run, signed release or
 publication is claimed. The previous debug APK remains the downloadable demo.
 NDK composite notices are preserved by the manual workflow; per-component
 license attribution and the rest of issue #23 remain open.
+
+## Independent graphics decoder increment — 2026-10-27
+
+`python3 scripts/verify_pict_independently.py --manifest
+local-generated/original-resources/manifest.json --output
+local-generated/independent-pict-resources.json` returned the expected **exit 2**:
+907 exact matches, one pixel mismatch, no dimension mismatch or failed decoder.
+The standalone command over all 26 INTRO/END files returned exit 0 with 26 exact
+matches. ImageMagick 7.1.1-43 Q16 was the independent implementation. The preserved
+30×65 monochrome mismatch and an authored reproduction are detailed in
+PICT_CATALOG.md; no decoder logic or comparison tolerance was changed to hide it.
+
+`sh scripts/test_local.sh` passed **53 Python tests**, with the optional real
+ImageMagick synthetic test executed, plus native regressions. The complete
+coverage.py run/combine/report passed at **82%**, above the 80% gate. Native
+production code is unchanged from the already-passing 10-test sanitizer run.
+No Android or desktop runtime, original-game screenshot, audible output, CI run
+or public release is newly claimed. Private pictures/comparison outputs stay
+ignored; only authored fixtures, tool code and summary counts enter Git.
