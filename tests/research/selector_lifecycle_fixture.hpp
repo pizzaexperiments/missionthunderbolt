@@ -92,12 +92,14 @@ private:
     }
 };
 struct Outcome {int phase,attempts,row,column,pre_attempts;};
-inline Outcome run(World& world,const Config& c,mt::ShuffledLcgModel& rng) {
+inline Outcome run(World& world,const Config& c,mt::ShuffledLcgModel& rng,
+                   const mt::GridCandidateSelector::Directions* supplied=nullptr) {
     mt::GridCandidateSelector::Grid compact;
     for(unsigned i=0;i<world.grid.size();++i)compact[i]={world.grid[i].bytes[0],world.grid[i].longAt(16)};
     mt::GridCandidateSelector::Directions directions{{{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1},{-1,-1}}};
     if(c.directions==1)std::rotate(directions.begin(),directions.begin()+3,directions.end());
     if(c.directions==2)directions={{{-128,-128},{127,127},{-128,127},{127,-128},{0,127},{127,0},{0,-128},{-128,0}}};
+    if(supplied)directions=*supplied;
     const auto first=mt::GridCandidateSelector::select(compact,directions,rng);
     if(first.outcome!=mt::GridCandidateSelector::Outcome::needs_fallback)
         return {first.outcome==mt::GridCandidateSelector::Outcome::direct?4:5,0,first.coordinate.row,first.coordinate.column,first.iterations};

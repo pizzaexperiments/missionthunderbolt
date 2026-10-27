@@ -282,3 +282,27 @@ both optional graphics decoders available. CMake/CTest passed **13/13 ASan/UBSan
 and **14/14 SDL** checks. Production Python tools are unchanged (last measured
 coverage 82%). No new APK/runtime validation, original game boot, actual heap
 reclamation or full map/gameplay claim is made; original outputs remain ignored.
+
+## Startup A5 initialization and directions — 2026-10-27
+
+PR #32 was verified merged as `81db34416dd4f2a4b1aca62d5bac44b91a03b3ee`; the feature branch was
+fast-forwarded. Original CODE 1 blocks matched the bounded native model on
+**68 DATA/ZERO expansion** and **133 DREL relocation** cases. Actual inputs
+consume 6,888 DATA bytes and 864 ZERO bytes to create a 26,178-byte window, then
+apply 517 DREL entries. The recovered startup direction tables are untouched
+by those relocations. Resource/OS calls are not executed.
+
+The connected check passed **162 worlds** with both original/native startup
+processing producing directions, and the unchanged explicit-table mode again
+passed **486 worlds**. Counts, commands, source fingerprints and preconditions
+are documented in A5_INITIALIZATION.md. Startup table values are corroborated;
+subsequent table mutation and whole-game behavior are not.
+
+`sh scripts/test_local.sh` passed **56 Python tests** and native regressions, with
+both optional graphics decoders available. CMake/CTest passed **14/14 ASan/UBSan**
+and **15/15 SDL** checks. The first new driver compile hit misleading-indentation
+warnings under `-Werror`; the statements were split without weakening flags.
+Capstone 5.0.6 was installed locally for bounded static inspection; test execution
+still uses Unicorn 2.1.4, and Capstone is not bundled or a test prerequisite.
+Production Python tools are unchanged (last measured coverage 82%). No new
+Android runtime/build, original game boot, CREL or release claim is made.

@@ -18,10 +18,10 @@ PRIMARY, CHILD, TARGET, PREVIOUS, FOLLOWING, EXTRA=0xb0000,0xb0100,0xc0000,0xc10
 KEYS=('seed','directions','profile','shape','prefix','word','flags','count','row','column','position')
 
 
-def cases(payloads):
+def cases(payloads,startup=False):
     words=[0,1,29,52,70,81,175,65535]
     for si,seed in enumerate([0,42,0xffffffff]):
-        for direction in range(3):
+        for direction in range(1 if startup else 3):
             # Authored target uses the first original fallback draw on an all-
             # rejected map. Any earlier native/original discrepancy still changes
             # the compared output; target selection is not an expected result.
@@ -78,11 +78,15 @@ def make_world(c):
     return bytes(header+grid),records
 
 
-def execute(payloads,c):
+def execute(payloads,c,startup=None):
     from unicorn import Uc,UC_ARCH_M68K,UC_MODE_BIG_ENDIAN,UC_HOOK_CODE
     from unicorn.m68k_const import UC_CPU_M68K_M68000,UC_M68K_REG_A5,UC_M68K_REG_A7,UC_M68K_REG_SR,UC_M68K_REG_D3,UC_M68K_REG_D4,UC_M68K_REG_D5,UC_M68K_REG_PC,UC_M68K_REG_A0
     uc=Uc(UC_ARCH_M68K,UC_MODE_BIG_ENDIAN);uc.ctl_set_cpu_model(UC_CPU_M68K_M68000);uc.mem_map(0x10000,0x180000)
     for sid,data in payloads.items():uc.mem_write(PROFILES[sid]['base'],data)
+    uc.reg_write(UC_M68K_REG_SR,0x2000)
+    if startup:
+        from verify_a5_initialization import initialize_in_context
+        initialize_in_context(uc,startup,A5)
     stubs=[(0x42,1,396),(0x62,1,548),(0x136a,12,29850),(0x1372,12,29884),(0x68a,5,32110),(0x692,5,32200),
            (0xd7a,9,27148),(0xde2,9,28968),(0xb0a,7,3872),(0xb1a,7,4104),(0x1312,11,454)]
     for displacement,segment,offset in stubs:uc.mem_write(A5+displacement,b'\x4e\xf9'+struct.pack('>I',PROFILES[segment]['base']+offset))
@@ -91,8 +95,9 @@ def execute(payloads,c):
     call(uc,5,31998,struct.pack('>I',c['seed']),20000)
     if uc.reg_read(UC_M68K_REG_PC)!=STOP:raise AssertionError('initializer failed')
     directions=SYNTHETIC_DIRECTIONS if c['directions']==0 else SYNTHETIC_DIRECTIONS[3:]+SYNTHETIC_DIRECTIONS[:3] if c['directions']==1 else [(-128,-128),(127,127),(-128,127),(127,-128),(0,127),(127,0),(0,-128),(-128,0)]
-    for index,(row,column) in enumerate(directions,1):
-        uc.mem_write(A5-0x9e6+index,bytes([row&255]));uc.mem_write(A5-0x9da+index,bytes([column&255]))
+    if not startup:
+        for index,(row,column) in enumerate(directions,1):
+            uc.mem_write(A5-0x9e6+index,bytes([row&255]));uc.mem_write(A5-0x9da+index,bytes([column&255]))
     initial,records=make_world(c);uc.mem_write(GRID,initial+b'\x5a'*16)
     for identity,data in records.items():
         uc.mem_write(identity-18,b'\xa5'*16+struct.pack('>H',c['prefix'])+bytes(data)+b'\x5a'*16)
@@ -137,7 +142,7 @@ def execute(payloads,c):
     return ' '.join(parts),observed,len(events)
 
 
-def verify(manifest,driver):
+def verify(manifest,driver,startup_data=False):
     payloads={}
     for rec,data in manifest_inputs(manifest,'CODE'):
         sid=rec['id']
@@ -145,11 +150,17 @@ def verify(manifest,driver):
         if sid in payloads or hashlib.sha256(data).hexdigest()!=PROFILES[sid]['sha256']:raise ValueError('unsupported source segment')
         payloads[sid]=data
     if set(payloads)!=set(PROFILES):raise ValueError('source segment missing')
-    inputs=[];wanted=[];summaries=[]
-    for c in cases(payloads):
-        inputs.append(' '.join(str(c[k]) for k in KEYS));line,observed,events=execute(payloads,c);wanted.append(line)
+    inputs=[];wanted=[];summaries=[];startup=None
+    if startup_data:
+        from verify_a5_initialization import sources,startup_image
+        startup=sources(manifest);image,below,above=startup_image(startup)
+        pairs=[(int.from_bytes(image[below-2534+i:below-2534+i+1],signed=True),int.from_bytes(image[below-2522+i:below-2522+i+1],signed=True)) for i in range(1,9)]
+        if pairs!=SYNTHETIC_DIRECTIONS:raise AssertionError('baseline fixture directions differ from recovered startup values')
+        inputs.append(f'{below} {above} {startup["DATA"].hex()} {startup["ZERO"].hex()} {startup["DREL"].hex()}')
+    for c in cases(payloads,startup_data):
+        inputs.append(' '.join(str(c[k]) for k in KEYS));line,observed,events=execute(payloads,c,startup);wanted.append(line)
         summaries.append({'config':c,'outcome':observed,'events':events,'result_sha256':hashlib.sha256(line.encode()).hexdigest()})
-    run=subprocess.run([str(driver.resolve())],input='\n'.join(inputs)+'\n',text=True,capture_output=True,check=True,timeout=60)
+    run=subprocess.run([str(driver.resolve()),*(['--startup-data'] if startup_data else [])],input='\n'.join(inputs)+'\n',text=True,capture_output=True,check=True,timeout=60)
     actual=run.stdout.splitlines()
     if len(actual)!=len(wanted):raise AssertionError('native result count')
     for index,(a,b) in enumerate(zip(actual,wanted)):
@@ -159,15 +170,17 @@ def verify(manifest,driver):
     import unicorn
     return {'schema':1,'unicorn_version':unicorn.__version__,'source_profiles':PROFILES,'cases':len(wanted),
             'scope':'Original selector and recovered lifecycle composition on authored worlds; DisposePtr observed/skipped',
+            'direction_origin':'original DATA/ZERO/DREL startup' if startup_data else 'supplied synthetic tables',
             'phase_counts':{p:sum(s['outcome']['phase']==p for s in summaries) for p in range(6)},'results':summaries}
 
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('manifest',type=Path);p.add_argument('--native-driver',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--startup-directions',action='store_true')
     a=p.parse_args();repo=Path(__file__).resolve().parents[2];output=a.output.resolve()
     if output.exists():p.error('refusing to overwrite evidence')
     if output.is_relative_to(repo) and not output.is_relative_to(repo/'local-generated'):p.error('keep original-derived evidence private')
-    report=verify(a.manifest,a.native_driver);output.parent.mkdir(parents=True,exist_ok=True);output.write_text(json.dumps(report,indent=2)+'\n')
+    report=verify(a.manifest,a.native_driver,a.startup_directions);output.parent.mkdir(parents=True,exist_ok=True);output.write_text(json.dumps(report,indent=2)+'\n')
     print(f'Matched {report["cases"]} original selector/lifecycle cases: {report["phase_counts"]}')
 
 
