@@ -429,3 +429,8 @@ CODE 6 helper and verifies the 19×67 conversion traversal on 111 authored maps
 (141,303 cells), plus 131,072 helper probes. Original instructions produce every
 seed word directly and every final record byte matches. This remains limited to
 the 43 supported direct branches and authored initial records.
+
+[Six additional level-word glyphs](LEVEL_GRID_CONVERSION.md) expand the connected
+model to 49 glyphs. Original conversion and RNG match on 188 grids/239,324 cells
+and 57,618 draw events, including complete RNG state and all output record bytes.
+This does not identify terrain semantics or complete creation/progression paths.

@@ -61,7 +61,7 @@ def grid_cases():
         yield make(bytes(rng.choice(GLYPHS) for _ in range(COUNT)),rng.randrange(-32768,32768),rng.randrange(256),rng.randrange(256),[rng.randrange(65536) for _ in range(3)],None)
 
 
-def run_grid(uc,c):
+def run_grid(uc,c,service_observer=None):
     header=bytearray(b'\xa5'*104);header[6]=c['flags'];header[8]=c['byte8']
     for row in range(19):struct.pack_into('>I',header,28+4*row,MAP+row*67)
     uc.mem_write(GRID-16,b'\x5a'*16+bytes(header)+c['records']+b'\x5a'*16)
@@ -72,7 +72,10 @@ def run_grid(uc,c):
                       (UC_M68K_REG_A7,STACK),(UC_M68K_REG_D7,c['level']&65535)):uc.reg_write(reg,value)
     events=[]
     def service(machine,address,size,user):
-        if address!=A5+0x742:raise AssertionError('unmodeled grid service')
+        if address!=A5+0x742:
+            if service_observer is None:raise AssertionError('unmodeled grid service')
+            service_observer(machine,address)
+            return
         sp=machine.reg_read(UC_M68K_REG_A7);args=bytes(machine.mem_read(sp+4,6))
         events.append((args[2],args[4],struct.unpack_from('>H',args)[0]))
     hook=uc.hook_add(UC_HOOK_CODE,service,begin=A5+32,end=A5+6335)
