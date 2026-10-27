@@ -7,8 +7,8 @@ cmake --build dist/sanitizers --parallel 4
 ctest --test-dir dist/sanitizers --output-on-failure
 ```
 
-Local GCC ASan/UBSan: **eleven native tests passed** (core, API, save, C ABI,
-seeded mutations, manual WAIT, and the separate RNG, grid-layout, selector, fallback and linked-record
+Local GCC ASan/UBSan: **twelve native tests passed** (core, API, save, C ABI,
+seeded mutations, manual WAIT, and the separate RNG, grid-layout, selector, fallback, linked-record and release
 research models). The mutation test exercises 2,000 corrupt save inputs,
 extreme numeric API arguments and locale-independent serialization. All assertions
 remain active in Release test targets. No sanitizer assertions are disabled.
