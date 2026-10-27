@@ -13,6 +13,76 @@ public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActiv
   runTestOnUiThread(() -> activity.findViewById(id).performClick()); getInstrumentation().waitForIdleSync();
  }
  private String status(MainActivity activity) { return ((TextView)activity.findViewById(R.id.status)).getText().toString(); }
+ private MainActivity awaitRecreated(MainActivity previous,Instrumentation.ActivityMonitor monitor) throws Throwable {
+  long deadline=android.os.SystemClock.uptimeMillis()+20000;
+  while(android.os.SystemClock.uptimeMillis()<deadline) {
+   MainActivity candidate=(MainActivity)monitor.waitForActivityWithTimeout(Math.max(1,deadline-android.os.SystemClock.uptimeMillis()));
+   if(candidate==null)break;
+   getInstrumentation().waitForIdleSync();boolean[] live={false};
+   runTestOnUiThread(() -> {live[0]=candidate!=previous && !candidate.isDestroyed() && !candidate.isFinishing();});
+   if(live[0])return candidate;
+  }
+  fail("A distinct live activity was not recreated");return null;
+ }
+ private void automaticPlacement(MainActivity activity) throws Throwable {
+  for(int n=0;n<3 && !((android.widget.Button)activity.findViewById(R.id.controls_position)).getText().toString().equals("Controls: Auto");++n)click(activity,R.id.controls_position);
+ }
+ private void assertPlacement(MainActivity activity,int position) throws Throwable {
+  java.util.concurrent.CountDownLatch laidOut=new java.util.concurrent.CountDownLatch(1);
+  runTestOnUiThread(() -> {
+   View root=activity.findViewById(R.id.layout_root);
+   root.getViewTreeObserver().addOnPreDrawListener(new android.view.ViewTreeObserver.OnPreDrawListener() {
+    public boolean onPreDraw() {root.getViewTreeObserver().removeOnPreDrawListener(this);laidOut.countDown();return true;}
+   });root.requestLayout();root.invalidate();
+  });
+  boolean drawn=laidOut.await(10,java.util.concurrent.TimeUnit.SECONDS);
+  StringBuilder state=new StringBuilder();
+  runTestOnUiThread(() -> {
+   View root=activity.findViewById(R.id.layout_root);
+   state.append(" attached=").append(root.isAttachedToWindow()).append(" shown=").append(root.isShown())
+    .append(" focus=").append(root.hasWindowFocus()).append(" width=").append(root.getWidth())
+    .append(" visibility=").append(root.getWindowVisibility()).append(" destroyed=").append(activity.isDestroyed());
+  });
+  assertTrue("Control placement layout was not drawn:"+state,drawn);
+  runTestOnUiThread(() -> {
+   android.widget.LinearLayout root=activity.findViewById(R.id.layout_root),dpad=activity.findViewById(R.id.dpad);
+   for(int n=0;n<dpad.getChildCount();++n) {
+    android.view.ViewGroup row=(android.view.ViewGroup)dpad.getChildAt(n);
+    View first=row.getChildAt(0),last=row.getChildAt(row.getChildCount()-1);
+    int span=last.getRight()-first.getLeft(),free=row.getWidth()-row.getPaddingLeft()-row.getPaddingRight()-span;
+    assertTrue(row.getWidth()>0 && span>0);
+    int expected=row.getPaddingLeft()+(position==0?free/2:position==1?0:free);
+    assertEquals("Directional row position",expected,first.getLeft());
+   }
+   if(root.getOrientation()==android.widget.LinearLayout.HORIZONTAL)
+    assertEquals(position==1?R.id.control_panel:R.id.scene,root.getChildAt(0).getId());
+   else assertEquals(R.id.scene,root.getChildAt(0).getId());
+   android.widget.Button button=activity.findViewById(R.id.controls_position);
+   assertTrue(button.getHeight()>=Math.round(48*activity.getResources().getDisplayMetrics().density));
+   assertTrue(button.getContentDescription().toString().contains("Control placement"));
+  });
+ }
+ public void testControlPlacementPreservesStateAndVisibility() throws Throwable {
+  MainActivity a=getActivity();click(a,R.id.restart);click(a,R.id.move_right);automaticPlacement(a);
+  if(a.findViewById(R.id.dpad).getVisibility()!=View.VISIBLE)click(a,R.id.controls);
+  String before=status(a);assertPlacement(a,0);
+  click(a,R.id.controls_position);assertEquals(before,status(a));assertPlacement(a,1);
+  click(a,R.id.controls_position);assertEquals(before,status(a));assertPlacement(a,2);
+  if(a.findViewById(R.id.dpad).getVisibility()==View.VISIBLE)click(a,R.id.controls);
+  click(a,R.id.controls_position);assertEquals(View.GONE,a.findViewById(R.id.dpad).getVisibility());
+  assertEquals(before,status(a));click(a,R.id.controls);assertPlacement(a,0);
+ }
+ public void testControlPlacementSurvivesRecreation() throws Throwable {
+  MainActivity a=getActivity();click(a,R.id.restart);click(a,R.id.move_right);automaticPlacement(a);click(a,R.id.controls_position);
+  if(a.findViewById(R.id.dpad).getVisibility()!=View.VISIBLE)click(a,R.id.controls);
+  String before=status(a);Instrumentation.ActivityMonitor monitor=getInstrumentation().addMonitor(MainActivity.class.getName(),null,false);
+  try {
+   runTestOnUiThread(() -> a.recreate());MainActivity recreated=awaitRecreated(a,monitor);
+   assertNotNull(recreated);getInstrumentation().waitForIdleSync();assertEquals(before,status(recreated));
+   assertEquals("Controls: Left",((android.widget.Button)recreated.findViewById(R.id.controls_position)).getText().toString());
+   assertPlacement(recreated,1);automaticPlacement(recreated);
+  } finally {getInstrumentation().removeMonitor(monitor);}
+ }
  public void testModeKeepsTurnsAndRestartIsExplicit() throws Throwable {
   MainActivity a=getActivity(); click(a,R.id.restart); click(a,R.id.move_right);
   assertTrue(status(a).contains("Turns: 1"));
@@ -33,7 +103,7 @@ public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActiv
   Instrumentation.ActivityMonitor monitor=getInstrumentation().addMonitor(MainActivity.class.getName(),null,false);
   try {
    runTestOnUiThread(() -> a.recreate());
-   MainActivity recreated=(MainActivity)monitor.waitForActivityWithTimeout(20000);
+   MainActivity recreated=awaitRecreated(a,monitor);
    assertNotNull(recreated);getInstrumentation().waitForIdleSync();
    assertEquals(before,status(recreated));
   } finally { getInstrumentation().removeMonitor(monitor); }
@@ -246,7 +316,7 @@ public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActiv
   Instrumentation.ActivityMonitor monitor=getInstrumentation().addMonitor(MainActivity.class.getName(),null,false);
   try {
    runTestOnUiThread(() -> a.recreate());
-   MainActivity recreated=(MainActivity)monitor.waitForActivityWithTimeout(20000);
+   MainActivity recreated=awaitRecreated(a,monitor);
    assertNotNull(recreated);getInstrumentation().waitForIdleSync();
    assertEquals("Sound: On",((android.widget.Button)recreated.findViewById(R.id.sound_toggle)).getText().toString());
    assertEquals(37,((android.widget.SeekBar)recreated.findViewById(R.id.sound_volume)).getProgress());

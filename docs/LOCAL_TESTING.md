@@ -339,3 +339,16 @@ both optional external graphics decoders present. CMake/CTest passed
 **16/16 ASan/UBSan** and **17/17 SDL** checks. Production Python scripts are
 unchanged (last measured coverage 82%). Unresolved glyphs remain unsupported;
 no full generator, new APK/runtime, original boot, CI run or release is claimed.
+
+## Android control placement — 2026-10-27
+
+`sh scripts/test_local.sh` passed **56 Python tests** and native regressions
+with both optional graphics decoders present. Debug/test APK and debug lint,
+unsigned release APK/AAB and release lint passed. All **17 instrumentation tests**
+passed on API 23 x86_64 at measured 1.0/portrait and 1.3/landscape, target SDK 35.
+The independent lifecycle helper also preserved Left placement and turn 2 across
+process death and three background cycles, with a clean app crash buffer.
+See ANDROID_RUNTIME.md for artifact identity, harness fixes and unrun checks.
+Android-only changes do not alter the preceding 16/16 sanitizer and 17/17 SDL
+results; those suites were not rerun for this UI increment. No Actions or release
+was triggered.

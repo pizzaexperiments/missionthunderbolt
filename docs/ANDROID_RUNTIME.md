@@ -110,3 +110,41 @@ output-stack behavior, not audible host/physical-device proof. Focus callbacks
 were injected; real competing-client arbitration and hardware routing remain
 unverified. No historical sample or cue mapping is packaged. See
 [NATIVE_AUDIO.md](NATIVE_AUDIO.md) for behavior and limits.
+
+## Configurable control placement increment — 2026-10-27
+
+The complete **17-test suite passed on API 23 x86_64** at measured font scale
+1.0/portrait and 1.3/landscape, target SDK 35. Tests measure directional row
+positions and landscape child order for Auto/Left/Right, check the 48 dp placement
+button and accessible description, preserve game state and hidden controls, and
+verify the setting on a distinct live recreated Activity. The recreation helper
+now rejects stale/destroyed Activity instances for all three recreation tests.
+
+Initial runs exposed an API-24-only test getter and a stale Activity reference in
+the harness. Actual measured geometry replaced the getter; the live-instance
+check resolved the latter. Assertions remain enabled. Writing the font setting
+alone left the app at 1.0; that landscape run passed 17 tests but is not counted
+as 1.3 evidence. Selecting Huge through Settings produced the reported 1.3 and
+the full suite passed again. The audio output check still consumed 528 authored
+PCM frames; the emulator has no host audio.
+
+Debug/test builds and debug lint passed. Unsigned release APK/AAB and release
+lint passed. The debug APK signature verified (apksigner also warned that the
+META-INF Gradle metadata entry is not signature-protected). Debug APK SHA-256:
+`5cdd119778ec35022909c3f6552286e16c838d7d375019c347f7ddcefb7675c5`.
+This identifies a local debug artifact, not a production-signed release.
+
+To independently check placement persistence alongside process death and three
+background cycles, install the debug APK, then run:
+
+```sh
+python3 tests/android_lifecycle_smoke.py --serial SERIAL --check-control-placement --output dist/verification/control-placement-lifecycle
+```
+
+The independent run passed on API 23 x86_64: Left placement and Modern/turn 2
+state survived forced process death and three background cycles; the app crash
+buffer was clean. The final synthetic screenshot shows portrait Left placement.
+
+The helper deliberately resets the synthetic demo and selects Left. Physical
+ARM64/TalkBack/gamepad, API 35 runtime, low-memory, performance and power checks
+remain unrun. This increment does not establish original gameplay fidelity.
