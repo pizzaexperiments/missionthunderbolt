@@ -148,3 +148,63 @@ buffer was clean. The final synthetic screenshot shows portrait Left placement.
 The helper deliberately resets the synthetic demo and selects Left. Physical
 ARM64/TalkBack/gamepad, API 35 runtime, low-memory, performance and power checks
 remain unrun. This increment does not establish original gameplay fidelity.
+
+## Audio memory-pressure handling — issue #18
+
+The Activity now forwards `onTrimMemory` at RUNNING_LOW or higher and legacy
+`onLowMemory` to the audio component. It cancels the pending completion, abandons
+focus and releases the cached static track. RUNNING_MODERATE retains the cache.
+Enabled/volume settings and active/paused/closed state are retained: trimming
+does not automatically replay sound or activate paused output. A subsequent
+foreground cue lazily recreates output. No gameplay save schema or mechanics
+change is involved.
+
+Two instrumentation tests cover repeated release, paused/closed output, lazy
+recreation and Activity forwarding at six trim levels plus repeated low-memory
+callbacks. They compare the entire native serialized state (map, player, turns,
+RNG and presentation, including its checksum), not only the status text.
+Reflection in the test accesses existing private state; no public test API is
+added to the app. Callback injection does not simulate actual resource exhaustion
+or a low-memory-killer decision.
+
+The lifecycle helper can additionally ask Android to send COMPLETE trim while
+the synthetic app is backgrounded, before process death and during three
+background cycles:
+
+```sh
+python3 tests/android_lifecycle_smoke.py --serial SERIAL --check-control-placement --send-memory-trim --output dist/verification/memory-pressure-lifecycle
+```
+
+The helper checks that the shell command is accepted; it does not independently
+observe callback delivery or the system's real memory-pressure policy. Existing
+Activity callback tests cover the handler. Physical ARM64, API 35 runtime, actual
+OOM/low-memory kills, performance and battery measurements remain unverified.
+
+Validation on 2026-10-27: all **19 instrumentation tests passed on API 23
+x86_64**, measured font scale **1.3**, portrait, target SDK 35; AudioTrack consumed
+528 authored PCM frames. The local runner requested 1.0 but the running framework
+retained 1.3, so its final configuration assertion failed after the complete
+suite passed. This is recorded as a 1.3 run only; normal-font/landscape results
+for this 19-test suite are unrun. Prior 17-test configurations remain historical
+checkpoints. The raw failure log and a measured-configuration report remain
+under ignored local paths.
+
+Debug/test APKs and debug lint, unsigned release APK/AAB and release lint passed
+using `gradle --no-daemon assembleDebug assembleDebugAndroidTest lintDebug
+assembleRelease bundleRelease lintRelease` from `android/`. Debug signature
+verification passed, with the same Gradle META-INF metadata warning noted above.
+Debug APK SHA-256:
+`a5eb61453e883bfd76a5dff016973c8d3b58781019ea49b103bf9e1a0139f3ef`.
+
+The initial edit used the wrong working directory and changed no files. The
+first emulator launch also lacked the existing AVD locator; selecting
+`ANDROID_AVD_HOME=/workspace/.cloud-setup/android-user/avd` resolved that setup
+failure. The subsequent build includes the new callbacks and both tests. No
+Actions or release was triggered.
+
+The independent lifecycle run also passed on API 23 x86_64/target SDK 35:
+Classic/turn 2 and Left placement survived process death and three background
+cycles, with COMPLETE trim requests accepted at each background interval and a
+clean app crash buffer. The final synthetic screenshot shows portrait Left
+placement. Reports/screenshots remain ignored in
+`dist/verification/memory-pressure-lifecycle/`.

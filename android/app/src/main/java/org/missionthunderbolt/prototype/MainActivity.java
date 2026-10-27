@@ -177,6 +177,13 @@ public class MainActivity extends Activity {
  }
  @Override protected void onResume() {super.onResume();if(audio!=null)audio.resume();}
  @Override protected void onDestroy() {if(audio!=null)audio.close();super.onDestroy();}
+ @Override public void onTrimMemory(int level) {
+  super.onTrimMemory(level);
+  if(level>=android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW && audio!=null)audio.trimMemory();
+ }
+ @Override public void onLowMemory() {
+  super.onLowMemory();if(audio!=null)audio.trimMemory();
+ }
  @Override protected void onPause() {
   persistState(); getPreferences(MODE_PRIVATE).edit().putBoolean("controls",controlsVisible).putFloat("zoom",zoom).apply();
   getPreferences(MODE_PRIVATE).edit().putBoolean("sound_enabled",audio.isEnabled()).putInt("sound_volume",audio.getVolumePercent()).apply();

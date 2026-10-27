@@ -46,7 +46,7 @@ and Activity recreation. App install and `am start -W` also succeeded. APK tests
 use Android's platform test runner without third-party test dependencies; no CI
 run was triggered. Physical ARM64/API 35 acceptance is not implied by this result.
 
-The expanded 17-test suite, measured 1.3× font scaling, lifecycle and current
+The expanded 19-test suite, measured 1.3× font scaling, lifecycle and current
 limitations are recorded in [Android runtime evidence](ANDROID_RUNTIME.md).
 
 WAIT, Space and keypad-5 now consume one prototype time unit in place; see

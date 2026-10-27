@@ -36,6 +36,8 @@ final class DemoAudio implements AudioManager.OnAudioFocusChangeListener {
  }
  synchronized void resume() {if(!closed)active=true;}
  synchronized void pause() {active=false;stopAndAbandon();releaseTrack();}
+ // Release cached output under memory pressure, retaining settings and active state.
+ synchronized void trimMemory() {stopAndAbandon();releaseTrack();}
  synchronized void close() {pause();closed=true;}
  synchronized boolean playCue() {
   if(!enabled || !active || closed || unavailable || volumePercent==0 || manager==null)return false;

@@ -3,7 +3,7 @@
 This is a **synthetic native prototype**, not a faithful original-game port.
 Work proceeds on `feature/offline-research-tooling`, with `develop` as integration
 and `main` release-only. Commits are separately reviewable. Closures of #2, #4, #5, #24 and #25 were verified through the live GitHub API;
-Implementation PRs through [#33](https://github.com/pizzaexperiments/missionthunderbolt/pull/33) were verified merged into develop. GitHub Actions stays manual-only
+Implementation PRs through [#34](https://github.com/pizzaexperiments/missionthunderbolt/pull/34) were verified merged into develop. GitHub Actions stays manual-only
 because credits are unavailable; no CI run/public release is claimed here.
 
 ## Dependency order
@@ -50,7 +50,7 @@ flowchart TD
 | [#15](https://github.com/pizzaexperiments/missionthunderbolt/issues/15) | Versioned synthetic state, CRC32, migration/corruption/continuation tests and app-private atomic storage | Extend format only as real gameplay systems exist; no proprietary-save compatibility claim |
 | [#16](https://github.com/pizzaexperiments/missionthunderbolt/issues/16) | Original graphics available privately for research; reference requirements identified | Faithful Classic layout/menus/fonts/resource mapping and screenshot comparisons; current skins are demo-only |
 | [#17](https://github.com/pizzaexperiments/missionthunderbolt/issues/17) | Shared-state skins, persistent Auto/Left/Right controls, virtual accessible map cells/actions, zoom, keyboard/joystick and 17-test runtime regressions | Physical TalkBack usability, physical gamepad and broader device testing |
-| [#18](https://github.com/pizzaexperiments/missionthunderbolt/issues/18) | Recreation requires distinct live Activities; app-private state and control placement persistence tested; target 35 with inset handling | See Android runtime evidence for exact configurations; physical ARM64/performance and power/audio-focus acceptance remain |
+| [#18](https://github.com/pizzaexperiments/missionthunderbolt/issues/18) | Recreation requires distinct live Activities; state/control placement persistence and audio memory-pressure callbacks; target 35 with inset handling | See Android runtime evidence for exact configurations; physical ARM64/performance and power/audio-focus acceptance remain |
 | [#19](https://github.com/pizzaexperiments/missionthunderbolt/issues/19) | SDL native host, real render/input/save smoke checks on Linux, Windows static packaging configuration | Windows build/launch/physical input and portable ZIP verification |
 | [#20](https://github.com/pizzaexperiments/missionthunderbolt/issues/20) | Native `.app` metadata and separate pinned ARM64/Intel presets/manual artifact jobs | Both Mac builds/launch/save/input checks, signing/notarization |
 | [#22](https://github.com/pizzaexperiments/missionthunderbolt/issues/22) | Parser/save mutations, ASan/UBSan, 82% Python coverage; 1.72M coverage-guided synthetic parser executions | Original differential/screenshot goldens and longer-running scheduled fuzzing |
