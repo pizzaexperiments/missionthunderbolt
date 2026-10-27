@@ -2,8 +2,8 @@
 
 This is a **synthetic native prototype**, not a faithful original-game port.
 Work proceeds on `feature/offline-research-tooling`, with `develop` as integration
-and `main` release-only. Commits are separately reviewable. Closures of #4, #24 and #25 were verified through the live GitHub API;
-[PR #26](https://github.com/pizzaexperiments/missionthunderbolt/pull/26) was verified merged into develop. GitHub Actions stays manual-only
+and `main` release-only. Commits are separately reviewable. Closures of #2, #4, #24 and #25 were verified through the live GitHub API;
+[PR #26](https://github.com/pizzaexperiments/missionthunderbolt/pull/26) and [PR #27](https://github.com/pizzaexperiments/missionthunderbolt/pull/27) were verified merged into develop. GitHub Actions stays manual-only
 because credits are unavailable; no CI run/public release is claimed here.
 
 ## Dependency order
@@ -34,10 +34,10 @@ flowchart TD
 | Issue | Implemented/researched checkpoint | Remaining acceptance / evidence |
 | --- | --- | --- |
 | [#1](https://github.com/pizzaexperiments/missionthunderbolt/issues/1) | Pinned selected SDK/NDK/CMake/build-tools, verified local APK and manual artifact checks | Green CI run and uploaded Actions artifact still pending; no automatic runs |
-| [#2](https://github.com/pizzaexperiments/missionthunderbolt/issues/2) | Android setup/install/launch guide; clean tracked-source export built on Linux; emulator install/launch tested | Windows/macOS setup and physical device validation |
+| [#2](https://github.com/pizzaexperiments/missionthunderbolt/issues/2) | Android setup/install/launch guide; clean tracked-source export built on Linux; emulator install/launch tested | Closed as completed: clean Linux clone and documented install/launch satisfy the issue; native platforms/device breadth remain in #18–#20 |
 | [#3](https://github.com/pizzaexperiments/missionthunderbolt/issues/3) | Provenance boundaries, private import/index guard; maintainer selected MIT for new code | Historical redistribution rights remain ungranted; current rights-holder/permission research |
 | [#4](https://github.com/pizzaexperiments/missionthunderbolt/issues/4) | StuffIt decoded locally; AppleDouble/resource parser produced 1,571 hash-linked entries, including 15 CODE/13 CREL | Closed as completed; source difference documented; implementation merged through PR #26 |
-| [#5](https://github.com/pizzaexperiments/missionthunderbolt/issues/5) | 908 resource PICTs + 26 standalone slides decoded; PNG catalogs/contact sheets, indexed 1/4/8-bit fixtures | Independent original-runtime visual comparison and semantic sprite attribution |
+| [#5](https://github.com/pizzaexperiments/missionthunderbolt/issues/5) | 908 resource PICTs + 26 standalone slides decoded; PNG catalogs/contact sheets, indexed 1/4/8-bit fixtures | Independent decoder: 933/934 exact, one retained monochrome mismatch; original-runtime visual comparison and semantic sprite attribution |
 | [#6](https://github.com/pizzaexperiments/missionthunderbolt/issues/6) | Evidence-labeled trace validator, capture protocol, manual evidence notes | Lawful original reference environment/recordings; executable 2.0.g differs from manual 1.0 |
 | [#7](https://github.com/pizzaexperiments/missionthunderbolt/issues/7) | 28 Ghidra imports; 788 jump entries; 8,697 static call candidates; trap-frontier hypotheses; isolated RNG/grid-helper/selector instruction checks | CREL/runtime addressing, full trap/state/scheduler roles, RNG lifecycle and gameplay corroboration |
 | [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) | RNG/grid/selector models plus fallback control flow; 1,068 fallback and 105 full-pipeline comparisons with service shims | Recover and implement original generator/progression with golden traces |
@@ -54,7 +54,7 @@ flowchart TD
 | [#19](https://github.com/pizzaexperiments/missionthunderbolt/issues/19) | SDL native host, real render/input/save smoke checks on Linux, Windows static packaging configuration | Windows build/launch/physical input and portable ZIP verification |
 | [#20](https://github.com/pizzaexperiments/missionthunderbolt/issues/20) | Native `.app` metadata and separate pinned ARM64/Intel presets/manual artifact jobs | Both Mac builds/launch/save/input checks, signing/notarization |
 | [#22](https://github.com/pizzaexperiments/missionthunderbolt/issues/22) | Parser/save mutations, ASan/UBSan, 86% Python coverage; 1.72M coverage-guided synthetic parser executions | Original differential/screenshot goldens and longer-running scheduled fuzzing |
-| [#23](https://github.com/pizzaexperiments/missionthunderbolt/issues/23) | MIT/notices, unsigned release APK/AAB build, review hashes/SPDX inventory tool and manual signing workflow | Signing bindings, reviewed tag, complete dependency SBOM/notices, native packages and release review; no publication |
+| [#23](https://github.com/pizzaexperiments/missionthunderbolt/issues/23) | MIT/notices, unsigned release APK/AAB build, review hashes/SPDX inventory tool and manual signing workflow | NDK archive hashes/link-map/build-ID evidence added; component license attribution, signing bindings, reviewed tag, native packages and release review; no publication |
 | [#24](https://github.com/pizzaexperiments/missionthunderbolt/issues/24) | ADR retains offline C ABI and defers an unneeded HTTP service | Closed as completed; revisit only for a concrete network consumer |
 | [#25](https://github.com/pizzaexperiments/missionthunderbolt/issues/25) | Root instructions, dependency roadmap, explicit evidence and PR definition of done | Closed as completed; implementation merged through PR #26 |
 

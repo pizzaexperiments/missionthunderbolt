@@ -29,7 +29,8 @@ original-game fidelity or completion of other issues.
 ## Keep open
 
 - #1 needs the requested CI artifact evidence; Actions stays manual-only.
-- #2 and #14 need native platform verification; #19/#20 need their actual OS builds.
+- #14 needs native platform verification; #19/#20 need their actual OS builds.
+- #2 was subsequently closed against its stated one-machine acceptance; see below.
 - #3 still lacks historical redistribution permission.
 - #5/#6/#16 need original reference evidence and faithful resource/layout mapping.
 - #7–#12 have research progress, including instruction-corroborated RNG routines,
@@ -45,5 +46,23 @@ original-game fidelity or completion of other issues.
 - #23 needs signing/review/dependency inventory and target platform artifacts.
 
 #21 was also confirmed closed in the refreshed live issue list; it is tracked
-as a duplicate of #1. All other issues above remain open. Recheck live acceptance
+as a duplicate of #1. All other issues above except #2 remain open. Recheck live acceptance
 and comments before subsequent closures.
+
+## Follow-up closeout — Android development instructions
+
+PR #27 was verified merged as `f693dfd511ea5e7d18653a92f4dc9ab426626c3d`
+on 2026-10-27. The feature branch was fast-forwarded to that develop head.
+Issue [#2](https://github.com/pizzaexperiments/missionthunderbolt/issues/2) was
+closed as completed after refreshing its live acceptance and comments. Its four
+criteria require one verified clean-clone host, documented install/launch, no
+user-specific paths/secrets, and versions matching CI. The remote clean-clone
+Linux build in [build evidence](verification/android-build.md), portable
+[setup guide](ANDROID_DEVELOPMENT.md), and recorded API 23 install/launch fulfill
+that scope. Download caches were reused. Windows/macOS execution and physical
+device breadth were previously treated as extra blockers for #2; those belong
+to #18–#20 and do not change its one-machine requirement.
+
+[Closeout evidence](https://github.com/pizzaexperiments/missionthunderbolt/issues/2#issuecomment-6431707124).
+No CI run, merge, tag, production signing or release publication was performed
+by this increment.

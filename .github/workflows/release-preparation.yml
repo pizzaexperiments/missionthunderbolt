@@ -55,7 +55,7 @@ jobs:
         run: |
           sh scripts/test_local.sh
           cd android
-          gradle --no-daemon assembleRelease bundleRelease
+          gradle --no-daemon assembleRelease bundleRelease exportReleaseRuntimeDependencies
       - name: Sign and verify review artifacts
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -77,11 +77,14 @@ jobs:
           jarsigner -keystore "$KEYSTORE" -storepass:env ANDROID_KEYSTORE_PASSWORD -keypass:env ANDROID_KEY_PASSWORD -signedjar dist/release-artifacts/mission-thunderbolt.aab android/app/build/outputs/bundle/release/app-release.aab "$ANDROID_KEY_ALIAS"
           jarsigner -J-Duser.language=en -J-Duser.country=US -verify dist/release-artifacts/mission-thunderbolt.aab | tee "$RUNNER_TEMP/aab-verify.log"
           grep -q '^jar verified\.' "$RUNNER_TEMP/aab-verify.log"
+      - name: Collect packaged runtime dependency evidence
+        run: |
+          python3 scripts/android_dependency_evidence.py --artifact dist/release-artifacts/mission-thunderbolt.apk --artifact dist/release-artifacts/mission-thunderbolt.aab --ndk "$ANDROID_HOME/ndk/27.2.12479018" --runtime-report android/app/build/reports/release-runtime-dependencies.json --build-root android/app/.cxx/RelWithDebInfo --output dist/android-dependencies.json
       - name: Prepare review-only hashes and SPDX inventory
         env:
           RELEASE_TAG: ${{ inputs.tag }}
         run: |
-          python3 scripts/prepare_release.py --version "$RELEASE_TAG" --artifact dist/release-artifacts/mission-thunderbolt.apk --artifact dist/release-artifacts/mission-thunderbolt.aab --output dist/release-review --apksigner "$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          python3 scripts/prepare_release.py --version "$RELEASE_TAG" --artifact dist/release-artifacts/mission-thunderbolt.apk --artifact dist/release-artifacts/mission-thunderbolt.aab --output dist/release-review --apksigner "$ANDROID_HOME/build-tools/35.0.0/apksigner" --dependency-evidence dist/android-dependencies.json
           cp CHANGELOG.md dist/release-review/
           mkdir -p dist/release-review/licenses
           cp "$ANDROID_HOME/ndk/27.2.12479018/NOTICE" dist/release-review/licenses/Android-NDK-NOTICE.txt
