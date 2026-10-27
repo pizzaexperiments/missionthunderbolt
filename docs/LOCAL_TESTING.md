@@ -258,3 +258,27 @@ was changed by the agent. The previous 401 therefore records an earlier
 authentication failure, not an ongoing repository-permission or network-policy
 blocker. The available responses do not establish why the credential was
 rejected then and accepted later. PR/issue publication resumed after that check.
+
+## Connected selector/lifecycle — 2026-10-27
+
+PR #31 was verified merged into develop as
+`efdf7a8427c4302a1768350ed8cc4cc92c8809a8`; the feature branch was fast-forwarded.
+The combined original/native oracle passed **486 authored worlds**, running seven
+original CODE segments through initialization, selector, fallback and all four
+recovered lifecycle callbacks plus the prefix wrapper. Only DisposePtr was
+observed/skipped. Path counts: 54 first-scan, 30 second-scan, 84 random acceptance,
+210 retry-budget stops, 72 direct and 36 neighbor. Grid/record bytes, prefix words,
+header/RNG state and callback order matched; guard and return checks passed.
+Commands and limits are in GRID_RESEARCH.md.
+
+The initial combined run exposed a missing native trace event for nested child
+service entry, while final modeled state matched. The optional child-entry
+observer fixes observability without changing default release semantics. The
+isolated **1,730-case release oracle** passed again after that addition. Public
+regressions check entry-time count/slot state and connected frozen traces.
+
+`sh scripts/test_local.sh` passed **56 Python tests** plus native regressions with
+both optional graphics decoders available. CMake/CTest passed **13/13 ASan/UBSan**
+and **14/14 SDL** checks. Production Python tools are unchanged (last measured
+coverage 82%). No new APK/runtime validation, original game boot, actual heap
+reclamation or full map/gameplay claim is made; original outputs remain ignored.

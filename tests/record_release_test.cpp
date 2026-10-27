@@ -58,13 +58,18 @@ int main() {
     assert(result.status==M::Status::budget_exhausted && result.steps==64 && nodes.at(1).branch30==1);
     nodes={{1,{0,0}},{2,{0,0}}};M::Parent parent;parent.count51=2;parent.field52=9;
     parent.slots60[0]=1;parent.slots60[1]=2;parent.slots60[126]=77;events.clear();
+    std::vector<uint32_t> entries;
     result=M::release12(nodes,parent,10,32,[&](uint32_t id) {
         if(id==2)assert(parent.count51==1 && parent.slots60[1]==2);
         if(id==1)assert(parent.count51==0 && parent.slots60[1]==0 && parent.slots60[0]==1);
         events.push_back(id);
+    },[&](uint32_t id) {
+        assert(parent.count51==(id==2?1:0));
+        assert(parent.slots60[parent.count51]==id);entries.push_back(id);
     });
     assert(result.status==M::Status::complete && result.steps==5);
     assert((events==std::vector<uint32_t>{2,1,9,10}));
+    assert((entries==std::vector<uint32_t>{2,1}));
     assert(parent.count51==0 && parent.field52==9 && parent.slots60[0]==0 && parent.slots60[1]==0 && parent.slots60[126]==77);
     parent.count51=2;parent.slots60[0]=1;parent.slots60[1]=2;events.clear();
     result=M::release12(nodes,parent,10,2,[&](uint32_t id){events.push_back(id);});
