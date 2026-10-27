@@ -1,7 +1,7 @@
 # ADR 0001: retain the in-process C API; defer HTTP — issue #24
 
 Status: accepted for this restoration workstream under the maintainer's closeout instruction, 2026-10-27. Issue #24 is closed; implementation is in
-[draft PR #26](https://github.com/pizzaexperiments/missionthunderbolt/pull/26), which remains unmerged.
+[PR #26](https://github.com/pizzaexperiments/missionthunderbolt/pull/26), verified merged into develop on 2026-10-27.
 
 ## Context and consumers
 

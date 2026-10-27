@@ -98,3 +98,29 @@ were confirmed closed as completed after refreshing their live bodies/comments.
 The environment's older policy snapshot did not reflect the working API route.
 Existing credentials were reused. No code or test behavior changed for closeout;
 previous local verification remains the evidence. No Actions run or merge occurred.
+
+## Post-merge fallback and native demo audio — 2026-10-27
+
+The live API confirmed PR #26 merged into develop as
+`a851a724e7d371d4e8307982b70202549502d50b`. The active feature branch was
+fast-forwarded to that head while preserving the in-progress changes.
+
+Fallback verification passed **1,068** isolated cases and **105** composed
+selector/fallback cases, comparing grid bytes, RNG state and synthetic callback
+order. Original linked-record callbacks and historical direction values remain
+unverified. `sh scripts/test_local.sh` passed 45 Python tests plus native
+regressions; CMake/CTest passed **10/10 ASan/UBSan** and **11/11 SDL** checks.
+
+The opt-in authored PCM path passed **15 Android instrumentation tests**, with
+**528 consumed frames** reported at 22,050 Hz, on API 23 x86_64/normal portrait/
+target SDK 35. The static-track initialization-order defect found in the first
+attempt was corrected before the successful complete run. Process-death restore
+and three background cycles passed with a clean app crash buffer. Debug/test
+builds, debug lint, unsigned release APK/AAB builds and release lint passed.
+The `-no-audio` emulator verifies platform frame consumption, not audible output
+or original audio fidelity. Physical/API35/OS focus competition remain unrun.
+
+Current audio-enabled debug demo: `dist/mission-thunderbolt-research-debug.apk`,
+SHA256 `627c494b01c98bb2c017e113b6739d4af17cb62209feb1973209250fb20a0c18`. Earlier hashes
+above identify their prior checkpoints. Sound defaults off; no original audio
+is packaged. This is a debug-signed synthetic demo, not a production release.

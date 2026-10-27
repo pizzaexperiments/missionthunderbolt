@@ -3,7 +3,7 @@
 This is a **synthetic native prototype**, not a faithful original-game port.
 Work proceeds on `feature/offline-research-tooling`, with `develop` as integration
 and `main` release-only. Commits are separately reviewable. Closures of #4, #24 and #25 were verified through the live GitHub API;
-[draft PR #26](https://github.com/pizzaexperiments/missionthunderbolt/pull/26) remains unmerged. GitHub Actions stays manual-only
+[PR #26](https://github.com/pizzaexperiments/missionthunderbolt/pull/26) was verified merged into develop. GitHub Actions stays manual-only
 because credits are unavailable; no CI run/public release is claimed here.
 
 ## Dependency order
@@ -36,16 +36,16 @@ flowchart TD
 | [#1](https://github.com/pizzaexperiments/missionthunderbolt/issues/1) | Pinned selected SDK/NDK/CMake/build-tools, verified local APK and manual artifact checks | Green CI run and uploaded Actions artifact still pending; no automatic runs |
 | [#2](https://github.com/pizzaexperiments/missionthunderbolt/issues/2) | Android setup/install/launch guide; clean tracked-source export built on Linux; emulator install/launch tested | Windows/macOS setup and physical device validation |
 | [#3](https://github.com/pizzaexperiments/missionthunderbolt/issues/3) | Provenance boundaries, private import/index guard; maintainer selected MIT for new code | Historical redistribution rights remain ungranted; current rights-holder/permission research |
-| [#4](https://github.com/pizzaexperiments/missionthunderbolt/issues/4) | StuffIt decoded locally; AppleDouble/resource parser produced 1,571 hash-linked entries, including 15 CODE/13 CREL | Closed as completed; source difference documented; implementation in unmerged PR #26 |
+| [#4](https://github.com/pizzaexperiments/missionthunderbolt/issues/4) | StuffIt decoded locally; AppleDouble/resource parser produced 1,571 hash-linked entries, including 15 CODE/13 CREL | Closed as completed; source difference documented; implementation merged through PR #26 |
 | [#5](https://github.com/pizzaexperiments/missionthunderbolt/issues/5) | 908 resource PICTs + 26 standalone slides decoded; PNG catalogs/contact sheets, indexed 1/4/8-bit fixtures | Independent original-runtime visual comparison and semantic sprite attribution |
 | [#6](https://github.com/pizzaexperiments/missionthunderbolt/issues/6) | Evidence-labeled trace validator, capture protocol, manual evidence notes | Lawful original reference environment/recordings; executable 2.0.g differs from manual 1.0 |
 | [#7](https://github.com/pizzaexperiments/missionthunderbolt/issues/7) | 28 Ghidra imports; 788 jump entries; 8,697 static call candidates; trap-frontier hypotheses; isolated RNG/grid-helper/selector instruction checks | CREL/runtime addressing, full trap/state/scheduler roles, RNG lifecycle and gameplay corroboration |
-| [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) | RNG initializer, 67×19 record layout and bounded candidate selector modeled; 105 selector/RNG instruction comparisons | Recover and implement original generator/progression with golden traces |
+| [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) | RNG/grid/selector models plus fallback control flow; 1,068 fallback and 105 full-pipeline comparisons with service shims | Recover and implement original generator/progression with golden traces |
 | [#9](https://github.com/pizzaexperiments/missionthunderbolt/issues/9) | Manual-backed WAIT; signed-byte coordinate clip and candidate gate checked against original instructions | Original turn/FOV/collision/running implementation and differential tests |
 | [#10](https://github.com/pizzaexperiments/missionthunderbolt/issues/10) | Manual combat/wield/exchange evidence recorded | Damage/hit/RNG/weapon rules and original comparisons |
 | [#11](https://github.com/pizzaexperiments/missionthunderbolt/issues/11) | Manual quantity/container/equipment evidence recorded | Original schemas, constraints, effects and verified transitions |
 | [#12](https://github.com/pizzaexperiments/missionthunderbolt/issues/12) | AI/spawning evidence gaps documented | Controlled original traces, recovered entity/AI/pathfinding logic |
-| [#13](https://github.com/pizzaexperiments/missionthunderbolt/issues/13) | 137 complete single-buffer PCM previews plus one sample-only preview; timed command order/parameters preserved | Render timed sequence 9015, auditory equivalence, native playback/cue controls and device proof |
+| [#13](https://github.com/pizzaexperiments/missionthunderbolt/issues/13) | 137 single-buffer previews plus one sample-only; timed commands preserved; opt-in authored PCM controls | Opt-in authored Android PCM path added; historical sequence/cue fidelity and physical output remain open |
 | [#14](https://github.com/pizzaexperiments/missionthunderbolt/issues/14) | Separate bounded map/seeded RNG, portable CMake, stable C ABI errors/ownership and C-client test | Windows/macOS matrix execution; future recovered systems must remain independent of rendering |
 | [#15](https://github.com/pizzaexperiments/missionthunderbolt/issues/15) | Versioned synthetic state, CRC32, migration/corruption/continuation tests and app-private atomic storage | Extend format only as real gameplay systems exist; no proprietary-save compatibility claim |
 | [#16](https://github.com/pizzaexperiments/missionthunderbolt/issues/16) | Original graphics available privately for research; reference requirements identified | Faithful Classic layout/menus/fonts/resource mapping and screenshot comparisons; current skins are demo-only |
@@ -56,7 +56,7 @@ flowchart TD
 | [#22](https://github.com/pizzaexperiments/missionthunderbolt/issues/22) | Parser/save mutations, ASan/UBSan, 86% Python coverage; 1.72M coverage-guided synthetic parser executions | Original differential/screenshot goldens and longer-running scheduled fuzzing |
 | [#23](https://github.com/pizzaexperiments/missionthunderbolt/issues/23) | MIT/notices, unsigned release APK/AAB build, review hashes/SPDX inventory tool and manual signing workflow | Signing bindings, reviewed tag, complete dependency SBOM/notices, native packages and release review; no publication |
 | [#24](https://github.com/pizzaexperiments/missionthunderbolt/issues/24) | ADR retains offline C ABI and defers an unneeded HTTP service | Closed as completed; revisit only for a concrete network consumer |
-| [#25](https://github.com/pizzaexperiments/missionthunderbolt/issues/25) | Root instructions, dependency roadmap, explicit evidence and PR definition of done | Closed as completed; implementation in unmerged PR #26 |
+| [#25](https://github.com/pizzaexperiments/missionthunderbolt/issues/25) | Root instructions, dependency roadmap, explicit evidence and PR definition of done | Closed as completed; implementation merged through PR #26 |
 
 [#21](https://github.com/pizzaexperiments/missionthunderbolt/issues/21) is already
 closed as a duplicate of #1; no separate implementation is needed.
@@ -65,7 +65,7 @@ closed as a duplicate of #1; no separate implementation is needed.
 
 - [Android workflow](ANDROID_DEVELOPMENT.md), [build evidence](verification/android-build.md), [controls](MODERN_CONTROLS.md), [runtime evidence](ANDROID_RUNTIME.md).
 - [Portable API](API.md), [save format](SAVE_FORMAT.md), [desktop workflow](DESKTOP_DEVELOPMENT.md), [quality gates](QUALITY.md).
-- [Rights](RIGHTS_AND_PROVENANCE.md), [extraction](RESOURCE_EXTRACTION.md), [graphics](PICT_CATALOG.md), [sound](SOUND_CONVERSION.md).
+- [Rights](RIGHTS_AND_PROVENANCE.md), [extraction](RESOURCE_EXTRACTION.md), [graphics](PICT_CATALOG.md), [sound](SOUND_CONVERSION.md), [native demo audio](NATIVE_AUDIO.md).
 - [Reference capture](REFERENCE_RESEARCH.md), [manual evidence](MANUAL_EVIDENCE.md), [68K analysis](68K_ANALYSIS.md), [grid research](GRID_RESEARCH.md), [remaining fidelity gaps](GAMEPLAY_EVIDENCE_GAPS.md).
 - [Release preparation](RELEASE_PREPARATION.md), [offline API decision](decisions/0001-offline-api.md), [closeout review](ISSUE_CLOSEOUT_REVIEW.md).
 

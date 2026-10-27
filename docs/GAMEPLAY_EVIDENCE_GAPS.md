@@ -5,8 +5,8 @@ validated jump-table-guided static call candidates have been generated. No origi
 runtime captures are available. Isolated RNG arithmetic, initialization and
 continued draws have now been corroborated against original 68000 instructions;
 see [RNG research](RNG_RESEARCH.md). Grid record addressing, coordinate clipping
-and a selector before its unresolved fallback have also been checked against
-original instructions; see [grid research](GRID_RESEARCH.md). Full gameplay
+and selector/fallback control flow with explicit linked-record service shims
+have also been checked against original instructions; see [grid research](GRID_RESEARCH.md). Full gameplay
 semantics remain incomplete. The
 synthetic engine is useful for integration tests, not a source of historical
 rules. No guessed combat, inventory, AI, generation or UI has been added as if it

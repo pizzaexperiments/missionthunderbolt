@@ -66,7 +66,8 @@ accelerated emulator or physical device is needed for that check.
 ARM64 is compiled into the APK, but no physical ARM64 device was available.
 Physical gamepad/TalkBack coverage, sustained performance, low-memory behavior,
 battery/audio-focus measurements and production signing remain unrun. The current
-app is silent. Original-vs-port behavior is an entirely separate research task.
+app was silent at that checkpoint. The subsequent authored PCM path is recorded
+below. Original-vs-port behavior is an entirely separate research task.
 
 ## Virtual-map accessibility increment
 
@@ -90,3 +91,22 @@ across process death and three background cycles, with a clean app crash buffer.
 These new 12-test results cover normal portrait only; earlier 1.3×/landscape
 results remain seven-test historical checkpoints. Release outputs are unsigned;
 physical TalkBack/gamepad, ARM64, API 35 runtime and performance remain unverified.
+
+## Opt-in authored PCM audio increment — 2026-10-27
+
+The complete **15-test suite passed** on API 23 x86_64, normal font/portrait,
+target SDK 35. The new output test measured **528 consumed PCM frames** at
+22,050 Hz from the authored cue. It checks initialized static output, complete
+PCM writes, frame progress, mute/zero volume, explicit focus callbacks, pause/
+release, missing-service fallback, settings recreation and keyboard volume control
+without a simulation turn. The first attempt exposed a static-track load-state
+ordering bug; writing PCM before requiring STATE_INITIALIZED fixed it, and the
+full suite passed with the playback assertion intact.
+
+A subsequent process-death/three-background-cycle run passed with a clean app
+crash buffer. Debug/test APK, debug lint, unsigned release APK/AAB and release
+lint passed. The emulator used `-no-audio`: frame consumption is verified Android
+output-stack behavior, not audible host/physical-device proof. Focus callbacks
+were injected; real competing-client arbitration and hardware routing remain
+unverified. No historical sample or cue mapping is packaged. See
+[NATIVE_AUDIO.md](NATIVE_AUDIO.md) for behavior and limits.

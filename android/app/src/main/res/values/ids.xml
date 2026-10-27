@@ -12,4 +12,6 @@
  <item name="zoom_in" type="id"/>
  <item name="zoom_out" type="id"/>
  <item name="zoom_reset" type="id"/>
+ <item name="sound_toggle" type="id"/>
+ <item name="sound_volume" type="id"/>
 </resources>
