@@ -31,7 +31,7 @@ python -m coverage combine
 python -m coverage report
 ```
 
-The current recorded checkpoint is **45 tests passed / 86% coverage**. This is measured Python
+The current recorded checkpoint is **49 tests passed / 84% coverage**. This is measured Python
 statement coverage, not native branch coverage or a fidelity metric. The
 manual-only quality workflow runs the same gate and combined native sanitizers;
 it has not been triggered in this task. Existing deterministic seed/action/save

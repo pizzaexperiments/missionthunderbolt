@@ -124,3 +124,32 @@ Current audio-enabled debug demo: `dist/mission-thunderbolt-research-debug.apk`,
 SHA256 `627c494b01c98bb2c017e113b6739d4af17cb62209feb1973209250fb20a0c18`. Earlier hashes
 above identify their prior checkpoints. Sound defaults off; no original audio
 is packaged. This is a debug-signed synthetic demo, not a production release.
+
+## Release dependency evidence and #2 closeout — 2026-10-27
+
+PR #27 was verified merged into develop as
+`f693dfd511ea5e7d18653a92f4dc9ab426626c3d`; the existing feature branch was
+fast-forwarded to it. Issue #2 was closed against its four stated criteria,
+with evidence linked in ISSUE_CLOSEOUT_REVIEW.md. No Actions run was requested.
+
+`sh scripts/test_local.sh` passed **49 Python tests** and all native regressions.
+The first attempt exposed a new test import-path error; adding its own script
+path initialization fixed it. Final coverage.py 7.10.7 run/combine/report passed
+at **84%** across all Python tools (80% required). Root CMake/CTest passed
+**10/10 ASan/UBSan** checks. No parser fuzz campaign was repeated.
+
+With the documented JDK17/Gradle8.7/NDK27.2.12479018 toolchain,
+`gradle --no-daemon --console=plain assembleRelease bundleRelease
+exportReleaseRuntimeDependencies` passed. After extending the runtime report to
+include local-file artifacts, its export was rerun successfully. The dependency
+collector passed on the unsigned release APK and AAB with four ABIs, matching
+ELF build IDs and dynamic dependencies; it recorded 16 ABI/archive entries.
+There are no Java runtime modules/artifacts. System requirements are libc.so,
+libdl.so and libm.so. Regression tests reject stale build IDs, changed artifact
+hashes, newly added file dependencies and foreign static archives.
+
+App Java/gameplay code was unchanged; the CMake change emits a linker map. No new
+device/runtime test, audible output test, Windows/macOS run, signed release or
+publication is claimed. The previous debug APK remains the downloadable demo.
+NDK composite notices are preserved by the manual workflow; per-component
+license attribution and the rest of issue #23 remain open.

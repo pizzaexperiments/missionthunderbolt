@@ -65,3 +65,50 @@ SPDX document was validated with jsonschema 4.25.1 against the official SPDX 2.3
 JSON schema. The workflow repeats that schema validation and preserves Android
 NDK/toolchain notices. Desktop jobs accept an optional existing reviewed tag as
 well as their normal selected workflow ref. None of these remote jobs ran here.
+
+## Android native dependency evidence
+
+Build release inputs with `gradle --no-daemon assembleRelease bundleRelease
+exportReleaseRuntimeDependencies` from `android/`. CMake emits private lld maps
+for each ABI. The Gradle report includes resolved modules **and artifacts**, so
+local-file dependencies cannot disappear from the check. Then from the repo root:
+
+```sh
+python3 scripts/android_dependency_evidence.py \
+  --artifact android/app/build/outputs/apk/release/app-release-unsigned.apk \
+  --artifact android/app/build/outputs/bundle/release/app-release.aab \
+  --ndk "$ANDROID_HOME/ndk/27.2.12479018" \
+  --runtime-report android/app/build/reports/release-runtime-dependencies.json \
+  --build-root android/app/.cxx/RelWithDebInfo \
+  --output dist/android-dependencies.json
+python3 scripts/prepare_release.py --version research-review \
+  --artifact android/app/build/outputs/apk/release/app-release-unsigned.apk \
+  --artifact android/app/build/outputs/bundle/release/app-release.aab \
+  --dependency-evidence dist/android-dependencies.json \
+  --output dist/release-review
+```
+
+The collector matches packaged ELF build IDs and dynamic dependencies to the
+linked build outputs, hashes every listed contributing NDK archive and both
+NDK notices, and records per-member/artifact hashes. New Java runtime modules or
+artifacts, non-NDK static archives, unknown native libraries, duplicate/stale ABI
+maps, missing build IDs and mismatched packages fail collection. Delete stale
+project build outputs or supply explicit `--build-dir` arguments if multiple
+CMake configurations remain; the tool does not silently select one. Paths with
+whitespace in linker maps are not supported by this initial parser.
+
+Release preparation rejects dependency evidence for different artifact hashes,
+copies the evidence into the review directory, and adds SPDX archive packages
+with `STATIC_LINK` relationships. The namespace includes dependency evidence.
+Archive licenses remain `NOASSERTION`: a composite NDK notice is not sufficient
+to infer individual package licenses automatically. This improves the inventory;
+it does not yet complete #23's transitive license/notices review or desktop SBOM.
+OS libraries libc/libdl/libm are recorded as platform requirements, not bundled
+packages. Build-tool dependencies are outside this runtime inventory.
+
+The manual signing workflow now collects evidence **after signing**, so inventory
+hashes describe the signed review artifacts. That workflow remains unrun.
+Local unsigned APK/AAB collection passed on all four ABIs, identifying four
+runtime archives per ABI (libc++, libc++abi, libunwind, compiler-rt), with no Java
+runtime dependencies. Build-ID checks are useful correspondence evidence, not
+a cryptographic attestation of a trustworthy or reproducible build.

@@ -41,7 +41,37 @@ def check_members(path):
                 if info.issym() or info.islnk():safe(info.linkname)
 
 
-def prepare(repo,artifacts,output,version,apksigner=None):
+def dependency_packages(evidence, rows):
+    """Bind separately collected runtime evidence to exact artifact digests."""
+    if evidence.get('schema') != 1 or evidence.get('kind') != 'android-ndk-link-review':
+        raise ValueError('unsupported dependency evidence')
+    supplied=evidence.get('artifacts',[])
+    expected={(r['name'],r['sha256']) for r in rows}
+    if len(supplied)!=len(rows) or {(r['name'],r['sha256']) for r in supplied}!=expected:
+        raise ValueError('dependency evidence artifact hashes do not match')
+    if evidence.get('java_runtime_modules') != [] or not evidence.get('builds'):
+        raise ValueError('unsupported or missing runtime dependency records')
+    packages=[];ids=[]
+    for abi,build in sorted(evidence['builds'].items()):
+        if not re.fullmatch(r'[A-Za-z0-9_-]+',abi) or not build.get('archives'):
+            raise ValueError('invalid runtime ABI evidence')
+        for index,archive in enumerate(build['archives']):
+            path=PurePosixPath(archive['path'])
+            if path.is_absolute() or '..' in path.parts or '\\' in str(path) or not re.fullmatch(r'[0-9a-f]{64}',archive['sha256']):
+                raise ValueError('invalid runtime archive evidence')
+            identifier=f'SPDXRef-NDK-{abi}-{index}';ids.append(identifier)
+            packages.append({'name':f'{abi}/{path.name}','SPDXID':identifier,
+                'versionInfo':f'NDK {evidence["ndk_version"]}; LLVM {evidence["llvm_version"]}',
+                'downloadLocation':'https://developer.android.com/ndk/downloads',
+                'filesAnalyzed':False,'licenseDeclared':'NOASSERTION','licenseConcluded':'NOASSERTION',
+                'copyrightText':'NOASSERTION',
+                'checksums':[{'algorithm':'SHA256','checksumValue':archive['sha256']}],
+                'sourceInfo':f'NDK-relative archive: {path}',
+                'comment':'Archive contributed sections according to linker map; review preserved NDK notices for component license attribution.'})
+    return packages,ids
+
+
+def prepare(repo,artifacts,output,version,apksigner=None,dependency_evidence=None):
     repo=repo.resolve();output=output.resolve()
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._+\-]*',version):raise ValueError('invalid version label')
     if output.exists():raise ValueError('refusing to overwrite review directory')
@@ -65,7 +95,9 @@ def prepare(repo,artifacts,output,version,apksigner=None):
             signature='verified (certificate/release approval still requires review)'
         rows.append({'name':artifact.name,'bytes':artifact.stat().st_size,'sha256':digest(artifact),'signature':signature})
     if not rows:raise ValueError('at least one artifact is required')
-    namespace=uuid.uuid5(uuid.NAMESPACE_URL,commit+version+json.dumps(rows,sort_keys=True))
+    evidence=json.loads(dependency_evidence.read_text()) if dependency_evidence else None
+    dependencies,dependency_ids=dependency_packages(evidence,rows) if evidence is not None else ([],[])
+    namespace=uuid.uuid5(uuid.NAMESPACE_URL,commit+version+json.dumps([rows,evidence],sort_keys=True))
     source={'name':'missionthunderbolt-source','SPDXID':'SPDXRef-Source','versionInfo':commit,
             'downloadLocation':'https://github.com/pizzaexperiments/missionthunderbolt',
             'filesAnalyzed':False,'licenseDeclared':'MIT','licenseConcluded':'NOASSERTION',
@@ -78,14 +110,18 @@ def prepare(repo,artifacts,output,version,apksigner=None):
                          'copyrightText':'NOASSERTION','checksums':[{'algorithm':'SHA256','checksumValue':row['sha256']}]})
         relationships.append({'spdxElementId':identifier,'relationshipType':'OTHER','relatedSpdxElement':'SPDXRef-Source',
                               'comment':'Source checkout recorded; artifact correspondence requires build provenance review'})
+        for dependency_id in dependency_ids:
+            relationships.append({'spdxElementId':identifier,'relationshipType':'STATIC_LINK','relatedSpdxElement':dependency_id})
+    packages.extend(dependencies)
     spdx={'spdxVersion':'SPDX-2.3','dataLicense':'CC0-1.0','SPDXID':'SPDXRef-DOCUMENT',
           'name':f'MissionThunderbolt-{version}-review','documentNamespace':f'https://spdx.org/spdxdocs/missionthunderbolt-{namespace}',
           'creationInfo':{'created':created,'creators':['Tool: mission-thunderbolt-release-prep-1']},
           'packages':packages,'relationships':relationships,
-          'comment':'Review-only artifact inventory. Not a complete transitive dependency SBOM or rights/signing approval.'}
+          'comment':'Review-only inventory with optional NDK static archive dependencies. License completeness and rights/signing approval require review.'}
     report={'schema':1,'status':'review-required','version':version,'source_commit':commit,'artifacts':rows,
             'project_license':'MIT','license_sha256':digest(license_file),
             'original_asset_distribution':'not authorized','published':False,
+            'dependency_evidence':'android-dependencies.json' if evidence is not None else None,
             'limitations':['Package-path guard is not content-based rights verification',
                            'Transitive/native runtime dependencies require a separate license/SBOM review',
                            'Artifact hashes do not establish reproducible builds or device acceptance'],
@@ -95,6 +131,7 @@ def prepare(repo,artifacts,output,version,apksigner=None):
         (temp/'SHA256SUMS').write_text(''.join(f'{r["sha256"]}  {r["name"]}\n' for r in rows))
         (temp/'release-review.json').write_text(json.dumps(report,indent=2)+'\n')
         (temp/'sbom.spdx.json').write_text(json.dumps(spdx,indent=2)+'\n')
+        if evidence is not None:(temp/'android-dependencies.json').write_text(json.dumps(evidence,indent=2)+'\n')
         shutil.copy2(license_file,temp/'LICENSE')
         notice=repo/'THIRD_PARTY_NOTICES.md'
         if notice.exists():shutil.copy2(notice,temp/notice.name)
@@ -107,8 +144,9 @@ def prepare(repo,artifacts,output,version,apksigner=None):
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--artifact',type=Path,action='append',required=True)
     p.add_argument('--output',type=Path,required=True);p.add_argument('--version',required=True);p.add_argument('--apksigner',type=Path)
+    p.add_argument('--dependency-evidence',type=Path)
     a=p.parse_args()
-    try:report=prepare(Path(__file__).resolve().parents[1],a.artifact,a.output,a.version,a.apksigner)
+    try:report=prepare(Path(__file__).resolve().parents[1],a.artifact,a.output,a.version,a.apksigner,a.dependency_evidence)
     except (ValueError,OSError,subprocess.CalledProcessError,zipfile.BadZipFile,tarfile.TarError) as e:p.error(str(e))
     print(f'Prepared review metadata for {len(report["artifacts"])} artifact(s); no publication or rights approval performed')
 
