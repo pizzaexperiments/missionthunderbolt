@@ -76,7 +76,9 @@ The original D0 return bits are not modeled as a typed result contract.
 
 The initial bounded-selector checkpoint stopped before the fallback at CODE 13
 offset 15742. Its subsequent control-flow model with explicit service shims is
-recorded below; the original linked-record callbacks remain unresolved. This model is not linked into demo map
+recorded below; the original linked-record callbacks were unresolved at that checkpoint. The
+query/unlink helpers below now have isolated verification; release callbacks
+remain unresolved. This model is not linked into demo map
 generation, movement, spawning or rendering. Full topology, mission progression,
 collision/FOV, scheduler behavior and original game comparisons remain outstanding.
 
@@ -163,3 +165,76 @@ python tests/research/verify_grid_fallback.py local-generated/original-resources
 Reports remain private. Public native tests freeze independently executed synthetic
 scan, mutation, callback-order and budget-boundary cases. Active demo gameplay
 still does not use these research models.
+
+## Linked-record query and unlink helpers — 2026-10-27
+
+The CODE 0 jump table resolves two fallback callback entries to routines now
+modeled separately in `engine/linked_record_model.hpp`:
+
+| Callback / jump | Original entry | Corroborated scope |
+| --- | --- | --- |
+| A5+0xd7a / jump 427 | CODE 9 offset 27148 | Read-only word filter with conditional long field +30 |
+| A5+0xb0a / jump 349 | CODE 7 offset 3872 | Grid-link clearing, header count and singly linked list removal |
+
+CODE 7 SHA256 is
+`43eb181114493dd938496157cf0943d5fb5d152b56086fb684122fe50385e852`;
+CODE 9 SHA256 is
+`6212eb2b13c828c35e7593f05d15a439421dca9bdd7d6746c04f24220a96c717`.
+Private bounded Ghidra inspection supplied candidate boundaries; original
+Motorola 68000 instruction execution, not decompiled C alone, supplied the checks.
+Analytical addresses are test scaffolding, not relocated runtime addresses.
+
+The filter accepts raw word values **0, 29–30, 56–58, 65–69, 81, 107–109, 119,
+141 and 175**. Value **70** passes only when the long field at byte **+30** is
+nonzero. All negative signed-word values reject. No semantic item/type names are
+assigned. The native predicate matched **131,072 probes**: every 16-bit word
+with field +30 zero and again with it `0xffffffff`. The source record remained
+unchanged, stack returned balanced, and A2/A3/A4/A6 were preserved. Other nonzero
+field values are represented by the same native nonzero test, not an exhaustive
+32-bit original-state sweep.
+
+The unlink routine reads signed-byte row **+48**, column **+49** and next pointer
+**+56** from the target record. It first decrements the grid-header word at
+**+18**, wrapping at 16 bits, and clears the chosen 20-byte cell's long field
+**+12**. Then it either replaces header head **+20** or finds the predecessor
+through next pointers and bypasses the target. Finally it clears the target's
+next pointer. These are raw field relationships, not verified inventory/entity
+names. It does not free the record or perform the separate release callbacks.
+
+The native unlink model matched **715 original cases**: **449 normal removals**
+and **266 research-budget stops**. Inputs cover head/middle/tail and self-head
+removal, lists of lengths 1–9, four count values including zero-underflow and
+65535, corner/interior coordinates, zero/small/sufficient traversal budgets and
+cyclic lists with an absent target. All grid/header/node bytes outside the
+explicitly changed fields, including guard bytes, were verified unchanged.
+Normal returns preserved stack balance and callee registers.
+
+The original predecessor search has no budget and performs unchecked memory
+access. The native model requires an existing nonzero target and valid grid
+coordinates before changing state. It additionally provides an explicit
+`missing_node` result when its supplied node map is incomplete. That status and
+coordinate rejection are model safety contracts, not recovered original error
+handling. Exhaustion preserves the already-decremented count and cleared cell
+link; it does not roll back or report successful removal.
+
+A public interface-composition regression uses the recovered unlink helper from
+the existing fallback model. Both acceptance and later protected-kind rejection
+retain the header/list/grid mutations. Release remains an authored callback.
+This is native model composition: the earlier 1,068 fallback and 105 full-pipeline
+original checks still used callback shims, and have not been rerun as an original
+selector plus all real lifecycle callbacks. Active demo gameplay remains separate.
+
+```sh
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp \
+  tests/research/linked_record_driver.cpp -o dist/linked_record_driver
+python tests/research/verify_linked_records.py local-generated/original-resources/manifest.json \
+  --native-driver dist/linked_record_driver \
+  --output local-generated/analysis/linked-record-register-crosscheck.json
+```
+
+Use Unicorn 2.1.4 and a fresh output filename. Source fingerprints, exact accepted
+values and each unlink result stay in the private report. Public frozen tests
+exercise the exhaustive predicate, count wrap, partial mutations, native
+preconditions and fallback interface composition without original bytes.
+Original record allocation/release, historical direction-table initialization,
+full generator/progression, scheduling and gameplay comparison remain open.

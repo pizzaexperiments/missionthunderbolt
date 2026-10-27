@@ -193,3 +193,25 @@ coverage.py run/combine/report passed at **82%** (80% gate). Root CMake/CTest
 passed **10/10 ASan/UBSan** checks. No new Android/desktop runtime or original
 gameplay validation is claimed. Third-party comparison tools, original inputs
 and detailed comparison outputs remain outside public source/packages.
+
+## Linked-record helpers — 2026-10-27
+
+The live API verified PR #29 merged into develop as
+`42535e509f7e1f08ccceff29de3b6180ed6971a3`; the active feature branch was
+fast-forwarded. Isolated linked-record research then passed **131,072 original
+query probes** and **715 original/native unlink comparisons** (449 removals,
+266 research-budget stops). Final verification includes callee-register, stack,
+read-only query and unrelated-byte/guard checks. The first oracle attempt failed
+because setting supervisor mode after A7 swapped out the initialized stack;
+initializing SR before A7 fixed the test setup. No original instructions or
+assertions were changed. Commands, fingerprints, raw fields and limits are in
+GRID_RESEARCH.md. Reports and static disassembly stay private.
+
+`sh scripts/test_local.sh` passed **56 Python tests** and native regressions with
+both optional external picture decoders present. Root CMake/CTest passed
+**11/11 ASan/UBSan** and **12/12 SDL** tests, including the new linked-record
+regression and authored fallback interface composition. Python tools under the
+coverage gate are unchanged; their last measured statement coverage remains 82%.
+The source-only research model is not linked into active Android/SDL gameplay;
+no new Android build, runtime test or fidelity claim is made. Full original
+selector/lifecycle composition and game rules remain incomplete.
