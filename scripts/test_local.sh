@@ -24,4 +24,6 @@ c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/grid_selec
 ./dist/grid_selector_test
 c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/grid_fallback_test.cpp -o dist/grid_fallback_test
 ./dist/grid_fallback_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/linked_record_test.cpp -o dist/linked_record_test
+./dist/linked_record_test
 echo "All local smoke tests passed"
