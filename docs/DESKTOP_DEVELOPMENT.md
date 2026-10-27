@@ -1,5 +1,8 @@
 # Native desktop synthetic demo — issues #19 and #20
 
+GitHub Actions is currently [paused](../.github/ACTIONS_PAUSED.md), including
+manual dispatch. Use local commands and post results in the PR.
+
 The optional SDL2 renderer uses the same portable C++ state/saves as Android.
 It draws synthetic tiles only; no Mac emulator, historical art or network service
 is bundled. The terminal host remains available without SDL2.

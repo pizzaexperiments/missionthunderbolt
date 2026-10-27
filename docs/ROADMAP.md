@@ -3,8 +3,8 @@
 This is a **synthetic native prototype**, not a faithful original-game port.
 Work proceeds on `feature/offline-research-tooling`, with `develop` as integration
 and `main` release-only. Commits are separately reviewable. Closures of #2, #4, #5, #24 and #25 were verified through the live GitHub API;
-Implementation PRs through [#34](https://github.com/pizzaexperiments/missionthunderbolt/pull/34) were verified merged into develop. GitHub Actions stays manual-only
-because credits are unavailable; no CI run/public release is claimed here.
+Implementation PRs through [#35](https://github.com/pizzaexperiments/missionthunderbolt/pull/35) were verified merged into develop. All five GitHub Actions workflows are disabled during the maintainer-requested
+pause. Local test results belong in PRs; no CI run/public release is claimed here.
 
 ## Dependency order
 

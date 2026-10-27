@@ -1,5 +1,8 @@
 # Release preparation — issue #23
 
+GitHub Actions is currently [paused](../.github/ACTIONS_PAUSED.md), including
+manual dispatch. Use local commands and post results in the PR.
+
 The maintainer selected **MIT** for newly written project code. LICENSE and
 THIRD_PARTY_NOTICES.md do not relicense historical assets or dependencies. Public
 packages remain synthetic-only unless separate rights evidence is reviewed.

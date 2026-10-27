@@ -17,7 +17,7 @@ This repository begins with a **demonstration engine**, not a recreation of orig
 
 ## Build
 
-See [Android development](docs/ANDROID_DEVELOPMENT.md) for pinned tools, build/install/launch commands and troubleshooting. Local APK builds have passed; [evidence and remaining checks](docs/verification/android-build.md) distinguish build, installation and gameplay validation. GitHub Actions is manual-only to conserve credits.
+See [Android development](docs/ANDROID_DEVELOPMENT.md) for pinned tools, build/install/launch commands and troubleshooting. Local APK builds have passed; [evidence and remaining checks](docs/verification/android-build.md) distinguish build, installation and gameplay validation. [GitHub Actions is paused](.github/ACTIONS_PAUSED.md); run tests locally and post results in each PR.
 
 ## Rights
 

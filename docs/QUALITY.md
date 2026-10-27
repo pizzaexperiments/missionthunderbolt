@@ -1,5 +1,8 @@
 # Synthetic regressions, mutation testing and coverage — issue #22
 
+GitHub Actions is currently [paused](../.github/ACTIONS_PAUSED.md), including
+manual dispatch. Use local commands and post results in the PR.
+
 ```sh
 sh scripts/test_local.sh
 cmake -S . -B dist/sanitizers -DCMAKE_BUILD_TYPE=Debug -DMT_ENABLE_SANITIZERS=ON

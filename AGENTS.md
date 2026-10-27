@@ -6,7 +6,7 @@
 - For this active workstream, use `feature/offline-research-tooling`; do not commit directly to `develop` or `main`.
 - When work has passed review and local verification, open a PR **feature → develop**. Merge only with approval.
 - `main` is release-only. When a release is ready, open a reviewed **develop → main** PR. No direct commits to `main`.
-- GitHub Actions credits are unavailable; workflow is manually triggered only. Run tests locally and put test evidence in PRs.
+- GitHub Actions is paused: all five workflows are disabled. Do not enable or dispatch any workflow unless the maintainer explicitly requests it. Run tests locally and post exact results in the PR; see `.github/ACTIONS_PAUSED.md`.
 
 ## Project reality
 This is a research prototype, **not** a faithful reconstruction. Do not claim old game logic is implemented without corroborating original reference behavior. Do not claim a verified APK without a build artifact and device/emulator test.
@@ -42,5 +42,6 @@ Native Android first, Windows/macOS later, with a portable C++ engine and Classi
 - A reviewable commit/PR references its issue, explains behavior and validation, records
   remaining gaps and includes only shareable evidence. Do not mark an issue complete
   while original-specific acceptance is untested. Keep docs/ROADMAP.md current.
-- Only manually trigger Actions with an explicit reason consistent with available credits.
-  No automatic push/PR CI or release publication. Merge requires maintainer approval.
+- Do not run GitHub Actions while the pause is in effect, including manual dispatch.
+  Billing-cycle resets do not authorize re-enabling it. No automatic push/PR CI or
+  release publication. Merge requires maintainer approval.
