@@ -6,7 +6,7 @@ Research project for a **native** Android port of classic Macintosh *Mission: Th
 
 ## Current state
 
-This repository begins with a **demonstration engine**, not a recreation of original gameplay. The supplied historical archive is kept privately and has been extracted into a hash-linked resource inventory. Static 68K analysis and local graphics/audio conversion tools are available, but full original gameplay semantics remain incomplete. Isolated RNG initialization and arithmetic have been checked against original instructions; map generation and other gameplay systems remain research work. The synthetic Android APK builds and has passed emulator checks; see the evidence links below for exact scope.
+This repository begins with a **demonstration engine**, not a recreation of original gameplay. The supplied historical archive is kept privately and has been extracted into a hash-linked resource inventory. Static 68K analysis and local graphics/audio conversion tools are available, but full original gameplay semantics remain incomplete. Isolated RNG initialization, grid layout and bounded candidate selection have been checked against original instructions; full map generation and other gameplay systems remain research work. The synthetic Android APK builds and has passed emulator checks; see the evidence links below for exact scope.
 
 ## Goals
 

@@ -70,3 +70,22 @@ The earlier WAIT-only APK hash above describes the earlier checkpoint.
 The optional Atheris 3.1.0 synthetic parser campaign completed 1,722,666 executions
 in 121 seconds, with no failure artifacts and 71 MB peak RSS. Reproduction and
 limits are recorded in QUALITY.md; this is not original-game differential coverage.
+
+## Grid-helper and selector increment — 2026-10-27
+
+The original-instruction/native comparisons passed 120 pointer-builder cases
+(152,760 cell addresses), all 65,536 coordinate byte pairs, 2,048 candidate-gate
+probes and 105 selector/RNG cases. Selector outcomes were 29 direct, 36 neighbor
+and 40 stopped before the unresolved fallback. Source fingerprints, synthetic
+allocator/direction inputs, exact commands and limits are recorded in
+[GRID_RESEARCH.md](GRID_RESEARCH.md). A real Ghidra synthetic fixture also verified
+the new exact-A5 filter: two direct references accepted, alias/indexed references
+excluded. Original output remains private.
+
+`sh scripts/test_local.sh` passed 45 Python tests and the native regressions.
+CMake/CTest passed **9/9 ASan/UBSan** and **10/10 SDL** checks. The parser Python
+source is unchanged; its last measured statement coverage remains 86%. These new
+research headers are exercised by standalone tests and are not connected to the
+active demo engine. Android/desktop host application logic was not changed, and
+no new Android/device verification is claimed for this increment. The existing
+APK, signing and physical-device limitations above remain applicable.
