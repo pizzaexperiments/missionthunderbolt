@@ -89,3 +89,12 @@ research headers are exercised by standalone tests and are not connected to the
 active demo engine. Android/desktop host application logic was not changed, and
 no new Android/device verification is claimed for this increment. The existing
 APK, signing and physical-device limitations above remain applicable.
+
+## GitHub connection and closeout — 2026-10-27
+
+The authenticated API returned HTTP 200 for this repository, and creating draft
+PR #26 plus issue evidence comments/closures succeeded. Issues #4, #24 and #25
+were confirmed closed as completed after refreshing their live bodies/comments.
+The environment's older policy snapshot did not reflect the working API route.
+Existing credentials were reused. No code or test behavior changed for closeout;
+previous local verification remains the evidence. No Actions run or merge occurred.
