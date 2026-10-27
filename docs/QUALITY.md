@@ -71,3 +71,9 @@ limit failure. Final libFuzzer feedback was `cov: 335`, `ft: 837`, 218 retained
 corpus units and **71 MB peak RSS**. These are campaign feedback counters, not
 percent statement coverage and not evidence of historical fidelity. The separate
 unit-test coverage figure above is measured independently.
+
+The connected direct-grid increment (2026-10-27) passed **17/17 ASan/UBSan**
+and **18/18 SDL** CTest checks, plus 56 Python tests and native smoke tests.
+Its optional private original-instruction comparison matched 131,072 base-word
+probes and 111 complete grids/141,303 cells. See DIRECT_GRID_CONVERSION.md for
+scope and reproduction; this does not establish full generator/gameplay fidelity.

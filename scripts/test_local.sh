@@ -36,4 +36,6 @@ c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/glyph_prep
 ./dist/glyph_preparation_test
 c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/basic_cell_conversion_test.cpp -o dist/basic_cell_conversion_test
 ./dist/basic_cell_conversion_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/direct_grid_conversion_test.cpp -o dist/direct_grid_conversion_test
+./dist/direct_grid_conversion_test
 echo "All local smoke tests passed"

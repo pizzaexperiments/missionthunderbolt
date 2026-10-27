@@ -420,6 +420,12 @@ exact gates, changing loop bound, source context and unfinished conversion into
 
 [Direct-write cell conversion](BASIC_CELL_CONVERSION.md) now corroborates 43
 branches plus the shared subtype adjustment, with 23,822 conversion and 268,288
-tail probes. The tests seed the word produced by an unresolved coordinate helper
-and stop before advancing the outer map loop. Creation/RNG branches, allocation
+tail probes. Those bounded tests seed the helper word and stop before advancing
+the outer map loop. Creation/RNG branches, allocation
 and complete conversion remain unmodeled; unsupported glyphs are explicit.
+
+The [connected direct-grid increment](DIRECT_GRID_CONVERSION.md) now resolves the
+CODE 6 helper and verifies the 19×67 conversion traversal on 111 authored maps
+(141,303 cells), plus 131,072 helper probes. Original instructions produce every
+seed word directly and every final record byte matches. This remains limited to
+the 43 supported direct branches and authored initial records.

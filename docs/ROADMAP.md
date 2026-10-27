@@ -3,7 +3,7 @@
 This is a **synthetic native prototype**, not a faithful original-game port.
 Work proceeds on `feature/offline-research-tooling`, with `develop` as integration
 and `main` release-only. Commits are separately reviewable. Closures of #2, #4, #5, #24 and #25 were verified through the live GitHub API;
-Implementation PRs through [#35](https://github.com/pizzaexperiments/missionthunderbolt/pull/35) were verified merged into develop. All five GitHub Actions workflows are disabled during the maintainer-requested
+Implementation PRs through [#36](https://github.com/pizzaexperiments/missionthunderbolt/pull/36) were verified merged into develop. All five GitHub Actions workflows are disabled during the maintainer-requested
 pause. Local test results belong in PRs; no CI run/public release is claimed here.
 
 ## Dependency order
@@ -40,7 +40,7 @@ flowchart TD
 | [#5](https://github.com/pizzaexperiments/missionthunderbolt/issues/5) | 908 resource PICTs + 26 standalone slides decoded; PNG catalogs/contact sheets, indexed 1/4/8-bit fixtures | All 934 pictures match at least one external decoder; four panel roles visually attributed. Closed as completed: decoder/catalog scope; runtime presentation remains #16 |
 | [#6](https://github.com/pizzaexperiments/missionthunderbolt/issues/6) | Evidence-labeled trace validator, capture protocol, manual evidence notes | Lawful original reference environment/recordings; executable 2.0.g differs from manual 1.0 |
 | [#7](https://github.com/pizzaexperiments/missionthunderbolt/issues/7) | 28 Ghidra imports; 788 jump entries; 8,697 static call candidates; trap-frontier hypotheses; isolated RNG/grid-helper/selector instruction checks | DREL data initialization corroborated; CREL/runtime addressing, full trap/state/scheduler roles, RNG lifecycle and gameplay corroboration |
-| [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) | RNG/grid/selector/fallback models; startup/lifecycle checks, 1,600 byte-preparation cases and 43 direct cell-conversion branches | Recover and implement original generator/progression with golden traces |
+| [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) | RNG/grid/selector/fallback models; startup/lifecycle checks, 1,600 byte-preparation cases; 43 direct branches and connected 111-map/141,303-cell traversal | Recover and implement original generator/progression with golden traces |
 | [#9](https://github.com/pizzaexperiments/missionthunderbolt/issues/9) | Manual-backed WAIT; signed-byte coordinate clip and candidate gate checked against original instructions | Original turn/FOV/collision/running implementation and differential tests |
 | [#10](https://github.com/pizzaexperiments/missionthunderbolt/issues/10) | Manual combat/wield/exchange evidence recorded | Damage/hit/RNG/weapon rules and original comparisons |
 | [#11](https://github.com/pizzaexperiments/missionthunderbolt/issues/11) | Manual quantity/container/equipment evidence; raw filter/list removal/release/prefix models and connected selector checks corroborated | Original schemas, constraints, effects and verified transitions |
