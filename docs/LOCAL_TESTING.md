@@ -21,7 +21,7 @@ The report contains type/ID/size/PICT dimensions/SHA256 metadata only. It **does
 **APK status:** local debug and unsigned release APK/AAB builds passed; the
 synthetic debug app installed/launched and passed API 23 emulator checks. See
 [Android development](ANDROID_DEVELOPMENT.md) and [runtime evidence](ANDROID_RUNTIME.md)
-for exact versions, counts and limitations. CI remains manual-only to conserve credits.
+for exact versions, counts and limitations. GitHub Actions is paused; run local checks and post evidence in the PR.
 
 Never publish original game archives, code segments, art, audio, or derivatives without confirming redistribution permission.
 

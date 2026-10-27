@@ -95,5 +95,5 @@ Do not start/stop an emulator or clear app data belonging to someone else.
 - `INSTALL_FAILED_NO_MATCHING_ABIS`: check the APK's packaged native ABIs.
 
 See [local build evidence](verification/android-build.md) and
-[local testing](LOCAL_TESTING.md). CI is deliberately manual-only; do not spend
-Actions credits to replace local testing.
+[local testing](LOCAL_TESTING.md). GitHub Actions is paused, including manual dispatch. Run local checks and post
+exact commands, results and limitations in the PR. See [the pause policy](../.github/ACTIONS_PAUSED.md).
