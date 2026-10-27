@@ -215,3 +215,46 @@ coverage gate are unchanged; their last measured statement coverage remains 82%.
 The source-only research model is not linked into active Android/SDL gameplay;
 no new Android build, runtime test or fidelity claim is made. Full original
 selector/lifecycle composition and game rules remain incomplete.
+
+## Record release control flow — 2026-10-27
+
+The live API confirmed PR #30 merged as
+`0b927d8f141d4a3c96831bdeaa2968643fc06980`; the existing feature branch was
+fast-forwarded. The original release walkers matched the native model on
+**1,730 authored cases** (334 complete, 1,396 budget stops). Final modeled fields
+are compared exactly; callback order and intermediate state fingerprints are
+checked alongside unrelated original bytes/guards and normal return state.
+A separate CODE 11 wrapper sweep matched **131,072 prefix probes**, observing
+one DisposePtr call with the prefix address. The Macintosh trap was skipped.
+Source profiles, commands, preconditions and scope are in GRID_RESEARCH.md.
+
+`sh scripts/test_local.sh` passed **56 Python tests** and native regressions, with
+both optional picture decoders present. Root CMake/CTest passed **12/12 ASan/UBSan**
+and **13/13 SDL** checks. The first new unit run had an incorrect expected research
+step count of six; the independent original oracle reports five for that authored
+shape. The expectation was corrected to five, retaining the assertion and model.
+Native interface composition covers filter, unlink and both release helpers,
+including partial mutations through fallback rejection. Original whole-selector/
+lifecycle composition remains unrun.
+
+Production Python scripts are unchanged (last measured coverage 82%). No new
+Android APK/runtime, original game boot, allocator reclamation or public release
+is claimed. Original disassembly and comparison reports remain ignored.
+
+The release-model source was committed locally as `9b20560`. The subsequent Git
+push failed authentication, and a read-only authenticated API recheck returned
+HTTP **401 Bad credentials**. Current environment status exposes no ready GitHub
+credential binding, and no GitHub connector tools are available. The existing
+credential was not printed or replaced. PR payload/description and a source-only
+patch were prepared locally; no follow-up PR, issue update or remote branch push
+is claimed for this increment. Publishing awaits a refreshed credential connection.
+
+### Authentication recovered on retry
+
+The later authenticated repository request succeeded and confirmed push/admin
+permissions; `git push origin feature/offline-research-tooling` then succeeded
+through commit `4ef32b1`. No credential value or authentication configuration
+was changed by the agent. The previous 401 therefore records an earlier
+authentication failure, not an ongoing repository-permission or network-policy
+blocker. The available responses do not establish why the credential was
+rejected then and accepted later. PR/issue publication resumed after that check.

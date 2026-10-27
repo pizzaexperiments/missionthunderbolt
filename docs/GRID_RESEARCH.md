@@ -238,3 +238,87 @@ exercise the exhaustive predicate, count wrap, partial mutations, native
 preconditions and fallback interface composition without original bytes.
 Original record allocation/release, historical direction-table initialization,
 full generator/progression, scheduling and gameplay comparison remain open.
+
+## Record release walkers and prefix wrapper — 2026-10-27
+
+The next isolated lifecycle pieces live in `engine/record_release_model.hpp`.
+They model mutation/order, while final memory-manager behavior remains outside
+the portable model and the original game has not been booted.
+
+| Entry | Resolved callback | Corroborated behavior |
+| --- | --- | --- |
+| CODE 9 offset 28968 | A5+0xde2 / jump 440 | Walk two chains, clear links and issue disposal callbacks |
+| CODE 7 offset 4104 | A5+0xb1a / jump 351 | Release child slots in descending order, then field +52 and parent |
+| CODE 11 offset 454 | A5+0x1312 / jump 606 | Complement prefix word; conditionally invoke DisposePtr |
+
+CODE 7/9 fingerprints are listed above. CODE 11 SHA256 is
+`a4b03764578a4d99ec8758315c15ddc2737bb454c939cc9fc0ef3695624250ca`.
+The wrapper's Ghidra decompilation stops at an undecoded A-line trap; the isolated
+instruction harness explicitly observes/skips that trap rather than treating the
+partial decompilation as complete behavior.
+
+The CODE 9 walker first processes the chain reached through raw pointer **+26**,
+then the chain reached through **+30**. For each chained node, it saves the next
++26 pointer, clears that node's +26 field, and either recurses if +30 is nonzero
+or calls the disposal endpoint immediately. After a chain finishes it clears
+the owner's corresponding link. It disposes the root last. There is no added
+deduplication: shared synthetic references can produce repeated callback IDs.
+
+The CODE 7 parent uses byte **+51** as a remaining-child count and slots starting
+at **+60**. It decrements the count **before** releasing that child graph, then
+clears the slot **after** the child call returns. Once count is zero, it invokes
+the disposal endpoint for a nonzero long **+52**, then for the parent. Field +52
+is not explicitly cleared. The model restricts count to **0–127** before changing
+state; the original signed-byte indices outside that domain are not modeled.
+
+An explicit heap-backed frame stack preserves the original recursion order
+without recursing on the native host stack. A caller-supplied budget charges
+original routine entries and chain/child loop bodies. The corresponding original
+hooks stop before those instructions. Stops preserve partial links/count/slots
+and are **not successful completion or resumable checkpoints**. Missing modeled
+nodes produce a native diagnostic, not a recovered original error return.
+Disposal observers must not mutate the modeled records; original allocator
+reclamation and arbitrary callback mutation are not verified here.
+
+The walker oracle matched **1,730** cases: **334 complete** and **1,396 research-
+budget stops**. These comprise 420 graph cases and 1,310 parent cases. Inputs
+include both chains, nested/shared/self-references, seeded cyclic graphs, all
+valid child counts 0–127, nonzero/zero field +52, unused-slot sentinels and
+partial stops at entries/loop bodies. It compares every modeled final field
+exactly, disposal ID order and observer-time 32-bit FNV state fingerprints.
+Fingerprints are useful intermediate-state checks, not collision-free snapshots.
+Unrelated original record/parent bytes and guards are compared directly; normal
+returns check stack balance and callee registers. The A5+0x1312 endpoint is an
+observation-only RTS shim in these walker runs.
+
+The separate CODE 11 wrapper check matched **131,072 probes**: every prefix word
+for a null payload pointer and again for one authored nonnull payload pointer.
+Null does nothing. Nonnull complements the word at **payload−2**; only an original
+prefix of **0xffff** becomes zero and reaches the **DisposePtr** trap. The trap's
+A0 argument is **payload−2**, not the supplied payload pointer. The sole observed
+trap was skipped; no Macintosh allocation was reclaimed. Payload/guard bytes,
+stack and frame register were preserved. This is wrapper/control-flow evidence,
+not a recovered allocation schema or verification of the Memory Manager itself.
+
+Public regressions compose all four recovered query/unlink/release interfaces
+with the fallback model. They check a conditional second-scan query, release
+order, grid/header/list clearing, and release mutations retained after a later
+protected-kind rejection. That is **native interface composition**. The original
+selector plus these real callback routines and prefix wrapper has not yet been
+executed together; the earlier selector/fallback oracle still uses service shims.
+
+```sh
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp \
+  tests/research/record_release_driver.cpp -o dist/record_release_driver
+python tests/research/verify_record_release.py local-generated/original-resources/manifest.json \
+  --native-driver dist/record_release_driver \
+  --output local-generated/analysis/record-release-final-crosscheck.json
+python tests/research/verify_release_prefix.py local-generated/original-resources/manifest.json \
+  --native-driver dist/record_release_driver \
+  --output local-generated/analysis/release-prefix-final-crosscheck.json
+```
+
+Use Unicorn 2.1.4 and new private output paths. None of these research models
+change active demo gameplay, implement pickup/equip/effects or complete #8/#11.
+Original allocation, full callback/selector composition, directions, generation
+and progression remain unfinished.
