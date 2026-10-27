@@ -172,3 +172,24 @@ production code is unchanged from the already-passing 10-test sanitizer run.
 No Android or desktop runtime, original-game screenshot, audible output, CI run
 or public release is newly claimed. Private pictures/comparison outputs stay
 ignored; only authored fixtures, tool code and summary counts enter Git.
+
+## GraphicsMagick follow-up — 2026-10-27
+
+PR #28 was verified merged as `b1388131976492c6ce978fc48d920bb2afaea9e4`; the
+feature branch was fast-forwarded. GraphicsMagick's independent resource run
+returned expected exit 2: **808 exact, 100 failed, zero pixel/dimension mismatches**.
+Its standalone run returned exit 0: **26 exact**. Joining source fork/ID/SHA
+records with the retained ImageMagick report established **934/934 pictures
+matching at least one external decoder**. GraphicsMagick matches the previously
+disputed 30×65 picture. An authored indexed one-bit PixMap reproduces the
+ImageMagick padding discrepancy while matching GraphicsMagick and known pixels.
+No native PICT output or pixel tolerance changed. Full commands, tool identity,
+limits and visually attributed panels are in PICT_CATALOG.md.
+
+With optional GraphicsMagick supplied via `GRAPHICSMAGICK_EXECUTABLE` and its
+normal library search path, `sh scripts/test_local.sh` passed **56 Python tests**
+and all native regressions. Both optional external-decoder tests executed.
+coverage.py run/combine/report passed at **82%** (80% gate). Root CMake/CTest
+passed **10/10 ASan/UBSan** checks. No new Android/desktop runtime or original
+gameplay validation is claimed. Third-party comparison tools, original inputs
+and detailed comparison outputs remain outside public source/packages.

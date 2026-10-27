@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import shutil
 import struct
@@ -22,6 +23,15 @@ def authored_bitmap():
             +rect+rect+rect+b'\0\0'+rows+b'\0\xff')
 
 
+def authored_indexed_pixmap():
+    rect = struct.pack('>hhhh', 0, 0, 4, 30)
+    pixmap = struct.pack('>HHIIIHHHHIII', 0, 0, 0, 72 << 16, 72 << 16, 0, 1, 1, 1, 0, 0, 0)
+    palette = struct.pack('>IHH', 0, 0, 1)+struct.pack('>HHHHHHHH', 0, 65535, 65535, 65535, 1, 0, 0, 0)
+    rows = b''.join(((1 << (31-y*7)) | 3).to_bytes(4, 'big') for y in range(4))
+    return (b'\0\0'+rect+b'\0\x11\x02\xff'+b'\0\x90'+struct.pack('>H', 0x8004)
+            +rect+pixmap+palette+rect+rect+b'\0\0'+rows+b'\0\xff')
+
+
 class IndependentPictTests(unittest.TestCase):
     def test_authored_bitmap_rows_ignore_padding_bits(self):
         width, height, pixels = decode(authored_bitmap())
@@ -29,6 +39,29 @@ class IndependentPictTests(unittest.TestCase):
         for y in range(4):
             black = [x for x in range(30) if pixels[(y*30+x)*3:(y*30+x+1)*3] == b'\0\0\0']
             self.assertEqual(black, [y*7])
+
+    def test_authored_indexed_pixmap_matches_known_bitmap_pixels(self):
+        self.assertEqual(decode(authored_indexed_pixmap()), decode(authored_bitmap()))
+
+    @unittest.skipUnless(shutil.which(os.environ.get('GRAPHICSMAGICK_EXECUTABLE', 'gm')), 'optional GraphicsMagick decoder unavailable')
+    def test_graphicsmagick_indexed_depths_and_padded_rows(self):
+        tool = shutil.which(os.environ.get('GRAPHICSMAGICK_EXECUTABLE', 'gm'))
+        for data in [pict(depth) for depth in (1, 4, 8)]+[authored_indexed_pixmap()]:
+            self.assertEqual(compare(data, tool, 'graphicsmagick')['status'], 'exact')
+
+    def test_graphicsmagick_adapter_uses_separate_bounded_commands(self):
+        commands = []
+        def reference(command, **kwargs):
+            commands.append(command)
+            self.assertEqual(kwargs['timeout'], 20)
+            if command[1] == 'convert':
+                pixels = decode(pict(1))[2]
+                Path(command[-1][4:]).write_bytes(b''.join(bytes((v, v)) for v in pixels))
+            return subprocess.CompletedProcess(command, 0, stdout='8 1', stderr='')
+        with patch('verify_pict_independently.subprocess.run', side_effect=reference):
+            self.assertEqual(compare(pict(1), 'synthetic-gm', 'graphicsmagick')['status'], 'exact')
+        self.assertEqual([c[1] for c in commands], ['convert', 'identify'])
+        self.assertTrue(all('-limit' in c for c in commands))
 
     @unittest.skipUnless(shutil.which('convert'), 'optional ImageMagick decoder unavailable')
     def test_authored_depths_against_real_independent_decoder(self):
