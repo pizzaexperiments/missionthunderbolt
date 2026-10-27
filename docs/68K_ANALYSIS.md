@@ -158,3 +158,11 @@ the alias/indexed operands were excluded. `PrepareSyntheticEntry.java` accepts o
 the two authored fixture names. Headless exit status alone is insufficient;
 inspect compiler diagnostics and the expected output rows. Original reports stay
 under ignored local-generated/, and existing segment reports are never overwritten.
+
+## DATA/ZERO and DREL startup processing
+
+The bounded CODE 1 expansion/relocation blocks now have original-instruction
+comparisons and a portable model. [A5 initialization](A5_INITIALIZATION.md) covers
+26,178 initialized below-A5 bytes, 517 DREL entries and recovered startup neighbor
+deltas. Resource/OS loading and CREL relocation remain unresolved. This does not
+change the zero-base interpretation of existing Ghidra CODE imports.

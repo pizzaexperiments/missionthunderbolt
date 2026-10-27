@@ -395,3 +395,14 @@ the first differing output field. This supersedes the earlier claim that only
 shimmed callbacks had been run with the original selector. Full generator/mission
 progression, allocation/reclamation, historical directions and gameplay reference
 comparisons remain open for #7–#12.
+
+## Startup table evidence
+
+The earlier direction-table uncertainty now has a bounded resolution: original
+DATA/ZERO startup expansion and DREL processing establish the selector's initial
+eight row/column deltas. [Startup A5 analysis](A5_INITIALIZATION.md) records source
+fingerprints, strict model limits, 68 expansion/133 relocation checks and 162
+connected worlds using values produced by original startup instructions. These
+are initial values; subsequent table mutation is still unverified. This extends
+the earlier explicit synthetic-table evidence without claiming full map
+generation or execution of the Macintosh application loader.
