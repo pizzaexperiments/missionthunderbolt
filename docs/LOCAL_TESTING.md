@@ -388,3 +388,20 @@ build/CTest passed **17/17 ASan/UBSan** and **18/18 SDL** checks. The driver ini
 failed a misleading-indentation warning; formatting was corrected with `-Werror`
 retained. Production Python scripts are unchanged (last measured coverage 82%).
 No Android build/runtime, Actions run, original boot or release was performed.
+
+## Six level-word conversion branches — 2026-10-27
+
+PR #37 was verified merged as `150070e3dc47099283f22e631dba394a1e964124` before syncing the
+feature branch. The 49-glyph connected model matched original instructions on
+**188 maps / 239,324 cells / 57,618 RNG draws**, including all record bytes and
+complete RNG state. The strict direct-only oracle also passed **131,072 helper
+probes and 111 maps / 141,303 cells** after adding the optional observer hook.
+The observer reads service arguments/results; it does not supply them.
+Reproduction/limits: LEVEL_GRID_CONVERSION.md. Original evidence remains ignored.
+
+`sh scripts/test_local.sh` passed **56 Python tests** and native regressions with
+both optional graphics decoders. Configured/built local CMake targets and ran
+CTest: **18/18 ASan/UBSan**, **19/19 SDL** passed. Native frozen regressions include
+the original seed-42 two-draw results and final seed words. No failures/skips
+occurred; no Android build/runtime, original game boot, Actions run/upload or
+release was performed. Production Python tools are unchanged (last coverage 82%).

@@ -77,3 +77,9 @@ and **18/18 SDL** CTest checks, plus 56 Python tests and native smoke tests.
 Its optional private original-instruction comparison matched 131,072 base-word
 probes and 111 complete grids/141,303 cells. See DIRECT_GRID_CONVERSION.md for
 scope and reproduction; this does not establish full generator/gameplay fidelity.
+
+The six-branch level-word increment (2026-10-27) passed **18/18 ASan/UBSan**,
+**19/19 SDL** and 56 Python tests plus native checks. Its private connected oracle
+matched 188 maps/239,324 cells and 57,618 original RNG events with complete state
+comparison. The default direct-only oracle also passed again. Commands/scope:
+LEVEL_GRID_CONVERSION.md. Actions remains disabled; evidence is posted in the PR.

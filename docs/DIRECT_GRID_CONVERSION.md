@@ -79,3 +79,8 @@ Remaining work includes creation/RNG/default glyph paths, original allocation an
 record initialization, connecting earlier loading/selection/preparation stages,
 later population/progression and reference gameplay comparisons. The prepared
 0x2d/0x2e/0x3b/0x24 creation branches remain unsupported.
+
+The following [level-word glyph increment](LEVEL_GRID_CONVERSION.md) combines
+these 43 branches with six additional branches in a separate model, including
+two conditional original RNG paths. The direct-only oracle above retains its
+strict default service boundary and remains a separate regression check.
