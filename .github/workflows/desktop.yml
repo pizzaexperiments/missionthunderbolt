@@ -1,0 +1,98 @@
+# Manual-only: conserve Actions credits. Produces review artifacts, not releases.
+name: Manual desktop research packages
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Optional existing reviewed tag; empty uses selected workflow ref
+        required: false
+        type: string
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+      - name: Verify requested release tag
+        if: inputs.tag != ''
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          git check-ref-format "refs/tags/$RELEASE_TAG"
+          test "$(git rev-parse --verify --end-of-options "refs/tags/$RELEASE_TAG^{commit}")" = "$(git rev-parse HEAD)"
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/vcpkg
+          ref: 0e5030f583a5427123cd3b714255e5ae62faa3ba
+          path: dist/vcpkg
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Prepare pinned vcpkg
+        shell: pwsh
+        run: |
+          & ./dist/vcpkg/bootstrap-vcpkg.bat -disableMetrics
+          "VCPKG_ROOT=$env:GITHUB_WORKSPACE/dist/vcpkg" >> $env:GITHUB_ENV
+      - run: cmake --preset desktop-windows
+      - run: cmake --build dist/windows --parallel 4
+      - run: ctest --test-dir dist/windows --output-on-failure
+      - run: cmake --install dist/windows --prefix dist/packages/windows-x64
+      - name: Preserve dependency notice and package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist/packages/windows-x64/licenses
+          Copy-Item dist/vcpkg_installed/x64-windows-static/share/sdl2/copyright dist/packages/windows-x64/licenses/SDL2.txt
+          Copy-Item docs/DESKTOP_DEVELOPMENT.md dist/packages/windows-x64/README.md
+          Compress-Archive -Path dist/packages/windows-x64/* -DestinationPath dist/windows-x64-research.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64-research-demo
+          path: dist/windows-x64-research.zip
+          if-no-files-found: error
+  macos:
+    strategy:
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+      - name: Verify requested release tag
+        if: inputs.tag != ''
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          git check-ref-format "refs/tags/$RELEASE_TAG"
+          test "$(git rev-parse --verify --end-of-options "refs/tags/$RELEASE_TAG^{commit}")" = "$(git rev-parse HEAD)"
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/vcpkg
+          ref: 0e5030f583a5427123cd3b714255e5ae62faa3ba
+          path: dist/vcpkg
+      - name: Prepare pinned vcpkg
+        run: |
+          ./dist/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+          echo "VCPKG_ROOT=$GITHUB_WORKSPACE/dist/vcpkg" >> "$GITHUB_ENV"
+      - run: cmake --preset desktop-macos-${{ matrix.arch }}
+      - run: cmake --build dist/macos-${{ matrix.arch }} --parallel 4
+      - run: ctest --test-dir dist/macos-${{ matrix.arch }} --output-on-failure
+      - run: cmake --install dist/macos-${{ matrix.arch }} --prefix dist/packages/macos-${{ matrix.arch }}
+      - name: Preserve notice and application modes
+        run: |
+          mkdir -p dist/packages/macos-${{ matrix.arch }}/licenses
+          cp dist/vcpkg_installed/${{ matrix.arch }}-osx/share/sdl2/copyright dist/packages/macos-${{ matrix.arch }}/licenses/SDL2.txt
+          cp docs/DESKTOP_DEVELOPMENT.md dist/packages/macos-${{ matrix.arch }}/README.md
+          tar -czf dist/macos-${{ matrix.arch }}-research.tar.gz -C dist/packages/macos-${{ matrix.arch }} .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.arch }}-research-demo
+          path: dist/macos-${{ matrix.arch }}-research.tar.gz
+          if-no-files-found: error

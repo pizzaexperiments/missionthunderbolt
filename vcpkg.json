@@ -1,0 +1,6 @@
+{
+  "name": "mission-thunderbolt-research",
+  "version-string": "0.1-research",
+  "builtin-baseline": "0e5030f583a5427123cd3b714255e5ae62faa3ba",
+  "dependencies": ["sdl2"]
+}

@@ -2,9 +2,11 @@
 
 Research project for a **native** Android port of classic Macintosh *Mission: Thunderbolt*, with portable C++ core and optional Classic / Modern presentation modes.
 
+**[How we're building this — an LLM capability experiment](docs/HOW_WE_ARE_BUILDING_THIS.md)** explains the restoration strategy, test methodology, human/AI responsibilities, and verified limitations.
+
 ## Current state
 
-This repository begins with a **demonstration engine**, not a recreation of original gameplay. Original Macintosh 68K CODE/CREL resources have been recovered separately; no game mechanics are claimed to be disassembled yet. No APK has been built or verified.
+This repository begins with a **demonstration engine**, not a recreation of original gameplay. The supplied historical archive is kept privately and has been extracted into a hash-linked resource inventory. Static 68K analysis and local graphics/audio conversion tools are available, but full original gameplay semantics remain incomplete. Isolated RNG initialization, grid layout and bounded candidate selection have been checked against original instructions; full map generation and other gameplay systems remain research work. The synthetic Android APK builds and has passed emulator checks; see the evidence links below for exact scope.
 
 ## Goals
 
@@ -15,10 +17,10 @@ This repository begins with a **demonstration engine**, not a recreation of orig
 
 ## Build
 
-Open `android/` in Android Studio, install SDK platform 35 and NDK/CMake, and build `assembleDebug`. GitHub Actions is configured for automated build validation. The project has not yet been device-tested.
+See [Android development](docs/ANDROID_DEVELOPMENT.md) for pinned tools, build/install/launch commands and troubleshooting. Local APK builds have passed; [evidence and remaining checks](docs/verification/android-build.md) distinguish build, installation and gameplay validation. GitHub Actions is manual-only to conserve credits.
 
 ## Rights
 
-Original game binaries, art, sound, manuals and resource forks are **not included** pending rights review. Do not upload these to a public repo without authorization.
+New project code is licensed under [MIT](LICENSE). Original game binaries, art, sound, manuals and resource forks are **not included** in public source/packages; their rights remain separately restricted. See [license boundaries](THIRD_PARTY_NOTICES.md) and do not upload historical material without authorization.
 
 See `docs/ROADMAP.md` for progress and limitations.

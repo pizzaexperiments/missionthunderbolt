@@ -1,0 +1,46 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "desktop-windows",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/dist/windows",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/dist/vcpkg_installed",
+        "MT_BUILD_SDL_HOST": "ON"
+      }
+    },
+    {
+      "name": "desktop-macos-arm64",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/dist/macos-arm64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "arm64-osx",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/dist/vcpkg_installed",
+        "CMAKE_OSX_ARCHITECTURES": "arm64",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "11.0",
+        "MT_BUILD_SDL_HOST": "ON"
+      }
+    },
+    {
+      "name": "desktop-macos-x64",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/dist/macos-x64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-osx",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/dist/vcpkg_installed",
+        "CMAKE_OSX_ARCHITECTURES": "x86_64",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "11.0",
+        "MT_BUILD_SDL_HOST": "ON"
+      }
+    }
+  ]
+}

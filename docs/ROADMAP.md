@@ -1,54 +1,74 @@
-# Mission Thunderbolt native port master plan
+# Mission Thunderbolt roadmap and issue checkpoints
 
-**Status (October 26, 2026):** C++ core/API tests passing; Android CI SDK setup failing before APK build (run 40402366349). The code is a synthetic demonstration, **not** original gameplay. No installable APK has been verified.
+This is a **synthetic native prototype**, not a faithful original-game port.
+Work proceeds on `feature/offline-research-tooling`, with `develop` as integration
+and `main` release-only. Commits are separately reviewable. Closures of #4, #24 and #25 were verified through the live GitHub API;
+[draft PR #26](https://github.com/pizzaexperiments/missionthunderbolt/pull/26) remains unmerged. GitHub Actions stays manual-only
+because credits are unavailable; no CI run/public release is claimed here.
 
-## Milestones and execution order
+## Dependency order
 
-### M0 — Reproducible research demo APK (highest priority)
-- [#1](https://github.com/pizzaexperiments/missionthunderbolt/issues/1) fix Android CI and emit debug APK
-- [#2](https://github.com/pizzaexperiments/missionthunderbolt/issues/2) local build/device testing
-- [#25](https://github.com/pizzaexperiments/missionthunderbolt/issues/25) Codex contributor instructions
-- [#14](https://github.com/pizzaexperiments/missionthunderbolt/issues/14) modular native engine
-- Android app issues [#17](https://github.com/pizzaexperiments/missionthunderbolt/issues/17), [#18](https://github.com/pizzaexperiments/missionthunderbolt/issues/18)
-
-### M1 — Authorized game input and evidence
-- [#3](https://github.com/pizzaexperiments/missionthunderbolt/issues/3) legal provenance and local-only asset workflow
-- [#4](https://github.com/pizzaexperiments/missionthunderbolt/issues/4) resource parser and inventories
-- [#5](https://github.com/pizzaexperiments/missionthunderbolt/issues/5) PICT decoder and catalog
-- [#6](https://github.com/pizzaexperiments/missionthunderbolt/issues/6) original gameplay behavior reference
-- [#7](https://github.com/pizzaexperiments/missionthunderbolt/issues/7) 68K/CREL call graph
-- [#13](https://github.com/pizzaexperiments/missionthunderbolt/issues/13) audio decoding
-
-### M2 — Faithful gameplay replacing the demo
-- [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) map generation/progression
-- [#9](https://github.com/pizzaexperiments/missionthunderbolt/issues/9) movement/turns/FOV
-- [#10](https://github.com/pizzaexperiments/missionthunderbolt/issues/10) combat
-- [#11](https://github.com/pizzaexperiments/missionthunderbolt/issues/11) items/inventory
-- [#12](https://github.com/pizzaexperiments/missionthunderbolt/issues/12) enemy/ally AI
-- [#15](https://github.com/pizzaexperiments/missionthunderbolt/issues/15) save/load
-- [#16](https://github.com/pizzaexperiments/missionthunderbolt/issues/16) faithful Classic UI
-
-### M3 — Portable distribution and quality
-- [#19](https://github.com/pizzaexperiments/missionthunderbolt/issues/19) Windows
-- [#20](https://github.com/pizzaexperiments/missionthunderbolt/issues/20) macOS
-- [#22](https://github.com/pizzaexperiments/missionthunderbolt/issues/22) regression tests, fuzzing and sanitizers
-- [#23](https://github.com/pizzaexperiments/missionthunderbolt/issues/23) release signing, SBOM and checksums
-- [#24](https://github.com/pizzaexperiments/missionthunderbolt/issues/24) optional public HTTP API decision
-
-## Delivery directory conventions
-
-```text
-android/                          # Gradle project, Java host and JNI/C++ core
-tests/                            # Core and ABI checks
-docs/                             # Research and architecture notes
-scripts/                          # Original-import validation and future converters
-local-original/                   # IGNORED: locally supplied .sit/.zip and resource forks
-local-generated/                  # IGNORED: extracted PICT/PNG/snd/analysis output
-dist/                             # IGNORED: local APK and desktop packages
-.github/workflows/                # Public-source CI and APK artifact upload
+```mermaid
+flowchart TD
+  B[1/2 Android build and local workflow] --> C[14 portable core]
+  C --> S[15 versioned saves]
+  S --> A[17/18 Android controls and lifecycle]
+  C --> D[19/20 native desktop hosts]
+  C --> Q[22 regression and sanitizer checks]
+  C --> API[24 offline API decision]
+  P[3 provenance and private inputs] --> E[4 extraction]
+  E --> V[5 graphics and 13 audio]
+  E --> R[6 original reference traces]
+  E --> G[7 segmented-code analysis]
+  R --> M[8-12 recovered gameplay]
+  G --> M
+  M --> K[16 faithful Classic presentation]
+  V --> K
+  A --> L[23 reviewed release preparation]
+  D --> L
+  P --> L
 ```
 
-Local original source archive convention: `local-original/mission_thunderbolt.sit`. A future **authorized redistribution** can use GitHub Releases or separately permissioned storage, but do not put commercial game assets in a public release before rights are verified.
+## Issue-by-issue state
 
-## Codex workflow
-Start with #1, then #2 and #25. For each issue: inspect relevant code, propose smallest testable PR, run tests, document evidence and unblock dependencies. Never claim the full port is finished because a demo builds.
+| Issue | Implemented/researched checkpoint | Remaining acceptance / evidence |
+| --- | --- | --- |
+| [#1](https://github.com/pizzaexperiments/missionthunderbolt/issues/1) | Pinned selected SDK/NDK/CMake/build-tools, verified local APK and manual artifact checks | Green CI run and uploaded Actions artifact still pending; no automatic runs |
+| [#2](https://github.com/pizzaexperiments/missionthunderbolt/issues/2) | Android setup/install/launch guide; clean tracked-source export built on Linux; emulator install/launch tested | Windows/macOS setup and physical device validation |
+| [#3](https://github.com/pizzaexperiments/missionthunderbolt/issues/3) | Provenance boundaries, private import/index guard; maintainer selected MIT for new code | Historical redistribution rights remain ungranted; current rights-holder/permission research |
+| [#4](https://github.com/pizzaexperiments/missionthunderbolt/issues/4) | StuffIt decoded locally; AppleDouble/resource parser produced 1,571 hash-linked entries, including 15 CODE/13 CREL | Closed as completed; source difference documented; implementation in unmerged PR #26 |
+| [#5](https://github.com/pizzaexperiments/missionthunderbolt/issues/5) | 908 resource PICTs + 26 standalone slides decoded; PNG catalogs/contact sheets, indexed 1/4/8-bit fixtures | Independent original-runtime visual comparison and semantic sprite attribution |
+| [#6](https://github.com/pizzaexperiments/missionthunderbolt/issues/6) | Evidence-labeled trace validator, capture protocol, manual evidence notes | Lawful original reference environment/recordings; executable 2.0.g differs from manual 1.0 |
+| [#7](https://github.com/pizzaexperiments/missionthunderbolt/issues/7) | 28 Ghidra imports; 788 jump entries; 8,697 static call candidates; trap-frontier hypotheses; isolated RNG/grid-helper/selector instruction checks | CREL/runtime addressing, full trap/state/scheduler roles, RNG lifecycle and gameplay corroboration |
+| [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) | RNG initializer, 67×19 record layout and bounded candidate selector modeled; 105 selector/RNG instruction comparisons | Recover and implement original generator/progression with golden traces |
+| [#9](https://github.com/pizzaexperiments/missionthunderbolt/issues/9) | Manual-backed WAIT; signed-byte coordinate clip and candidate gate checked against original instructions | Original turn/FOV/collision/running implementation and differential tests |
+| [#10](https://github.com/pizzaexperiments/missionthunderbolt/issues/10) | Manual combat/wield/exchange evidence recorded | Damage/hit/RNG/weapon rules and original comparisons |
+| [#11](https://github.com/pizzaexperiments/missionthunderbolt/issues/11) | Manual quantity/container/equipment evidence recorded | Original schemas, constraints, effects and verified transitions |
+| [#12](https://github.com/pizzaexperiments/missionthunderbolt/issues/12) | AI/spawning evidence gaps documented | Controlled original traces, recovered entity/AI/pathfinding logic |
+| [#13](https://github.com/pizzaexperiments/missionthunderbolt/issues/13) | 137 complete single-buffer PCM previews plus one sample-only preview; timed command order/parameters preserved | Render timed sequence 9015, auditory equivalence, native playback/cue controls and device proof |
+| [#14](https://github.com/pizzaexperiments/missionthunderbolt/issues/14) | Separate bounded map/seeded RNG, portable CMake, stable C ABI errors/ownership and C-client test | Windows/macOS matrix execution; future recovered systems must remain independent of rendering |
+| [#15](https://github.com/pizzaexperiments/missionthunderbolt/issues/15) | Versioned synthetic state, CRC32, migration/corruption/continuation tests and app-private atomic storage | Extend format only as real gameplay systems exist; no proprietary-save compatibility claim |
+| [#16](https://github.com/pizzaexperiments/missionthunderbolt/issues/16) | Original graphics available privately for research; reference requirements identified | Faithful Classic layout/menus/fonts/resource mapping and screenshot comparisons; current skins are demo-only |
+| [#17](https://github.com/pizzaexperiments/missionthunderbolt/issues/17) | Shared-state skins, adaptive controls, virtual accessible map cells/actions, zoom, keyboard/joystick and runtime regressions | Physical TalkBack usability, physical gamepad and broader device testing |
+| [#18](https://github.com/pizzaexperiments/missionthunderbolt/issues/18) | Recreation, app-private process-death restore and background cycles tested; target raised to 35 with inset handling | See Android runtime evidence for exact configurations; physical ARM64/performance and power/audio-focus acceptance remain |
+| [#19](https://github.com/pizzaexperiments/missionthunderbolt/issues/19) | SDL native host, real render/input/save smoke checks on Linux, Windows static packaging configuration | Windows build/launch/physical input and portable ZIP verification |
+| [#20](https://github.com/pizzaexperiments/missionthunderbolt/issues/20) | Native `.app` metadata and separate pinned ARM64/Intel presets/manual artifact jobs | Both Mac builds/launch/save/input checks, signing/notarization |
+| [#22](https://github.com/pizzaexperiments/missionthunderbolt/issues/22) | Parser/save mutations, ASan/UBSan, 86% Python coverage; 1.72M coverage-guided synthetic parser executions | Original differential/screenshot goldens and longer-running scheduled fuzzing |
+| [#23](https://github.com/pizzaexperiments/missionthunderbolt/issues/23) | MIT/notices, unsigned release APK/AAB build, review hashes/SPDX inventory tool and manual signing workflow | Signing bindings, reviewed tag, complete dependency SBOM/notices, native packages and release review; no publication |
+| [#24](https://github.com/pizzaexperiments/missionthunderbolt/issues/24) | ADR retains offline C ABI and defers an unneeded HTTP service | Closed as completed; revisit only for a concrete network consumer |
+| [#25](https://github.com/pizzaexperiments/missionthunderbolt/issues/25) | Root instructions, dependency roadmap, explicit evidence and PR definition of done | Closed as completed; implementation in unmerged PR #26 |
+
+[#21](https://github.com/pizzaexperiments/missionthunderbolt/issues/21) is already
+closed as a duplicate of #1; no separate implementation is needed.
+
+## Evidence and development entry points
+
+- [Android workflow](ANDROID_DEVELOPMENT.md), [build evidence](verification/android-build.md), [controls](MODERN_CONTROLS.md), [runtime evidence](ANDROID_RUNTIME.md).
+- [Portable API](API.md), [save format](SAVE_FORMAT.md), [desktop workflow](DESKTOP_DEVELOPMENT.md), [quality gates](QUALITY.md).
+- [Rights](RIGHTS_AND_PROVENANCE.md), [extraction](RESOURCE_EXTRACTION.md), [graphics](PICT_CATALOG.md), [sound](SOUND_CONVERSION.md).
+- [Reference capture](REFERENCE_RESEARCH.md), [manual evidence](MANUAL_EVIDENCE.md), [68K analysis](68K_ANALYSIS.md), [grid research](GRID_RESEARCH.md), [remaining fidelity gaps](GAMEPLAY_EVIDENCE_GAPS.md).
+- [Release preparation](RELEASE_PREPARATION.md), [offline API decision](decisions/0001-offline-api.md), [closeout review](ISSUE_CLOSEOUT_REVIEW.md).
+
+Original inputs stay in ignored `local-original/`, research derivatives in
+`local-generated/`, and build/test artifacts in `dist/`. Public tests generate
+synthetic fixtures in code. Do not attach proprietary outputs to a PR or CI run.

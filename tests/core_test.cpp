@@ -17,5 +17,17 @@ int main() {
     assert(game.presentation() == mt::Presentation::Modern);
     mt::PrototypeGame replay(20, 12, 1);
     assert(replay.asciiMap() != game.asciiMap());
+    for (uint32_t seed : {0u, 1u, 42u, 0xffffffffu}) {
+        mt::PrototypeGame first(20, 12, seed), second(20, 12, seed);
+        assert(first.asciiMap() == second.asciiMap());
+        assert(first.rngState() == second.rngState());
+        const auto before = first.asciiMap();
+        first.setPresentation(mt::Presentation::Modern);
+        assert(first.asciiMap() == before && first.turns() == 0);
+        for (int i=0; i<10; ++i) {
+            assert(first.move(1,0) == second.move(1,0));
+            assert(first.asciiMap() == second.asciiMap());
+        }
+    }
     std::cout << "core smoke tests passed\n";
 }

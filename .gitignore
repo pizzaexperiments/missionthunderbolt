@@ -12,3 +12,13 @@ dist/
 *.iml
 local.properties
 .DS_Store
+
+# Native/Python dependency and test caches
+**/.cxx/
+__pycache__/
+*.py[cod]
+/build/
+/vcpkg_installed/
+.coverage
+.coverage.*
+/htmlcov/

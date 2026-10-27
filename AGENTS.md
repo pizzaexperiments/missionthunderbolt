@@ -1,27 +1,46 @@
-# Codex / contributor instructions
+# Codex and contributor operating guide
 
-This is a **research prototype**, not a faithful port yet. Treat all gameplay as synthetic unless traced to source evidence. Source prototype is under `android/app/src/main/cpp/`, Android host in `android/app/src/main/java/`; tests in `tests/`.
+## Branch policy — mandatory
+- `develop` is the default **integration** branch.
+- Start all implementation branches from the current `develop` head, using `feature/<topic>` or `fix/<topic>`.
+- For this active workstream, use `feature/offline-research-tooling`; do not commit directly to `develop` or `main`.
+- When work has passed review and local verification, open a PR **feature → develop**. Merge only with approval.
+- `main` is release-only. When a release is ready, open a reviewed **develop → main** PR. No direct commits to `main`.
+- GitHub Actions credits are unavailable; workflow is manually triggered only. Run tests locally and put test evidence in PRs.
 
-## How to work
-1. Read `README.md`, `docs/ROADMAP.md`, `docs/API.md`, and the selected GitHub issue.
-2. Make a small plan and a single-purpose pull request referencing the issue.
-3. Add deterministic unit tests for engine/parser changes. Run:
-   ```sh
-   g++ -std=c++17 -Wall -Wextra -Werror android/app/src/main/cpp/game.cpp tests/core_test.cpp -o /tmp/mt-core && /tmp/mt-core
-   g++ -std=c++17 -Wall -Wextra -Werror android/app/src/main/cpp/game.cpp android/app/src/main/cpp/api.cpp tests/api_test.cpp -o /tmp/mt-api && /tmp/mt-api
-   ```
-4. For Android, install Java 17, SDK platform 35, build-tools 35.0.0, NDK 27.2.12479018, CMake 3.22.1, Gradle 8.7 and run `cd android && gradle --no-daemon assembleDebug`. Record exact CI run.
-5. PR description must include test results, screenshots/logs where relevant, risks, unresolved gaps, and no unverified claims.
+## Project reality
+This is a research prototype, **not** a faithful reconstruction. Do not claim old game logic is implemented without corroborating original reference behavior. Do not claim a verified APK without a build artifact and device/emulator test.
 
-## Proprietary input boundaries
-- Do **not** commit, embed, attach to public GitHub issues, upload as Actions artifact, or include in publicly downloadable APK any original game executable/resources/PICT/snd/manual/StuffIt archive unless the contributor documents redistribution permission.
-- Keep original inputs in local `local-original/` (ignored), and generated derivatives in `local-generated/` (ignored).
-- Parser tests should use synthetic fixtures.
-- Users who lawfully possess the game may import their local archive for research. Do not circumvent DRM or attempt to acquire unauthorized assets.
+## Local tests
+```sh
+sh scripts/test_local.sh
+```
+Requires Python 3 and a C++17 compiler. Output in ignored `dist/`.
 
-## Product goals
-- First produce an installable **synthetic demo** Android APK with CI.
-- Then recover original behavior through documented, independently verifiable analysis.
-- Two UIs (Classic and Modern) share one deterministic rules engine.
-- Portable C++ core; native Android, Windows and macOS host apps; no runtime Mac emulator.
-- Stable in-process C ABI already exists. HTTP API is optional (#24).
+## Work on issues
+Read `README.md`, `docs/ROADMAP.md`, `docs/LOCAL_TESTING.md`, and the assigned issue. Deliver small, separately reviewable changes with tests and precise verification evidence. Document blockers and uncertainty.
+
+## Copyright and original assets
+Do not publish, commit, embed in releases, or attach commercial game binaries/resources/audio/manuals without determining rights. Local archive import goes in ignored `local-original/`; derived data under ignored `local-generated/`. Synthetic fixtures are preferred for public tests.
+
+## Release targeting
+Native Android first, Windows/macOS later, with a portable C++ engine and Classic/Modern UI. No Mac emulation at runtime. External HTTP API is optional; in-process C ABI already exists.
+
+## Verification and definition of done
+- Use the existing isolated checkout; do not create a Git worktree unless requested.
+- Read the selected issue and linked evidence; make an issue-sized plan before editing.
+- Run `sh scripts/test_local.sh`; use root CMake/CTest for C ABI, sanitizer and SDL checks.
+  Android uses Java 17, Gradle 8.7, SDK/target 35, build-tools 35.0.0,
+  NDK 27.2.12479018 and CMake 3.22.1; see docs/ANDROID_DEVELOPMENT.md.
+- Keep original inputs and derivatives ignored. Run `python3 scripts/check_public_inputs.py --staged`
+  and review staged paths/content before committing; path checks do not grant rights.
+- Add deterministic regressions for engine/parser changes, with no proprietary fixtures.
+  Never disable assertions, integrity checks or failing checks to claim readiness.
+- Record exact commands, test counts, platform/ABI, failures/skips/unrun checks and artifact
+  identity where relevant. Build, install, launch, gameplay fidelity and release signing
+  are separate claims. Manual 1.0 and executable 2.0.g are not assumed equivalent.
+- A reviewable commit/PR references its issue, explains behavior and validation, records
+  remaining gaps and includes only shareable evidence. Do not mark an issue complete
+  while original-specific acceptance is untested. Keep docs/ROADMAP.md current.
+- Only manually trigger Actions with an explicit reason consistent with available credits.
+  No automatic push/PR CI or release publication. Merge requires maintainer approval.
