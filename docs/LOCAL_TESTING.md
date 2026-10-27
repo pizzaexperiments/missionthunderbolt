@@ -248,3 +248,13 @@ credential binding, and no GitHub connector tools are available. The existing
 credential was not printed or replaced. PR payload/description and a source-only
 patch were prepared locally; no follow-up PR, issue update or remote branch push
 is claimed for this increment. Publishing awaits a refreshed credential connection.
+
+### Authentication recovered on retry
+
+The later authenticated repository request succeeded and confirmed push/admin
+permissions; `git push origin feature/offline-research-tooling` then succeeded
+through commit `4ef32b1`. No credential value or authentication configuration
+was changed by the agent. The previous 401 therefore records an earlier
+authentication failure, not an ongoing repository-permission or network-policy
+blocker. The available responses do not establish why the credential was
+rejected then and accepted later. PR/issue publication resumed after that check.
