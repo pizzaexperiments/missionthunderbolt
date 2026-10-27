@@ -2,7 +2,7 @@
 
 This is a **synthetic native prototype**, not a faithful original-game port.
 Work proceeds on `feature/offline-research-tooling`, with `develop` as integration
-and `main` release-only. Commits are separately reviewable. Closures of #2, #4, #24 and #25 were verified through the live GitHub API;
+and `main` release-only. Commits are separately reviewable. Closures of #2, #4, #5, #24 and #25 were verified through the live GitHub API;
 [PR #26](https://github.com/pizzaexperiments/missionthunderbolt/pull/26) [PR #27](https://github.com/pizzaexperiments/missionthunderbolt/pull/27) and [PR #28](https://github.com/pizzaexperiments/missionthunderbolt/pull/28) were verified merged into develop. GitHub Actions stays manual-only
 because credits are unavailable; no CI run/public release is claimed here.
 
@@ -37,7 +37,7 @@ flowchart TD
 | [#2](https://github.com/pizzaexperiments/missionthunderbolt/issues/2) | Android setup/install/launch guide; clean tracked-source export built on Linux; emulator install/launch tested | Closed as completed: clean Linux clone and documented install/launch satisfy the issue; native platforms/device breadth remain in #18–#20 |
 | [#3](https://github.com/pizzaexperiments/missionthunderbolt/issues/3) | Provenance boundaries, private import/index guard; maintainer selected MIT for new code | Historical redistribution rights remain ungranted; current rights-holder/permission research |
 | [#4](https://github.com/pizzaexperiments/missionthunderbolt/issues/4) | StuffIt decoded locally; AppleDouble/resource parser produced 1,571 hash-linked entries, including 15 CODE/13 CREL | Closed as completed; source difference documented; implementation merged through PR #26 |
-| [#5](https://github.com/pizzaexperiments/missionthunderbolt/issues/5) | 908 resource PICTs + 26 standalone slides decoded; PNG catalogs/contact sheets, indexed 1/4/8-bit fixtures | All 934 pictures match at least one external decoder; four panel roles visually attributed. Decoder/catalog scope completed; runtime presentation remains #16 |
+| [#5](https://github.com/pizzaexperiments/missionthunderbolt/issues/5) | 908 resource PICTs + 26 standalone slides decoded; PNG catalogs/contact sheets, indexed 1/4/8-bit fixtures | All 934 pictures match at least one external decoder; four panel roles visually attributed. Closed as completed: decoder/catalog scope; runtime presentation remains #16 |
 | [#6](https://github.com/pizzaexperiments/missionthunderbolt/issues/6) | Evidence-labeled trace validator, capture protocol, manual evidence notes | Lawful original reference environment/recordings; executable 2.0.g differs from manual 1.0 |
 | [#7](https://github.com/pizzaexperiments/missionthunderbolt/issues/7) | 28 Ghidra imports; 788 jump entries; 8,697 static call candidates; trap-frontier hypotheses; isolated RNG/grid-helper/selector instruction checks | CREL/runtime addressing, full trap/state/scheduler roles, RNG lifecycle and gameplay corroboration |
 | [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) | RNG/grid/selector models plus fallback control flow; 1,068 fallback and 105 full-pipeline comparisons with service shims | Recover and implement original generator/progression with golden traces |
