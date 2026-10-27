@@ -322,3 +322,20 @@ both optional picture decoders present. CMake/CTest passed **15/15 ASan/UBSan**
 and **16/16 SDL** checks. Production Python scripts are unchanged (last measured
 coverage 82%). No new Android build/runtime, full generator, tile semantics,
 original game boot or release is claimed. Original outputs stay ignored.
+
+## Direct-write cell conversion — 2026-10-27
+
+PR #34 was refreshed and was still open, ready for review; no merge was assumed.
+The same workstream branch now includes a separate conversion increment.
+Original CODE 12 matched the native model on **268,288 subtype-tail probes**
+and **23,822 direct-write conversion probes** over 43 supported glyphs. Source
+byte/header/tuning/frame and cell guards plus stack checks passed; every final
+cell byte matched. The first run exposed missing P-branch flag and p-branch kind
+writes in the draft model. The model was corrected against the instructions and
+full probes rerun with checks intact. Scope/commands: BASIC_CELL_CONVERSION.md.
+
+`sh scripts/test_local.sh` passed **56 Python tests** and native regressions with
+both optional external graphics decoders present. CMake/CTest passed
+**16/16 ASan/UBSan** and **17/17 SDL** checks. Production Python scripts are
+unchanged (last measured coverage 82%). Unresolved glyphs remain unsupported;
+no full generator, new APK/runtime, original boot, CI run or release is claimed.
