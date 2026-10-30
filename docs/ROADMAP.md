@@ -6,7 +6,7 @@ release-only. Dependent branches may stack without waiting for merges; every imp
 PR targets `develop`, with its prerequisite PRs/commits and local evidence recorded. Closures of #2, #4, #5, #24 and #25 were verified through the live GitHub API.
 The 2026-10-30 acceptance review closed #3, #14 and #17 as completed in
 their workflow/prototype scopes; see [closeout review](ISSUE_CLOSEOUT_REVIEW.md).
-The #45 integration repair and #46–#48 were verified merged into `develop`, including the formerly stranded #43/#44 changes. All five GitHub Actions workflows are disabled during the maintainer-requested
+The #45 integration repair and #46–#51 were verified merged into `develop`, including the formerly stranded #43/#44 changes. All five GitHub Actions workflows are disabled during the maintainer-requested
 pause. Local test results belong in PRs; no CI run/public release is claimed here.
 
 ## Dependency order
@@ -46,7 +46,7 @@ flowchart TD
 | [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) | RNG/grid/selector/fallback models; startup/lifecycle checks, 1,600 byte-preparation cases; 49 glyphs, connected 188-map/239,324-cell traversal with original RNG | Recover and implement original generator/progression with golden traces |
 | [#9](https://github.com/pizzaexperiments/missionthunderbolt/issues/9) | Manual-backed WAIT; signed-byte coordinate clip and candidate gate checked against original instructions | Original turn/FOV/collision/running implementation and differential tests |
 | [#10](https://github.com/pizzaexperiments/missionthunderbolt/issues/10) | Manual combat/wield/exchange evidence recorded | Damage/hit/RNG/weapon rules and original comparisons |
-| [#11](https://github.com/pizzaexperiments/missionthunderbolt/issues/11) | Manual quantity/container/equipment evidence; raw filter/list prepend/removal/release/prefix models, 69 supplied-allocation factory variants/RNG tail and connected selector checks corroborated; separate 56-byte child prefix corroborated on 1,458 cases/4,368 draws | Original schemas, constraints, effects and verified transitions |
+| [#11](https://github.com/pizzaexperiments/missionthunderbolt/issues/11) | Manual quantity/container/equipment evidence; raw filter/list prepend/removal/release/prefix models, 69 supplied-allocation factory variants/RNG tail and connected selector checks corroborated; 56-byte child prefix and supported type dispatch corroborated on 2,096 cases/5,302 draws | Original schemas, constraints, effects and verified transitions |
 | [#12](https://github.com/pizzaexperiments/missionthunderbolt/issues/12) | AI/spawning evidence gaps documented | Controlled original traces, recovered entity/AI/pathfinding logic |
 | [#13](https://github.com/pizzaexperiments/missionthunderbolt/issues/13) | 137 single-buffer previews plus one sample-only; timed commands preserved; opt-in authored PCM controls | Opt-in authored Android PCM path added; historical sequence/cue fidelity and physical output remain open |
 | [#14](https://github.com/pizzaexperiments/missionthunderbolt/issues/14) | Separate bounded map/seeded RNG, portable CMake, stable C ABI errors/ownership and C-client test | Closed as completed for prototype refactor; native Windows/macOS execution remains #19/#20, future systems must preserve core independence |
@@ -57,7 +57,7 @@ flowchart TD
 | [#19](https://github.com/pizzaexperiments/missionthunderbolt/issues/19) | SDL native host, real render/input/save smoke checks on Linux, Windows static packaging configuration | Windows build/launch/physical input and portable ZIP verification |
 | [#20](https://github.com/pizzaexperiments/missionthunderbolt/issues/20) | Native `.app` metadata and separate pinned ARM64/Intel presets/manual artifact jobs | Both Mac builds/launch/save/input checks and CI artifacts; signing/notarization plan documented |
 | [#22](https://github.com/pizzaexperiments/missionthunderbolt/issues/22) | Parser/save mutations, ASan/UBSan, 82% Python coverage; 1.72M coverage-guided synthetic parser executions | Original differential/screenshot goldens; scheduled fuzzing is useful follow-up |
-| [#23](https://github.com/pizzaexperiments/missionthunderbolt/issues/23) | MIT/notices, unsigned release APK/AAB build, review hashes/SPDX inventory tool and manual signing workflow | NDK archive hashes/link-map/build-ID evidence added; component license attribution, signing bindings, reviewed tag, native packages and release review; no publication |
+| [#23](https://github.com/pizzaexperiments/missionthunderbolt/issues/23) | MIT/notices, unsigned release APK/AAB build, review hashes/SPDX inventory tool and manual signing workflow | NDK archive hashes/link-map/build-ID and notice-evidence attribution added; member-specific license conclusions, signing bindings, reviewed tag, native packages and release review; no publication |
 | [#24](https://github.com/pizzaexperiments/missionthunderbolt/issues/24) | ADR retains offline C ABI and defers an unneeded HTTP service | Closed as completed; revisit only for a concrete network consumer |
 | [#25](https://github.com/pizzaexperiments/missionthunderbolt/issues/25) | Root instructions, dependency roadmap, explicit evidence and PR definition of done | Closed as completed; implementation merged through PR #26 |
 
