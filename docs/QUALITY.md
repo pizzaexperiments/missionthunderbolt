@@ -15,7 +15,12 @@ cmake --build dist/sdl --parallel 4
 ctest --test-dir dist/sdl --output-on-failure
 ```
 
-The latest [five-child helper](CHILD_CHAIN.md) increment passed **31/31 ASan/UBSan**
+The [playable mission integration](PLAYABLE_RESEARCH_MISSION.md) passed **33/33
+ASan/UBSan** and **34/34 SDL**, plus 84 Python tests with zero skips. Its frozen
+recipe checks were added afterward and the integration target rebuilt/passed
+under both configurations.
+
+The preceding [five-child helper](CHILD_CHAIN.md) increment passed **31/31 ASan/UBSan**
 and **32/32 SDL** CTest checks locally, plus 84 Python tests with zero skips and
 all local native/demo smoke checks. After strengthening the new test, its target
 was rebuilt and passed again under both sanitizer and SDL configurations.

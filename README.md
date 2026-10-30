@@ -8,6 +8,12 @@ Research project for a **native** Android port of classic Macintosh *Mission: Th
 
 This repository begins with a **demonstration engine**, not a recreation of original gameplay. The supplied historical archive is kept privately and has been extracted into a hash-linked resource inventory. Static 68K analysis and local graphics/audio conversion tools are available, but full original gameplay semantics remain incomplete. Recovered RNG, grid selection and record-lifecycle routines have been compared with connected original instruction runs on synthetic inputs; full map generation and other gameplay systems remain research work. The synthetic Android APK builds and has passed emulator checks; see the evidence links below for exact scope.
 
+The [playable research mission](docs/PLAYABLE_RESEARCH_MISSION.md) now connects
+recovered RNG, grid conversion, record placement and unlink routines to an
+authored 67×19 scenario. Explore rooms and collect a visible sample in Android;
+press **New mission** if an older save opens the legacy demo. Original generation,
+movement, combat, AI and inventory rules are still incomplete.
+
 ## Goals
 
 - Android app built with Android SDK/NDK, no Macintosh emulator at runtime.

@@ -224,3 +224,13 @@ existing APK identities, readiness checks and exact launch/test outcomes. It
 keeps framework startup failures separate from app results; the SDK target or
 completed package installation alone is not runtime verification. Physical ARM64
 acceptance remains separate.
+
+## Playable mission integration — 2026-10-30
+
+Version **0.2-integration** connects recovered RNG/grid conversion and record
+placement/unlink to an authored playable mission. **22 Android instrumentation
+tests passed** on API 23 x86_64, measured normal font/portrait, target 35. The 19
+legacy tests use an explicit old-format fixture with their assertions unchanged;
+three new tests cover the live mission, pickup, recreation and zoom camera.
+See [complete integration evidence and artifact hashes](PLAYABLE_RESEARCH_MISSION.md).
+These are results for the new APK, not API 35 or physical-device qualification.

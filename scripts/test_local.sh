@@ -66,4 +66,8 @@ c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/child_reco
 ./dist/child_record_copy_test
 c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/child_chain_test.cpp -o dist/child_chain_test
 ./dist/child_chain_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/research_mission_test.cpp -o dist/research_mission_test
+./dist/research_mission_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp android/app/src/main/cpp/game.cpp android/app/src/main/cpp/api.cpp tests/mission_integration_test.cpp -o dist/mission_integration_test
+./dist/mission_integration_test
 echo "All local smoke tests passed"

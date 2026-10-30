@@ -1,4 +1,6 @@
 <resources>
+ <item name="new_mission" type="id"/>
+ <item name="pickup" type="id"/>
     <item name="status" type="id" />
     <item name="board" type="id" />
     <item name="mode" type="id" />

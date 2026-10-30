@@ -3,7 +3,11 @@
 #include <cstring>
 #include <new>
 #include <stdexcept>
-struct mt_game { mt::PrototypeGame instance; mt_game(int w,int h,uint32_t seed):instance(w,h,seed){} };
+struct mt_game {
+    mt::PrototypeGame instance;
+    mt_game(int w,int h,uint32_t seed):instance(w,h,seed){}
+    explicit mt_game(mt::PrototypeGame value):instance(std::move(value)){}
+};
 namespace {
 thread_local int last_error = MT_ERROR_NONE;
 template<typename F, typename R> R protect(F fn, R failure) noexcept {
@@ -19,6 +23,18 @@ void require(const mt_game* game) { if (!game) throw std::invalid_argument("null
 extern "C" {
 mt_game* mt_game_create(int w,int h,uint32_t seed) {
     return protect([&] { return new mt_game(w,h,seed); }, static_cast<mt_game*>(nullptr));
+}
+mt_game* mt_game_create_research(uint32_t seed) {
+    return protect([&] { return new mt_game(mt::PrototypeGame::researchMission(seed)); },static_cast<mt_game*>(nullptr));
+}
+int mt_game_is_research(const mt_game* game) {
+    return protect([&] { require(game);return game->instance.isResearchMission()?1:0; },0);
+}
+int mt_game_pickup(mt_game* game) {
+    return protect([&] { require(game);return game->instance.pickup()?1:0; },0);
+}
+int mt_game_inventory_count(const mt_game* game) {
+    return protect([&] { require(game);return static_cast<int>(game->instance.inventoryCount()); },-1);
 }
 void mt_game_destroy(mt_game* game) { delete game; last_error=MT_ERROR_NONE; }
 int mt_game_move(mt_game* game,int dx,int dy) {

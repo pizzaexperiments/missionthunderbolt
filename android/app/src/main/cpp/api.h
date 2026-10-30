@@ -18,6 +18,11 @@ enum mt_error {
 int mt_game_last_error(void);
 const char* mt_error_message(int error);
 mt_game* mt_game_create(int width, int height, uint32_t seed);
+/* Authored playable slice using recovered RNG/conversion/record routines. */
+mt_game* mt_game_create_research(uint32_t seed);
+int mt_game_is_research(const mt_game* game);
+int mt_game_pickup(mt_game* game);
+int mt_game_inventory_count(const mt_game* game);
 void mt_game_destroy(mt_game* game);
 int mt_game_move(mt_game* game, int dx, int dy);
 /* Explicit one-time-unit wait, not a zero-displacement move. */

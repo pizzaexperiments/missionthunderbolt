@@ -16,6 +16,7 @@ final class BoardAccessibility extends AccessibilityNodeProvider {
   Rect bounds(int column,int row,int columns,int rows);
   void move(int dx,int dy);
   void waitTurn();
+  void pickup();
   void zoom(int direction);
  }
  private final View host;
@@ -48,7 +49,7 @@ final class BoardAccessibility extends AccessibilityNodeProvider {
   AccessibilityNodeInfo node=AccessibilityNodeInfo.obtain();
   node.setSource(host,id);node.setParent(host);node.setPackageName(host.getContext().getPackageName());
   node.setClassName("android.view.View");node.setEnabled(host.isEnabled());node.setFocusable(true);
-  node.setContentDescription((cell=='@'?"Player":cell=='#'?"Wall":"Floor")+", column "+(x+1)+", row "+(y+1));
+  node.setContentDescription((cell=='@'?"Player":cell=='#'?"Wall":cell=='!'?"Item":cell=='^'?"Up marker":cell=='v'?"Down marker":"Floor")+", column "+(x+1)+", row "+(y+1));
   node.setCollectionItemInfo(AccessibilityNodeInfo.CollectionItemInfo.obtain(y,1,x,1,false));
   Rect bounds=visibleBounds(x,y,rows);node.setBoundsInParent(bounds);
   node.setVisibleToUser(host.isShown() && !bounds.isEmpty());
@@ -72,8 +73,8 @@ final class BoardAccessibility extends AccessibilityNodeProvider {
   return result;
  }
  private void addActions(AccessibilityNodeInfo node) {
-  int[] ids={R.id.move_up,R.id.move_down,R.id.move_left,R.id.move_right,R.id.wait_turn,R.id.zoom_in,R.id.zoom_out,R.id.zoom_reset};
-  String[] labels={"Move up","Move down","Move left","Move right","Wait one time unit","Zoom in","Zoom out","Show entire map"};
+  int[] ids={R.id.move_up,R.id.move_down,R.id.move_left,R.id.move_right,R.id.wait_turn,R.id.pickup,R.id.zoom_in,R.id.zoom_out,R.id.zoom_reset};
+  String[] labels={"Move up","Move down","Move left","Move right","Wait one time unit","Pick up item","Zoom in","Zoom out","Show entire map"};
   for(int i=0;i<ids.length;++i)node.addAction(new AccessibilityNodeInfo.AccessibilityAction(ids[i],labels[i]));
  }
  boolean hostAction(int action) {
@@ -82,6 +83,7 @@ final class BoardAccessibility extends AccessibilityNodeProvider {
   else if(action==R.id.move_left)model.move(-1,0);
   else if(action==R.id.move_right)model.move(1,0);
   else if(action==R.id.wait_turn)model.waitTurn();
+  else if(action==R.id.pickup)model.pickup();
   else if(action==R.id.zoom_in)model.zoom(1);
   else if(action==R.id.zoom_out)model.zoom(-1);
   else if(action==R.id.zoom_reset)model.zoom(0);

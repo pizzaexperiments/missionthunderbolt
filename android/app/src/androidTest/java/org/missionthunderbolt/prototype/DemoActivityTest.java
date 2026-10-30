@@ -8,6 +8,31 @@ import android.content.pm.ActivityInfo;
 @SuppressWarnings("deprecation")
 public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
  public DemoActivityTest() { super(MainActivity.class); }
+ @Override protected void setUp() throws Exception {
+  super.setUp();
+  // These legacy regressions deliberately exercise the original synthetic demo.
+  // New mission behavior has its own IntegrationMissionTest coverage.
+  MainActivity activity=getActivity();
+  StringBuilder body=new StringBuilder("MTDEMO 0\n20 12 1 0 1 1\n");
+  for(int y=0;y<12;++y) {
+   for(int x=0;x<20;++x)body.append(y==0 || y==11 || x==0 || x==19?'#':'.');
+   body.append('\n');
+  }
+  java.util.zip.CRC32 crc=new java.util.zip.CRC32();crc.update(body.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+  String fixture=body.toString()+String.format(java.util.Locale.ROOT,"CRC32 %08x\n",crc.getValue());
+  java.lang.reflect.Method restore=MainActivity.class.getDeclaredMethod("restore",String.class);restore.setAccessible(true);
+  assertTrue("Authored legacy fixture must restore",(Boolean)restore.invoke(null,fixture));
+  java.lang.reflect.Method refresh=MainActivity.class.getDeclaredMethod("refresh");refresh.setAccessible(true);
+  java.lang.reflect.Method persist=MainActivity.class.getDeclaredMethod("persistState");persist.setAccessible(true);
+  java.lang.reflect.Field modern=MainActivity.class.getDeclaredField("modern"),zoom=MainActivity.class.getDeclaredField("zoom");
+  modern.setAccessible(true);zoom.setAccessible(true);
+  getInstrumentation().runOnMainSync(() -> {
+   try {modern.setBoolean(activity,false);zoom.setFloat(activity,1f);refresh.invoke(activity);persist.invoke(activity);}
+   catch(Exception error) {throw new AssertionError(error);}
+  });
+  getInstrumentation().waitForIdleSync();
+ }
+
  private void click(final MainActivity activity, final int id) throws Throwable {
   runTestOnUiThread(() -> activity.findViewById(id).performClick()); getInstrumentation().waitForIdleSync();
  }

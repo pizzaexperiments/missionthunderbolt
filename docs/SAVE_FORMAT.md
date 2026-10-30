@@ -36,3 +36,16 @@ Validation: native round-trip, continued deterministic actions, independent CRC3
 legacy/semantic-invalid fixtures, corrupted bytes and atomic failed C-API load
 passed; Android APK rebuilt successfully. Runtime rotation/process-death checks
 are tracked under #18 and remain distinct from compilation.
+
+## Research mission version 2
+
+`MTDEMO 2` stores the authored research mission independently of legacy versions
+0/1. Its first state line is `seed turns playerX playerY modern`, followed by an
+`RM1` payload: seed, carried-sample flag and all 103 recovered-RNG state words
+(local seed, selector seed, last result, 100 shuffle entries). The existing CRC32
+trailer protects the complete body. Loading validates the scenario seed, player
+walkability, presentation, turns and full deterministic-generation RNG state
+before publishing. The fixed sample record is recreated and its carried state
+reapplied through recovered unlink. See [recipe compatibility](PLAYABLE_RESEARCH_MISSION.md).
+Legacy versions still load into legacy mode. Future generation changes need a
+new recipe or explicit migration; proprietary saves remain unsupported.

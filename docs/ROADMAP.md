@@ -9,6 +9,10 @@ their workflow/prototype scopes; see [closeout review](ISSUE_CLOSEOUT_REVIEW.md)
 The #45 integration repair and #46–#58 were verified merged into `develop`, including the formerly stranded #43/#44 changes. All five GitHub Actions workflows are disabled during the maintainer-requested
 pause. Local test results belong in PRs; no CI run/public release is claimed here.
 
+A [playable authored mission](PLAYABLE_RESEARCH_MISSION.md) now integrates recovered
+RNG, full-grid conversion, record placement and sample unlink into the live engine.
+This does not complete original gameplay acceptance for #8–#12.
+
 ## Dependency order
 
 ```mermaid

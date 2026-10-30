@@ -1,7 +1,7 @@
 #include <jni.h>
 #include <mutex>
 #include "game.hpp"
-namespace { std::mutex lock; mt::PrototypeGame game(20, 12, 1); }
+namespace { std::mutex lock; mt::PrototypeGame game=mt::PrototypeGame::researchMission(1); }
 extern "C" JNIEXPORT jstring JNICALL Java_org_missionthunderbolt_prototype_MainActivity_map(JNIEnv* env, jclass) {
     std::lock_guard<std::mutex> guard(lock);
     const auto map = game.asciiMap();
@@ -14,7 +14,11 @@ extern "C" JNIEXPORT jint JNICALL Java_org_missionthunderbolt_prototype_MainActi
 }
 extern "C" JNIEXPORT void JNICALL Java_org_missionthunderbolt_prototype_MainActivity_reset(JNIEnv*, jclass) {
     std::lock_guard<std::mutex> guard(lock);
-    game = mt::PrototypeGame(20, 12, 1);
+    try {
+        const auto presentation=game.presentation();
+        auto candidate=game.isResearchMission()?mt::PrototypeGame::researchMission(game.seed()):mt::PrototypeGame(20,12,1);
+        candidate.setPresentation(presentation);game=std::move(candidate);
+    } catch (...) { /* Preserve the current world if reset cannot allocate. */ }
 }
 extern "C" JNIEXPORT jint JNICALL Java_org_missionthunderbolt_prototype_MainActivity_turnCount(JNIEnv*, jclass) {
     std::lock_guard<std::mutex> guard(lock);
@@ -51,4 +55,29 @@ extern "C" JNIEXPORT jint JNICALL Java_org_missionthunderbolt_prototype_MainActi
     std::lock_guard<std::mutex> guard(lock);
     game.wait();
     return game.turns();
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_org_missionthunderbolt_prototype_MainActivity_researchMission(JNIEnv*, jclass, jint seed) {
+    try {
+        auto candidate=mt::PrototypeGame::researchMission(static_cast<uint32_t>(seed));
+        std::lock_guard<std::mutex> guard(lock);candidate.setPresentation(game.presentation());game=std::move(candidate);
+        return JNI_TRUE;
+    } catch (...) { return JNI_FALSE; }
+}
+extern "C" JNIEXPORT jboolean JNICALL Java_org_missionthunderbolt_prototype_MainActivity_pickup(JNIEnv*, jclass) {
+    std::lock_guard<std::mutex> guard(lock);
+    try {return game.pickup()?JNI_TRUE:JNI_FALSE;}catch (...) {return JNI_FALSE;}
+}
+extern "C" JNIEXPORT jboolean JNICALL Java_org_missionthunderbolt_prototype_MainActivity_isResearchMission(JNIEnv*, jclass) {
+    std::lock_guard<std::mutex> guard(lock);return game.isResearchMission()?JNI_TRUE:JNI_FALSE;
+}
+extern "C" JNIEXPORT jint JNICALL Java_org_missionthunderbolt_prototype_MainActivity_inventoryCount(JNIEnv*, jclass) {
+    std::lock_guard<std::mutex> guard(lock);return static_cast<jint>(game.inventoryCount());
+}
+extern "C" JNIEXPORT jint JNICALL Java_org_missionthunderbolt_prototype_MainActivity_missionSeed(JNIEnv*, jclass) {
+    std::lock_guard<std::mutex> guard(lock);return static_cast<jint>(game.seed());
+}
+extern "C" JNIEXPORT jstring JNICALL Java_org_missionthunderbolt_prototype_MainActivity_missionStatus(JNIEnv* env, jclass) {
+    std::lock_guard<std::mutex> guard(lock);
+    try {const auto status=game.missionStatus();return env->NewStringUTF(status.c_str());}catch (...) {return nullptr;}
 }

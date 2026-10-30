@@ -31,6 +31,12 @@ public class MainActivity extends Activity {
  private static native void reset();
  private static native int turnCount();
  private static native int waitTurn();
+ private static native boolean researchMission(int seed);
+ private static native boolean pickup();
+ private static native boolean isResearchMission();
+ private static native int inventoryCount();
+ private static native int missionSeed();
+ private static native String missionStatus();
  private static native boolean isModern();
  private static native void setModern(boolean enabled);
  private static native String snapshot();
@@ -59,7 +65,7 @@ public class MainActivity extends Activity {
   controlsVisible = getPreferences(MODE_PRIVATE).getBoolean("controls", true);
   controlPlacement = getPreferences(MODE_PRIVATE).getInt("controls_position",0);
   if(controlPlacement<0 || controlPlacement>2)controlPlacement=0;
-  zoom = Math.max(1f, Math.min(4f, getPreferences(MODE_PRIVATE).getFloat("zoom", 1f)));
+  zoom = Math.max(1f, Math.min(4f, getPreferences(MODE_PRIVATE).getFloat("zoom", isResearchMission()?3f:1f)));
   boolean landscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
   root = new LinearLayout(this); root.setId(R.id.layout_root);
   root.setOrientation(landscape ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
@@ -69,7 +75,13 @@ public class MainActivity extends Activity {
   board = new Board(); board.setId(R.id.board); scene.addView(board,new LinearLayout.LayoutParams(-1,0,1));
   root.addView(scene, landscape ? new LinearLayout.LayoutParams(0,-1,1) : new LinearLayout.LayoutParams(-1,0,1));
   LinearLayout controls = new LinearLayout(this); controls.setOrientation(LinearLayout.VERTICAL);
-  LinearLayout tools = new LinearLayout(this); tools.setOrientation(landscape ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
+  LinearLayout tools = new LinearLayout(this); tools.setOrientation(LinearLayout.VERTICAL);
+  Button newMission = button("New mission", R.id.new_mission);
+  newMission.setContentDescription("Start a new research mission with a different seed");
+  newMission.setOnClickListener(v -> {
+   if(researchMission(missionSeed()+1)) {zoom=3f;refresh();persistState();}
+   else android.widget.Toast.makeText(this,"Could not start a mission. Please try again.",android.widget.Toast.LENGTH_SHORT).show();
+  });
   Button mode = button("Classic / Modern", R.id.mode);
   mode.setContentDescription("Switch presentation without restarting the demo");
   mode.setOnClickListener(v -> {modern = !modern; setModern(modern); refresh();});
@@ -78,8 +90,19 @@ public class MainActivity extends Activity {
   Button toggle = button("Controls", R.id.controls);
   toggle.setContentDescription("Show or hide directional controls");
   toggle.setOnClickListener(v -> {controlsVisible = !controlsVisible; dpad.setVisibility(controlsVisible ? View.VISIBLE : View.GONE);});
-  for (Button tool : new Button[]{mode,restart,toggle})
-   tools.addView(tool,landscape ? new LinearLayout.LayoutParams(-1,-2) : new LinearLayout.LayoutParams(0,-2,1));
+  Button[] actions={newMission,mode,restart,toggle};
+  if(landscape) {
+   for(Button tool:actions)tools.addView(tool,new LinearLayout.LayoutParams(-1,-2));
+  } else {
+   // Four narrow columns split labels mid-word on small phones. Two equal
+   // columns retain readable labels and the existing 48dp touch targets.
+   for(int row=0;row<2;++row) {
+    LinearLayout actionRow=new LinearLayout(this);
+    for(int column=0;column<2;++column)
+     actionRow.addView(actions[row*2+column],new LinearLayout.LayoutParams(0,-2,1));
+    tools.addView(actionRow);
+   }
+  }
   controls.addView(tools);
   placementToggle=button("Controls: Auto",R.id.controls_position);
   placementToggle.setOnClickListener(v -> {
@@ -103,7 +126,9 @@ public class MainActivity extends Activity {
   LinearLayout top = new LinearLayout(this); top.setGravity(android.view.Gravity.CENTER);
   top.addView(direction("UP",0,-1,R.id.move_up));
   Button wait = button("WAIT",R.id.wait_turn); wait.setContentDescription("Wait one time unit in place");
-  wait.setOnClickListener(v -> waitAction()); top.addView(wait); dpad.addView(top);
+  wait.setOnClickListener(v -> waitAction()); top.addView(wait);
+  Button pick=button("PICK UP",R.id.pickup);pick.setContentDescription("Pick up the item at your location");
+  pick.setOnClickListener(v -> pickupAction());top.addView(pick);dpad.addView(top);
   LinearLayout bottom = new LinearLayout(this); bottom.setGravity(android.view.Gravity.CENTER);
   bottom.addView(direction("LEFT",-1,0,R.id.move_left)); bottom.addView(direction("DOWN",0,1,R.id.move_down));
   bottom.addView(direction("RIGHT",1,0,R.id.move_right)); dpad.addView(bottom);
@@ -140,6 +165,10 @@ public class MainActivity extends Activity {
  }
  private void step(int dx,int dy) {int before=turns;turns=move(dx,dy);refresh();if(turns>before)playDemoCue();}
  private void waitAction() {int before=turns;turns=waitTurn();refresh();if(turns>before)playDemoCue();}
+ private void pickupAction() {
+  if(pickup()) {refresh();playDemoCue();}
+  else android.widget.Toast.makeText(this,"No item here",android.widget.Toast.LENGTH_SHORT).show();
+ }
  private void playDemoCue() {audio.playCue();refreshSound();}
  private void refreshSound() {
   if(soundToggle==null)return;
@@ -147,8 +176,16 @@ public class MainActivity extends Activity {
   soundToggle.setContentDescription(audio.isUnavailable() ? "Demo sound unavailable" : audio.isEnabled() ? "Mute demo sound" : "Enable demo sound");
   soundToggle.setEnabled(!audio.isUnavailable());
  }
- private void refresh() {turns = turnCount(); status.setText("Thunderbolt RESEARCH DEMO | " + (modern?"Modern":"Classic") + " | Turns: " + turns); board.setContentDescription("Synthetic demo board. " + (modern ? "Modern" : "Classic") +
-   " presentation. Turns " + turns + ". Use directional buttons or arrow keys to move."); board.invalidate(); board.accessibility.changed();}
+ private void refresh() {
+  turns=turnCount();boolean mission=isResearchMission();
+  String label=mission ? "RESEARCH MISSION | Seed: "+(missionSeed()&0xffffffffL)+" | Inventory: "+inventoryCount() : "Thunderbolt RESEARCH DEMO";
+  String detail=mission ? missionStatus() : null;
+  status.setText(label+" | "+(modern?"Modern":"Classic")+" | Turns: "+turns);
+  board.updateMap(map().split("\\n"),mission);
+  board.setContentDescription((mission?(detail==null?"Research mission":detail)+". Gold items can be picked up at your location. ":"Synthetic demo board. ")+
+   (modern?"Modern":"Classic")+" presentation. Turns "+turns+". Use directional buttons or arrow keys to move.");
+  board.invalidate();board.accessibility.changed();
+ }
  private AtomicFile saveFile() { return new AtomicFile(new File(getFilesDir(), "demo-state.mt")); }
  private void restoreSavedState(Bundle bundle) {
   if (bundle != null && restore(bundle.getString("demo-state"))) return;
@@ -220,6 +257,11 @@ public class MainActivity extends Activity {
  }
  class Board extends View {
   final Paint p = new Paint();
+  String[] currentRows=new String[0];boolean missionBoard=false;int playerX=0,playerY=0;
+  void updateMap(String[] rows,boolean mission) {
+   currentRows=rows;missionBoard=mission;
+   for(int y=0;y<rows.length;++y)for(int x=0;x<rows[y].length();++x)if(rows[y].charAt(x)=='@') {playerX=x;playerY=y;}
+  }
   final ScaleGestureDetector scaler;
   final BoardAccessibility accessibility;
   boolean scaled = false;
@@ -227,10 +269,11 @@ public class MainActivity extends Activity {
    super(MainActivity.this); p.setAntiAlias(false); setFocusable(true); setFocusableInTouchMode(true);
    setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
    accessibility=new BoardAccessibility(this,new BoardAccessibility.Model() {
-    public String[] rows() {return map().split("\\n");}
+    public String[] rows() {return currentRows;}
     public android.graphics.Rect bounds(int x,int y,int columns,int rows) {return cellBounds(x,y,columns,rows);}
     public void move(int dx,int dy) {step(dx,dy);}
     public void waitTurn() {waitAction();}
+    public void pickup() {pickupAction();}
     public void zoom(int direction) {
      zoom=direction==0 ? 1f : Math.max(1f,Math.min(4f,zoom*(direction>0 ? 1.25f : .8f)));
      invalidate(); accessibility.changed();
@@ -243,10 +286,15 @@ public class MainActivity extends Activity {
     }
    });
   }
+  private float origin(int extent,int count,int player,float cell) {
+   float size=cell*count;
+   if(!missionBoard || zoom<=1f || size<=extent)return (extent-size)/2f;
+   return Math.max(extent-size,Math.min(0f,extent/2f-(player+.5f)*cell));
+  }
   private android.graphics.Rect cellBounds(int x,int y,int columns,int rows) {
    if(rows==0 || columns==0)return new android.graphics.Rect();
    float cell=Math.max(1f,(float)Math.floor(Math.min(getWidth()/(float)columns,getHeight()/(float)rows)))*zoom;
-   float x0=(getWidth()-cell*columns)/2f,y0=(getHeight()-cell*rows)/2f;
+   float x0=origin(getWidth(),columns,playerX,cell),y0=origin(getHeight(),rows,playerY,cell);
    return new android.graphics.Rect((int)Math.floor(x0+x*cell),(int)Math.floor(y0+y*cell),
     (int)Math.ceil(x0+(x+1)*cell),(int)Math.ceil(y0+(y+1)*cell));
   }
@@ -255,14 +303,21 @@ public class MainActivity extends Activity {
    return accessibility.hostAction(action) || super.performAccessibilityAction(action,args);
   }
   @Override public boolean dispatchHoverEvent(MotionEvent event) {return accessibility.hover(event) || super.dispatchHoverEvent(event);}
-  @Override protected void onDraw(Canvas c) {super.onDraw(c);String[] rows = map().split("\\n");if(rows.length==0)return;
+  @Override protected void onDraw(Canvas c) {super.onDraw(c);String[] rows = currentRows;if(rows.length==0)return;
    float cell = Math.max(1f,(float)Math.floor(Math.min(getWidth()/(float)rows[0].length(),getHeight()/(float)rows.length)))*zoom;
-   float x0 = (getWidth()-cell*rows[0].length())/2f, y0 = (getHeight()-cell*rows.length)/2f;
+   float x0=origin(getWidth(),rows[0].length(),playerX,cell),y0=origin(getHeight(),rows.length,playerY,cell);
    c.drawColor(modern?Color.rgb(21,28,36):Color.WHITE);
    for(int y=0;y<rows.length;y++)for(int x=0;x<rows[y].length();x++){
     char ch=rows[y].charAt(x);
     int color=ch=='@'?(modern?Color.CYAN:Color.BLACK):ch=='#'?(modern?Color.rgb(95,115,132):Color.DKGRAY):(modern?Color.rgb(36,48,58):Color.LTGRAY);
     p.setColor(color);c.drawRect(x0+x*cell+1,y0+y*cell+1,x0+(x+1)*cell-1,y0+(y+1)*cell-1,p);
+    if(ch=='!') {
+     p.setColor(Color.rgb(255,190,35));float cx=x0+(x+.5f)*cell,cy=y0+(y+.5f)*cell;
+     android.graphics.Path diamond=new android.graphics.Path();float radius=Math.max(1f,cell*.4f);
+     diamond.moveTo(cx,cy-radius);diamond.lineTo(cx+radius,cy);diamond.lineTo(cx,cy+radius);diamond.lineTo(cx-radius,cy);diamond.close();c.drawPath(diamond,p);
+    } else if(ch=='^' || ch=='v') {
+     p.setColor(modern?Color.rgb(145,180,245):Color.rgb(55,90,155));c.drawCircle(x0+(x+.5f)*cell,y0+(y+.5f)*cell,Math.max(1f,cell*.25f),p);
+    }
    }
   }
   @Override public boolean performClick() { super.performClick(); return true; }

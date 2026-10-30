@@ -46,3 +46,13 @@ prototype time unit was consumed in place, 0 for a null handle or saturated
 counter. Null sets INVALID_ARGUMENT; saturation is a normal rejected action.
 It implements the manual-1.0 WAIT model documented in MANUAL_RULES.md, without
 claiming original 2.0.g scheduler/RNG/actor behavior.
+
+## Playable research mission additions
+
+`mt_game_create_research(seed)` creates an owned 67×19 authored mission using
+recovered RNG, conversion and record routines. `mt_game_is_research(game)` reports
+the mode. `mt_game_pickup(game)` returns 1 only when a floor sample is collected
+at the player's location; a rejected action returns 0 without advancing turns.
+`mt_game_inventory_count(game)` returns 0 or 1, or -1 for a null handle.
+The same error/ownership and serialization contracts apply. ABI version stays 1;
+`mt_game_create` retains the legacy demo. See [integration scope and saves](PLAYABLE_RESEARCH_MISSION.md).
