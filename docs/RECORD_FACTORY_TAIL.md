@@ -85,3 +85,8 @@ optional final callback, whole-factory/creation-glyph integration, progression
 and original gameplay references remain unverified. No Android build/runtime,
 original game boot, Actions run/upload or release was performed. All five Actions
 workflows remain disabled; test evidence belongs in the PR.
+
+The next [template-factory increment](RECORD_TEMPLATE_FACTORY.md) connects the
+supplied allocation/template prefix, 65 supported variant branches and this
+tail through the final follow-up gate. Allocation, child creation and the final
+callback remain explicit boundaries. The standalone tail oracle stays separate.

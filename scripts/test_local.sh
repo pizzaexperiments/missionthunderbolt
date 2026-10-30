@@ -42,4 +42,6 @@ c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/level_grid
 ./dist/level_grid_conversion_test
 c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/record_factory_tail_test.cpp -o dist/record_factory_tail_test
 ./dist/record_factory_tail_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/record_template_factory_test.cpp -o dist/record_template_factory_test
+./dist/record_template_factory_test
 echo "All local smoke tests passed"
