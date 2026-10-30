@@ -56,8 +56,10 @@ occurred in this increment. Production Python tools are unchanged (last coverage
 82%). No Android build/runtime, original game boot, Actions run/upload or release
 was performed. All five Actions workflows remain disabled.
 
-This PR targets `feature/factory-followup-stack` (PR #43), which targets
-`feature/record-followup` (PR #42). Review/merge in that order, retargeting dependent
-PRs to `develop` as predecessors land. New work need not wait for those merges.
+The original #43/#44 stack targeted temporary parent branches. Those PRs were
+merged there while only #42 reached `develop`; the integration repair carries
+the two incremental commits onto `develop` without changing their engine code.
+Future stacked branches target `develop` directly, with dependencies/commits
+identified in each PR. New work need not wait for predecessor merges.
 Allocator/child creation, unsupported variants, full glyph/progression integration
 and original gameplay validation remain unfinished. The active demo is unchanged.

@@ -51,9 +51,10 @@ unnamed and the driver rebuilt without relaxing flags. No Android build/runtime,
 original game boot, Actions run/upload or release was performed. Production
 Python tools are unchanged (last measured coverage 82%).
 
-This change is based on PR #42's `feature/record-followup` branch and can be
-reviewed as a dependent PR without merging its predecessor first. Both need
-maintainer merge approval. Full glyph creation, original allocation/resources,
+This change originally branched from #42 and targeted its feature branch.
+The later integration repair carries it onto `develop`; future dependent PRs
+target `develop` directly while documenting their prerequisites. All merges
+require maintainer approval. Full glyph creation, original allocation/resources,
 child creation, unsupported variants, progression and gameplay validation remain
 unfinished. GitHub Actions stays disabled.
 

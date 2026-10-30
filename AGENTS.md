@@ -3,8 +3,9 @@
 ## Branch policy — mandatory
 - `develop` is the default **integration** branch.
 - Start independent implementation branches from current `develop`, using `feature/<topic>` or `fix/<topic>`.
-- The maintainer authorizes sequential stacked PRs: dependent branches may start from the preceding PR head and target its branch. Document the dependency, keep each diff reviewable, and continue without waiting for merges.
-- Open independent PRs **feature → develop** and dependent PRs **feature → predecessor** after local verification. Do not commit directly to `develop` or `main`. Merge only with approval.
+- The maintainer authorizes sequential stacked branches: dependent work may start from the preceding PR head. Document the dependency and incremental commit(s), and continue without waiting for merges.
+- Target every implementation PR at `develop`, including stacked branches. Dependent diffs may initially include prerequisites and shrink as predecessors land. Do not merge implementation PRs into temporary feature branches. Verify merged changes actually reach `develop`.
+- Do not commit directly to `develop` or `main`. Merge only with approval.
 - `main` is release-only. When a release is ready, open a reviewed **develop → main** PR. No direct commits to `main`.
 - GitHub Actions is paused: all five workflows are disabled. Do not enable or dispatch any workflow unless the maintainer explicitly requests it. Run tests locally and post exact results in the PR; see `.github/ACTIONS_PAUSED.md`.
 

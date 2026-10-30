@@ -501,3 +501,16 @@ Local suites passed 56 Python tests plus native regressions, 23/23 ASan/UBSan
 and 24/24 SDL with both optional graphics decoders. No failures/skips occurred.
 No Android/runtime/device, Actions, original boot, release or merge was performed.
 Production Python tools are unchanged (last coverage 82%).
+
+## Stacked merge integration repair
+
+GitHub showed #42 merged into `develop`, #43 into `feature/record-followup`,
+and #44 into `feature/factory-followup-stack`. `develop` lacked the #43/#44
+engine/tests despite all three PRs being closed/merged. The repair carries the
+two original incremental commits onto live `develop` with provenance notes.
+A source-tree diff against bd6938b is empty for android/tests/CMake/scripts.
+Fresh local validation passed 56 Python tests plus native checks, 23/23
+ASan/UBSan and 24/24 SDL, with both optional picture decoders. No original
+instruction comparison was repeated: engine/test code is unchanged from the
+previously compared stack tip. No Actions, Android build/runtime or release
+was performed. New stacked PRs target `develop`; see STACKED_PR_WORKFLOW.md.
