@@ -50,3 +50,27 @@ runtime components require a new evidence review. Without these optional
 arguments, the existing inventory mode remains available and reports its
 component attribution as `unreviewed`. Neither mode publishes an artifact.
 All GitHub Actions remain paused; this command runs locally.
+
+## Local verification — 2026-10-30
+
+At implementation commit `2e2f384`, `sh scripts/test_local.sh` passed **65 Python
+tests plus all native smoke checks**, including nine authored attribution tests.
+The focused release/dependency/attribution suite passed 15 tests. Rejections cover
+stale versions/hashes, unknown archives, missing evidence and unsupported license
+claims; rejected preparation leaves no partial review directory. Both optional
+picture decoders were available for the full suite; no tests skipped or failed.
+
+A real-input check collected fresh dependency evidence for the existing local
+unsigned APK/AAB across four ABIs, then prepared a private review directory with
+sixteen archive packages and both byte-identical upstream notices. The SPDX 2.3
+JSON schema validation passed. A first attempt using an older saved report was
+rejected because artifact hashes differed; fresh collection resolved that input
+mismatch without weakening checks. Artifact SHA256 values:
+
+- `app-release-unsigned.apk`: `7a2acfe3226a45b5c3b81641ca78e5275b56a4303e58b83d856d71ad6d1e4bde`
+- `app-release.aab`: `ee2fc75213c49a8e7b36d5dadd656b7e41f7e6220188431e1d4e48ef8d9bd0a3`
+
+These are existing build inputs, not new builds or proof that they were compiled
+from the attribution-tool commit. Review metadata remains `review-required`,
+`published: false`, with archive licenses unresolved. No signing, device test,
+Actions execution, tag, merge or publication was performed.
