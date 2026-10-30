@@ -58,3 +58,6 @@ Connecting that call to the supplied-allocation factory is the next dependent
 increment; original allocation, child creation and unsupported variants remain
 unfinished. GitHub Actions remains disabled. Sequential stacked PRs are explicitly
 authorized; merging still requires maintainer approval.
+
+The dependent [factory composition](FINALIZED_TEMPLATE_FACTORY.md) connects this
+routine through original CODE 9, including 670 actual original callback calls.

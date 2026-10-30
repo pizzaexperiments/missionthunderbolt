@@ -33,7 +33,7 @@ def cases():
                        'flag39':flag,'table':bytes(table)}
 
 
-def original(sources,c):
+def original(sources,c,followup=None):
     observed={'followup':0};descriptors=b'\0'*(76*12)
     def prepare(uc):
         uc.mem_write(TABLE-16,b'\x5a'*16+c['table']+b'\x5a'*16)
@@ -47,10 +47,12 @@ def original(sources,c):
             end=machine.reg_read(UC_M68K_REG_A0)
             if (end-TABLE)%112:raise AssertionError('unaligned template copy')
             observed['selected']=(end-TABLE)//112-1
-        def followup(machine,address,size,user):
-            observed['followup']=1;machine.emu_stop()
+        def at_followup(machine,address,size,user):
+            observed['followup']=1
+            if followup is None:machine.emu_stop()
         uc.hook_add(UC_HOOK_CODE,copied,begin=BASE+0xe8,end=BASE+0xe8)
-        uc.hook_add(UC_HOOK_CODE,followup,begin=BASE+0x1334,end=BASE+0x1334)
+        uc.hook_add(UC_HOOK_CODE,at_followup,begin=BASE+0x1334,end=BASE+0x1334)
+        if followup is not None:followup.prepare(uc)
     def inspect(uc):
         if 'selected' not in observed:raise AssertionError('template copy not observed')
         if bytes(uc.mem_read(TABLE-16,len(c['table'])+32))!=b'\x5a'*16+c['table']+b'\x5a'*16:raise AssertionError('templates changed')
@@ -58,8 +60,9 @@ def original(sources,c):
         if bytes(uc.mem_read(A5-0x1a48,8))!=struct.pack('>II',TABLE,DESC):raise AssertionError('table pointers changed')
         if bytes(uc.mem_read(A5-0x9e8-8,17))!=b'\xa5'*8+bytes([c['flag39']])+b'\xa5'*8:raise AssertionError('type flag context changed')
         if (uc.reg_read(UC_M68K_REG_D6)&65535)!=(c['level']&65535) or uc.reg_read(UC_M68K_REG_D7)!=c['variant']:raise AssertionError('factory word registers changed')
-        if uc.reg_read(UC_M68K_REG_PC)!=BASE+(0x1334 if observed['followup'] else 0x133c):raise AssertionError('callback boundary endpoint')
-    line,z,n=execute(sources,c,prepare=prepare,inspect=inspect,start=0xbc,stop=0x133c,early_stop=0x1334)
+        if uc.reg_read(UC_M68K_REG_PC)!=BASE+(0x1334 if observed['followup'] and followup is None else 0x133c):raise AssertionError('callback boundary endpoint')
+        if followup is not None:followup.inspect(uc,observed)
+    line,z,n=execute(sources,c,prepare=prepare,inspect=inspect,start=0xbc,stop=0x133c,early_stop=0x1334 if followup is None else None,service_observer=followup.service if followup is not None else None)
     return line+f' {observed["selected"]} {observed["followup"]}',z,n,observed['followup']
 
 
