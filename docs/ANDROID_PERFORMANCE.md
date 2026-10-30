@@ -128,3 +128,7 @@ data, summary statistics and installed metadata. The collection checks preserve
 raw evidence and reject mismatched artifacts or surviving processes before
 recording a purported cold launch. Their fixtures are authored, not device data;
 the actual emulator measurement above is separate evidence.
+
+The later [API 35 runtime qualification](ANDROID_API35.md) separately records
+that environment and its exact launch/test/performance outcomes. The API 23
+measurements above do not imply API 35 or physical-device performance.

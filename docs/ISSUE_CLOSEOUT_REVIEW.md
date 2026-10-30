@@ -41,7 +41,7 @@ original-game fidelity or completion of other issues.
   rendering, auditory equivalence and physical-device output remain open.
 - #15 covers current synthetic state and migration/corruption/storage tests; original
   entity/inventory/mission state does not yet exist and must not be called complete.
-- #18 still needs measured performance evidence; physical accessibility/input testing remains a documented limitation of #17.
+- #18 has an API 23 performance baseline; API 35 launch qualification and physical ARM64 remain unresolved. Physical accessibility/input testing remains a documented limitation of #17.
 - #22 now has a bounded 1.72M-execution coverage-guided parser campaign; original
   differential and screenshot fixtures remain; scheduled campaigns are useful follow-up.
 - #23 needs signing/review/dependency inventory and target platform artifacts.
