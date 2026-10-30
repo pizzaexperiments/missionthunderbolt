@@ -95,3 +95,7 @@ workflows remain disabled.
 [The final follow-up routine](RECORD_FOLLOWUP.md) is now independently recovered
 on 11,133 authored parent/child cases. Connecting it through the factory is a
 separate dependent change; this checkpoint still stops before the call.
+
+The dependent [finalized factory composition](FINALIZED_TEMPLATE_FACTORY.md)
+now executes the recovered follow-up rather than stopping at its boundary.
+This earlier oracle retains its original default stop-before-call contract.

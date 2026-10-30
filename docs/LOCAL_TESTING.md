@@ -473,3 +473,44 @@ Local suites passed 56 Python tests plus native regressions, 21/21 ASan/UBSan
 and 22/22 SDL. Both optional graphics decoders were present. No failures/skips
 occurred; no Android runtime/build, Actions, original boot or release was performed.
 Production Python tools are unchanged (last coverage 82%).
+
+## Stacked finalized factory composition
+
+`feature/factory-followup-stack` starts from PR #42's branch and is intended to
+target that branch, preserving a small dependent diff. Original CODE 9/7 matched
+1,005 factory cases with 670 executed follow-ups and 3,350 RNG draws. All final
+record bytes, complete RNG state, traces and preserved source/context guards
+match. Callback results are not injected. Commands: FINALIZED_TEMPLATE_FACTORY.md.
+
+Local suites passed 56 Python tests plus native regressions, 22/22 ASan/UBSan
+and 23/23 SDL with both optional graphics decoders. The initial research-driver
+compile rejected an unused argument; it was corrected with `-Werror` retained.
+No Android/runtime/device, Actions, original boot, release or merge was performed.
+Production Python tools are unchanged (last coverage 82%).
+
+## Stacked supplied-record placement
+
+`feature/supplied-record-placement` starts from PR #43 and targets that branch.
+Sequential original factory/follow-up and original attachment stages matched
+1,005 cases, 670 callbacks and 3,350 factory draws. Final record, world count/head,
+cell link and full RNG state match; unrelated world/source bytes and guards are
+preserved. The attachment ABI frame is authored; allocation and the original
+glyph caller remain excluded. Commands/domain: SUPPLIED_RECORD_PLACEMENT.md.
+
+Local suites passed 56 Python tests plus native regressions, 23/23 ASan/UBSan
+and 24/24 SDL with both optional graphics decoders. No failures/skips occurred.
+No Android/runtime/device, Actions, original boot, release or merge was performed.
+Production Python tools are unchanged (last coverage 82%).
+
+## Stacked merge integration repair
+
+GitHub showed #42 merged into `develop`, #43 into `feature/record-followup`,
+and #44 into `feature/factory-followup-stack`. `develop` lacked the #43/#44
+engine/tests despite all three PRs being closed/merged. The repair carries the
+two original incremental commits onto live `develop` with provenance notes.
+A source-tree diff against bd6938b is empty for android/tests/CMake/scripts.
+Fresh local validation passed 56 Python tests plus native checks, 23/23
+ASan/UBSan and 24/24 SDL, with both optional picture decoders. No original
+instruction comparison was repeated: engine/test code is unchanged from the
+previously compared stack tip. No Actions, Android build/runtime or release
+was performed. New stacked PRs target `develop`; see STACKED_PR_WORKFLOW.md.

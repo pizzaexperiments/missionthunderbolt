@@ -46,4 +46,8 @@ c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/record_tem
 ./dist/record_template_factory_test
 c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/record_followup_test.cpp -o dist/record_followup_test
 ./dist/record_followup_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/finalized_template_factory_test.cpp -o dist/finalized_template_factory_test
+./dist/finalized_template_factory_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/supplied_record_placement_test.cpp -o dist/supplied_record_placement_test
+./dist/supplied_record_placement_test
 echo "All local smoke tests passed"
