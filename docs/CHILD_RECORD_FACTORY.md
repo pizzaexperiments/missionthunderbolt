@@ -73,3 +73,8 @@ merge, signing or publication is claimed by this increment.
 [Explicit authored context](CHILD_FACTORY_CONTEXT.md) now supports types 37, 77,
 137 and 138 through a separate overload. The default API retains the seven-type
 rejection boundary documented at this earlier checkpoint.
+
+The [five-child helper](CHILD_CHAIN.md) now compares connected factory returns,
+ordered RNG draws and record links for an empty old parent branch, with five
+explicit supplied-allocation boundaries. It is separate from this factory API;
+recursive raw type 36 is still rejected here.

@@ -1,5 +1,38 @@
 # Issue closeout review
 
+## Current review — 2026-10-30
+
+The 16 remaining live issue bodies and their available comments were refreshed
+against integrated `develop` **`a24fc2c`**, including merged PR #58. **No further
+issue is ready to close as completed.** The following are outstanding parts of
+the written scope, not new requirements inferred from future project goals.
+Unmerged work is excluded from this assessment.
+
+| Issue | Specific remaining scope |
+| --- | --- |
+| [#1](https://github.com/pizzaexperiments/missionthunderbolt/issues/1) | Successful clean-checkout core/Android CI, CI `assembleDebug`, uploaded APK and linked successful run/artifact remain absent. Local builds do not fulfill those explicit checks; [Actions stays paused](../.github/ACTIONS_PAUSED.md). |
+| [#6](https://github.com/pizzaexperiments/missionthunderbolt/issues/6) | Representative original play screenshots/video or reproducible written traces, observed controls/states and observation-linked tests remain unavailable. The [capture protocol](REFERENCE_RESEARCH.md) and manual are not recorded play. |
+| [#7](https://github.com/pizzaexperiments/missionthunderbolt/issues/7) | [Ghidra imports, offsets and confidence-labeled call notes exist](68K_ANALYSIS.md), but CREL/resource-loader relocation semantics and runtime addressing remain unresolved. Completing combat/inventory/gameplay is not itself a prerequisite for this disassembly scope. |
+| [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) | Original generator construction/population, topology and mission/level/win/lose progression still lack a complete evidence-linked specification and native regression coverage. [Recovered preparation/conversion stages](LEVEL_GRID_CONVERSION.md) do not complete generation/progression. |
+| [#9](https://github.com/pizzaexperiments/missionthunderbolt/issues/9) | Original movement/collision/turn/FOV rules, boundary/diagonal/turn-cost cases and original-versus-port action traces remain incomplete. [Manual-backed WAIT](MANUAL_RULES.md) and coordinate helpers are narrower results. |
+| [#10](https://github.com/pizzaexperiments/missionthunderbolt/issues/10) | Cited weapon/damage tables, implemented attack/damage events, deterministic combat/RNG tests and original golden traces remain missing; [manual evidence](MANUAL_EVIDENCE.md) alone does not fulfill them. |
+| [#11](https://github.com/pizzaexperiments/missionthunderbolt/issues/11) | Inventory schemas, data-driven definitions, pickup/drop/equip/use tests and reference-validated transitions remain unfinished. [Child-record copy](CHILD_RECORD_COPY.md), factory and list routines retain raw-field names; they are not verified inventory behavior. |
+| [#12](https://github.com/pizzaexperiments/missionthunderbolt/issues/12) | Entity behavior tables, deterministic AI/event logs, verified ally/enemy targeting/collision and original comparisons remain absent; see [gameplay evidence gaps](GAMEPLAY_EVIDENCE_GAPS.md). |
+| [#13](https://github.com/pizzaexperiments/missionthunderbolt/issues/13) | Historical sequence/loop playback and representative auditory equivalence remain unverified. [Timing plans](SOUND_SEQUENCE.md) do not render audio; the [authored Android cue](NATIVE_AUDIO.md) proves output-stack consumption, not converted-original playback or audible hardware output. |
+| [#15](https://github.com/pizzaexperiments/missionthunderbolt/issues/15) | The four synthetic save checklist checks pass, but the objective's entity, mission-progress and inventory state does not yet exist in the [save format](SAVE_FORMAT.md). Reading proprietary original saves is not an added requirement. |
+| [#16](https://github.com/pizzaexperiments/missionthunderbolt/issues/16) | Original screenshot comparisons, faithful typography/layout, functional original menus and runtime resource attribution/fallback remain unverified. [Current skins](MODERN_CONTROLS.md) are synthetic. |
+| [#18](https://github.com/pizzaexperiments/missionthunderbolt/issues/18) | All four written checklist items have evidence, but the objective still includes reliable current-API and ARM64-device execution. [API35 launch qualification failed](ANDROID_API35.md); API23's two passing 19-test runs and [performance baseline](ANDROID_PERFORMANCE.md) do not substitute for those checks. |
+| [#19](https://github.com/pizzaexperiments/missionthunderbolt/issues/19) | Actual Windows x64 launch/play/input verification and a CI-produced downloadable portable package remain absent. [Linux SDL checks and Windows configuration](DESKTOP_DEVELOPMENT.md) are insufficient; demo gameplay is explicitly allowed. |
+| [#20](https://github.com/pizzaexperiments/missionthunderbolt/issues/20) | Both native Mac architectures, launch/input/save and CI artifacts remain untested. [Packaging/signing/notarization plans](DESKTOP_DEVELOPMENT.md) exist; completed notarization is not an extra acceptance requirement. |
+| [#22](https://github.com/pizzaexperiments/missionthunderbolt/issues/22) | Original-reference replay/screenshot/action-log and differential fixture scope remains incomplete. [Synthetic regressions, fuzzing, coverage and a defined ASan/UBSan job](QUALITY.md) exist. Scheduled fuzzing and a green hosted run are not additional written requirements for this issue. |
+| [#23](https://github.com/pizzaexperiments/missionthunderbolt/issues/23) | End-to-end signed tagged-release preparation, desktop artifacts/inventories and complete dependency/license review remain unverified. [Unsigned artifact metadata, checksums and signing instructions](RELEASE_PREPARATION.md) exist; public release publication is not required for closeout. |
+
+This review performed no new native/coverage runs, GitHub writes, issue closures,
+Actions runs, merges or release publication. Earlier closures below remain
+valid; this table supersedes their older remaining-work summaries.
+
+## Historical access and closeout — 2026-10-27
+
 Live GitHub access was verified on **2026-10-27** through the existing authenticated
 API connection. A repository request returned HTTP 200 and issue/PR writes
 succeeded. The earlier network-policy snapshot was stale; it no longer establishes

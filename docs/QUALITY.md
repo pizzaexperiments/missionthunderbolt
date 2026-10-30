@@ -15,8 +15,12 @@ cmake --build dist/sdl --parallel 4
 ctest --test-dir dist/sdl --output-on-failure
 ```
 
-The latest supplied-record copy-guard increment passed **30/30 ASan/UBSan** and
-**31/31 SDL** CTest checks locally. The preceding verified native baseline at
+The latest [five-child helper](CHILD_CHAIN.md) increment passed **31/31 ASan/UBSan**
+and **32/32 SDL** CTest checks locally, plus 84 Python tests with zero skips and
+all local native/demo smoke checks. After strengthening the new test, its target
+was rebuilt and passed again under both sanitizer and SDL configurations.
+The preceding [copy increment](CHILD_RECORD_COPY.md) passed **30/30 ASan/UBSan**
+and **31/31 SDL**. The earlier verified native baseline at
 **`f67e717`** was **29/29 ASan/UBSan** and **30/30 SDL**; see
 [word-selector validation](CHILD_RECORD_WORD_SELECTOR.md).
 The coverage refresh itself did not rerun CMake; these native counts come from
@@ -49,11 +53,11 @@ as **83%** by the text report, above the unchanged 80% gate. Six parallel data
 files were combined. This is Python statement coverage, not native branch
 coverage, Android device coverage or a historical-game fidelity metric.
 
-The copy-guard increment leaves the production Python scripts and synthetic
+The copy-guard and five-child increments leave the production Python scripts and synthetic
 Python tests unchanged, so this measurement covers those same files on the
-current branch. Its new optional original-instruction research oracle lives
-outside the `scripts` coverage source and the synthetic test gate. Neither that
-oracle nor the original game instructions are measured by this percentage.
+current branch. Their optional original-instruction research oracles live
+outside the `scripts` coverage source and the synthetic test gate. Neither those
+oracles nor the original game instructions are measured by this percentage.
 
 Actual tools were **Python 3.12.14**, **coverage.py 7.10.7** with its C extension,
 **GraphicsMagick 1.4 snapshot-20250331 Q16**, and **ImageMagick 7.1.1-43 Q16

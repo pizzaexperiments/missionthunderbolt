@@ -64,4 +64,6 @@ c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/child_reco
 ./dist/child_record_word_selector_test
 c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/child_record_copy_test.cpp -o dist/child_record_copy_test
 ./dist/child_record_copy_test
+c++ -std=c++17 -Wall -Wextra -Werror -Iandroid/app/src/main/cpp tests/child_chain_test.cpp -o dist/child_chain_test
+./dist/child_chain_test
 echo "All local smoke tests passed"
