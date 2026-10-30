@@ -69,3 +69,7 @@ parent child-construction integration, inventory semantics and gameplay referenc
 comparisons remain unfinished. Source listings and detailed original-derived
 reports remain ignored. No Android rebuild/device test, Actions execution,
 merge, signing or publication is claimed by this increment.
+
+[Explicit authored context](CHILD_FACTORY_CONTEXT.md) now supports types 37, 77,
+137 and 138 through a separate overload. The default API retains the seven-type
+rejection boundary documented at this earlier checkpoint.

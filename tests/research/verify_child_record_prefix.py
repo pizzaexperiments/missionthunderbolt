@@ -88,8 +88,9 @@ def cases():
             yield make(template(kind=71,byte=255,flags=flags),values=values)
 
 
-def original(sources,c,*,factory=False):
+def original(sources,c,*,factory=False,context=None):
     """Default stops before dispatch; factory=True explicitly enables its oracle."""
+    if context is not None and not factory:raise ValueError('context requires explicit factory mode')
     uc=Uc(UC_ARCH_M68K,UC_MODE_BIG_ENDIAN);uc.ctl_set_cpu_model(UC_CPU_M68K_M68000)
     uc.mem_map(0x10000,0x180000)
     for sid,base in ((1,0x10000),(12,0x20000),(5,0x30000),(9,BASE)):uc.mem_write(base,sources[sid])
@@ -118,6 +119,17 @@ def original(sources,c,*,factory=False):
     uc.mem_write(TABLE-16,guarded_table)
     pointer_context=b'\xa5'*8+struct.pack('>I',TABLE)+b'\xa5'*8
     uc.mem_write(A5-0x2626-8,pointer_context)
+    if context is not None:
+        if len(context['lookup'])!=50:raise ValueError('lookup must contain 50 authored bytes')
+        lookup_context=b'\xa5'*8+context['lookup']+b'\xa5'*8
+        external=bytearray(b'\xa5'*0x1190);struct.pack_into('>H',external,0x118e,context['factor_word'])
+        external_context=b'\x5a'*16+bytes(external)+b'\x5a'*16
+        external_pointer=b'\xa5'*8+struct.pack('>I',0xf0000)+b'\xa5'*8
+        counter_context=b'\xa5'*8+struct.pack('>HI',context['counter'],context['address_base'])+b'\xa5'*8
+        uc.mem_write(A5-0x19af-8,lookup_context)
+        uc.mem_write(0xf0000-16,external_context)
+        uc.mem_write(A5-0x1a48-8,external_pointer)
+        uc.mem_write(A5-0x9f8-8,counter_context)
     uc.mem_write(CELL-16,b'\xcc'*16+c['record']+b'\xcc'*16)
     level=c['level']&65535 if factory else 0x1234
     frame=bytearray(b'\xa5'*64);struct.pack_into('>H',frame,26,c['variant'])
@@ -145,6 +157,13 @@ def original(sources,c,*,factory=False):
             0x4cca:'byte13',0x4cd2:'flag25_bit2'})
         returns.extend((0x4aae,0x4ac0,0x4ad2,0x4aec,0x4b14,0x4b26,
                         0x4b38,0x4b4a,0x4b5c,0x4bec,0x4c0e))
+    if context is not None:
+        branches.update({0x4a36:'context_type37',0x4a50:'lookup_nonnegative',
+            0x4a56:'lookup_low',0x4a5e:'lookup_lowest',0x4a66:'lookup_high',
+            0x4a70:'lookup_middle',0x4a78:'lookup_eligible',0x4a88:'lookup_replacement',
+            0x4b9c:'context_type77',0x4ba4:'level_positive',0x4bbc:'level_nonpositive',
+            0x4c9e:'context_counter'})
+        returns.extend((0x4a3e,0x4a80,0x4a90,0x4cb0))
     def service(machine,address,size,user):
         if address not in allowed:raise AssertionError('unmodeled child-prefix service')
         if address in (A5+0x68a,A5+0x692):
@@ -186,7 +205,18 @@ def original(sources,c,*,factory=False):
             raise AssertionError('RNG/stack guards')
     state=lambda offset:struct.unpack('>I',bytes(uc.mem_read(A5+offset,4)))[0]
     numbers=[state(-0x56fe),state(-0x5702),state(-0xb26),*struct.unpack('>100I',bytes(uc.mem_read(A5-0x56fa,400)))]
+    counter_after=None
+    if context is not None:
+        if bytes(uc.mem_read(A5-0x19af-8,len(lookup_context)))!=lookup_context:raise AssertionError('lookup context changed')
+        if bytes(uc.mem_read(0xf0000-16,len(external_context)))!=external_context:raise AssertionError('external template context changed')
+        if bytes(uc.mem_read(A5-0x1a48-8,len(external_pointer)))!=external_pointer:raise AssertionError('external pointer context changed')
+        counter_after=struct.unpack('>H',bytes(uc.mem_read(A5-0x9f8,2)))[0]
+        expected_counter=(context['counter']+int(struct.unpack_from('>H',c['template'])[0] in (137,138)))&65535
+        if counter_after!=expected_counter:raise AssertionError('counter mutation')
+        expected_context=bytearray(counter_context);struct.pack_into('>H',expected_context,8,expected_counter)
+        if bytes(uc.mem_read(A5-0x9f8-8,len(counter_context)))!=bytes(expected_context):raise AssertionError('counter/base context guards')
     line=after[16:-16].hex()+' '+' '.join(map(str,numbers))+f' {selected} {len(draws)}'+''.join(' '+' '.join(map(str,d)) for d in draws)
+    if context is not None:line+=' '+str(counter_after)
     return line,len(draws),coverage
 
 

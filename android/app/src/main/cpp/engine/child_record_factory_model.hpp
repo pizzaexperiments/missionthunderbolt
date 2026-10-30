@@ -3,7 +3,8 @@
 
 namespace mt {
 // Research-only supplied-allocation CODE 9 body, 0x484e..0x4cd8. Selected
-// dispatch cases needing recursion, external helpers or globals are rejected.
+// dispatch cases needing recursion or external helpers are rejected; authored
+// global context is accepted only through the explicit Context overload.
 // No original table contents, allocator, caller ABI or gameplay is supplied.
 class ChildRecordFactoryModel {
 public:
@@ -11,23 +12,39 @@ public:
     using Templates=ChildRecordPrefixModel::Templates;
     using Draw=ChildRecordPrefixModel::Draw;
     using Result=ChildRecordPrefixModel::Result;
-    static bool supportsType(unsigned type) {
+    struct Context {
+        std::array<uint8_t,50> lookup{}; // Raw bytes at the original A5-0x19af.
+        uint16_t factor_word=0; // Signed word from the external template pointer +0x118e.
+        uint16_t counter=0;
+        uint32_t address_base=0; // An arithmetic address value; never dereferenced.
+    };
+    static bool supportsType(unsigned type,bool has_context=false) {
         if(type>65535u)return false;
         switch(type) {
-        case 36:case 37:case 70:case 77:case 137:case 138:case 166:return false;
+        case 36:case 70:case 166:return false;
+        case 37:case 77:case 137:case 138:return has_context;
         default:return true;
         }
     }
     static Result prepare(Record& output,const Templates& templates,int variant,int level,ShuffledLcgModel& rng) {
+        return prepareImpl(output,templates,variant,level,rng,nullptr);
+    }
+    static Result prepare(Record& output,const Templates& templates,int variant,int level,
+                          ShuffledLcgModel& rng,Context& context) {
+        return prepareImpl(output,templates,variant,level,rng,&context);
+    }
+private:
+    static Result prepareImpl(Record& output,const Templates& templates,int variant,int level,
+                              ShuffledLcgModel& rng,Context* context) {
         if(variant<0 || variant>32767)throw std::invalid_argument("variant must fit nonnegative word");
         if(level < -32768 || level>32767)throw std::invalid_argument("level must fit signed word");
         const auto selected=variant<=136?static_cast<unsigned>(variant):0u;
         const auto& source=templates[selected];
         const unsigned type=(unsigned(source[0])<<8)|source[1];
-        if(!supportsType(type))throw std::invalid_argument("unmodeled child-record dispatch type");
-        auto staged_rng=rng;Record record{};
+        if(!supportsType(type,context!=nullptr))throw std::invalid_argument("unmodeled child-record dispatch type");
+        auto staged_rng=rng;Record record{};Context staged_context=context?*context:Context{};
         auto result=ChildRecordPrefixModel::prepare(record,templates,variant,staged_rng);
-        result.draws.reserve(10);
+        result.draws.reserve(11);
         auto word=[&](unsigned p) {return (unsigned(record[p])<<8)|record[p+1];};
         auto put=[&](unsigned p,unsigned value) {
             record[p]=static_cast<uint8_t>(value>>8);record[p+1]=static_cast<uint8_t>(value);
@@ -37,7 +54,35 @@ public:
             const auto value=one_based?staged_rng.oneBased(bound):staged_rng.zeroBased(bound);
             result.draws.push_back({static_cast<uint16_t>(bound),one_based?1u:0u,value});return value;
         };
+        auto put_long=[&](unsigned p,uint32_t value) {
+            for(unsigned i=0;i<4;++i)record[p+i]=static_cast<uint8_t>(value>>(24-8*i));
+        };
         switch(type) {
+        case 37: {
+            const auto index=draw(50,false);put(8,index);
+            const auto value=staged_context.lookup[index];
+            // The original signed-byte/subtraction branch chain excludes these
+            // four raw values; negative bytes all enter the optional draw gate.
+            if(value!=2 && value!=4 && value!=6 && value!=33 && draw(5,false)==0) {
+                const auto count=draw(3,true);put(10,count);put(14,word(14)*count);
+            }
+            break;
+        }
+        case 77: {
+            record[2]=static_cast<uint8_t>(level);
+            if(level>0) {
+                put(8,7);record[6]=static_cast<uint8_t>(record[6]-7u);
+                record[7]=4;put(16,word(16)+10u);
+            } else put(8,10);
+            const int byte=record[7]<128?int(record[7]):int(record[7])-256;
+            put(4,static_cast<uint16_t>(byte*signed_word(staged_context.factor_word)));
+            break;
+        }
+        case 137:case 138:
+            staged_context.counter=static_cast<uint16_t>(staged_context.counter+1u);
+            put(40,staged_context.counter);
+            put_long(42,staged_context.address_base+5000u-draw(500,false));
+            record[24]|=8;break;
         case 25: {
             const int quotient=level/5;
             if(quotient<0 || quotient>2)put(8,33);
@@ -74,7 +119,7 @@ public:
         case 143:record[25]|=4;break;
         default:break; // All other word types select the table/default no-op.
         }
-        output=record;rng=std::move(staged_rng);return result;
+        output=record;rng=std::move(staged_rng);if(context)*context=staged_context;return result;
     }
 };
 }
