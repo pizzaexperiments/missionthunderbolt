@@ -459,3 +459,17 @@ both optional external graphics decoders. Local CMake builds/CTest passed
 **20/20 ASan/UBSan** and **21/21 SDL**. No failures/skips occurred; no Android
 build/runtime, original game boot, Actions run/upload or release was performed.
 Production Python tools are unchanged (last coverage 82%).
+
+## Final factory follow-up selection
+
+PR #41 was verified merged before creating `feature/record-followup` from current
+`develop`. The maintainer explicitly authorized sequential stacked PRs; AGENTS.md
+now records that dependency branches may target the preceding PR branch while
+merges still require approval. Original CODE 7 matched 11,133 authored parent/child
+cases, including all output bytes, source/child immutability, guards and return
+checks. Commands and model restrictions: RECORD_FOLLOWUP.md.
+
+Local suites passed 56 Python tests plus native regressions, 21/21 ASan/UBSan
+and 22/22 SDL. Both optional graphics decoders were present. No failures/skips
+occurred; no Android runtime/build, Actions, original boot or release was performed.
+Production Python tools are unchanged (last coverage 82%).

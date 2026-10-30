@@ -91,3 +91,7 @@ the follow-up callback, factory/creation-glyph integration, progression and
 original gameplay comparisons remain unfinished. No Android build/runtime,
 original game boot, Actions run/upload or release was performed. All five Actions
 workflows remain disabled.
+
+[The final follow-up routine](RECORD_FOLLOWUP.md) is now independently recovered
+on 11,133 authored parent/child cases. Connecting it through the factory is a
+separate dependent change; this checkpoint still stops before the call.

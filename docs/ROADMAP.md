@@ -1,9 +1,10 @@
 # Mission Thunderbolt roadmap and issue checkpoints
 
 This is a **synthetic native prototype**, not a faithful original-game port.
-Work proceeds on `feature/offline-research-tooling`, with `develop` as integration
-and `main` release-only. Commits are separately reviewable. Closures of #2, #4, #5, #24 and #25 were verified through the live GitHub API;
-Implementation PRs through [#40](https://github.com/pizzaexperiments/missionthunderbolt/pull/40) were verified merged into develop. All five GitHub Actions workflows are disabled during the maintainer-requested
+Work proceeds in `feature/*` branches, with `develop` as integration and `main`
+release-only. Dependent PRs may stack on the preceding branch without waiting
+for merges; each diff and its local evidence remain separately reviewable. Closures of #2, #4, #5, #24 and #25 were verified through the live GitHub API;
+Implementation PRs through [#41](https://github.com/pizzaexperiments/missionthunderbolt/pull/41) were verified merged into develop. All five GitHub Actions workflows are disabled during the maintainer-requested
 pause. Local test results belong in PRs; no CI run/public release is claimed here.
 
 ## Dependency order
