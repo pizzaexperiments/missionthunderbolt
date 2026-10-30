@@ -91,7 +91,7 @@ that PR #29 is merged or that the original game has been booted.
 
 On 2026-10-30, live issues and all merged implementation through PR #48 were
 reviewed against their written objectives and acceptance criteria. Three scopes
-are ready for closure, without treating unrelated future fidelity work as a new
+were closed as completed with live evidence comments, without treating unrelated future fidelity work as a new
 acceptance requirement:
 
 - **#3:** [rights and provenance](RIGHTS_AND_PROVENANCE.md) records confirmed/unknown
