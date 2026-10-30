@@ -547,3 +547,16 @@ placements also match. Local suites passed 56 Python tests plus native checks,
 25/25 ASan/UBSan and 26/26 SDL with both optional decoders. No failures/skips
 occurred. No Android build/runtime, Actions, original boot, merge or release was
 performed. Production Python tools are unchanged (last coverage 82%).
+
+## Variant 36 sequential continuation
+
+Continued from #47's head on `feature/factory-variant36`, targeting `develop`.
+Original factory variant 36 and control 31 match 210 cases, 105 initial draws,
+805 total draws and 140 actual callbacks. The initial draw overwrites byte +11
+before the known variant-31 writes and shared tail. Commands/scope: FACTORY_VARIANT36.md.
+
+Prior tail/mode/60–67 result digests are unchanged; 32,768 copy probes + 2,072
+factory cases and 1,065 finalized/placement cases also match. Local checks passed
+56 Python tests plus native regressions, 25/25 ASan/UBSan and 26/26 SDL with both
+optional decoders. No failures/skips, Android build/runtime, Actions, original boot,
+merge or release occurred. Production Python tools are unchanged (last coverage 82%).

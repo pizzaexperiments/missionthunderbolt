@@ -79,7 +79,7 @@ def execute(sources,c,prepare=None,inspect=None,start=0x1298,stop=0x1324,early_s
         draws.append(pending.pop()+[machine.reg_read(UC_M68K_REG_D0)&65535])
     uc.hook_add(UC_HOOK_CODE,service,begin=A5+32,end=A5+6335)
     offsets=[0x12a0,0x12b6,0x12c2,0x12d6,0x12e2,0x12ee,0x12fa,0x130e]
-    if prefix_bound is not None:offsets += [0xea4,0x100a]
+    if prefix_bound is not None:offsets += [0xcbc,0xea4,0x100a]
     for offset in offsets:uc.hook_add(UC_HOOK_CODE,returned,begin=BASE+offset,end=BASE+offset)
     # Initializer/warm-ups may have compiled helper blocks before hooks existed.
     # Rebuild those blocks so the service/trace guards observe every call.

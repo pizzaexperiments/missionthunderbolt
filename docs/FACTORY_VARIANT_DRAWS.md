@@ -66,3 +66,7 @@ PR #45's integration repair and PR #46 were verified merged into `develop` durin
 this work. The new branch starts from #46's head and also targets `develop`.
 Original allocation/resources, child creation, 21 unsupported variants below 89,
 complete glyph/progression integration and gameplay validation remain unfinished.
+
+The dependent [variant-36 increment](FACTORY_VARIANT36.md) adds a bound-20 byte
+overwrite followed by the known variant-31 path. Current support becomes 69
+variants below 89; this document's 68-variant results remain the earlier checkpoint.

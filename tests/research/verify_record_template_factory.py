@@ -16,7 +16,8 @@ from unicorn.m68k_const import (UC_M68K_REG_A0,UC_M68K_REG_A7,UC_M68K_REG_D6,
 
 TABLE,DESC=0xd0000,0xe0000
 PLAIN=[1,2,3,4,5,10,12,13,14,15,16,19,22,25,27,28,29,32,34,37,41,44,47,50,51,52,53,54,55,56,58,62,63,64,66,68,69,70,71,73,76,77,78,80,81,82,83,84,85]
-SPECIAL=[60,67,7,0,18,20,21,23,33,86,88,35,46,79,31,39,65,87,38]
+PREFIX_BOUNDS={36:20,60:4,67:10}
+SPECIAL=[36,60,67,7,0,18,20,21,23,33,86,88,35,46,79,31,39,65,87,38]
 SUPPORTED=sorted(PLAIN+SPECIAL)
 
 
@@ -62,7 +63,7 @@ def original(sources,c,followup=None):
         if (uc.reg_read(UC_M68K_REG_D6)&65535)!=(c['level']&65535) or uc.reg_read(UC_M68K_REG_D7)!=c['variant']:raise AssertionError('factory word registers changed')
         if uc.reg_read(UC_M68K_REG_PC)!=BASE+(0x1334 if observed['followup'] and followup is None else 0x133c):raise AssertionError('callback boundary endpoint')
         if followup is not None:followup.inspect(uc,observed)
-    line,z,n=execute(sources,c,prepare=prepare,inspect=inspect,start=0xbc,stop=0x133c,early_stop=0x1334 if followup is None else None,service_observer=followup.service if followup is not None else None,prefix_bound=4 if c["variant"]==60 else 10 if c["variant"]==67 else None)
+    line,z,n=execute(sources,c,prepare=prepare,inspect=inspect,start=0xbc,stop=0x133c,early_stop=0x1334 if followup is None else None,service_observer=followup.service if followup is not None else None,prefix_bound=PREFIX_BOUNDS.get(c["variant"]))
     return line+f' {observed["selected"]} {observed["followup"]}',z,n,observed['followup']
 
 
