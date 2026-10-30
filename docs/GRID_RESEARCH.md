@@ -454,3 +454,7 @@ All 32,768 nonnegative-word copy probes and 1,960 connected cases match original
 instructions, including 6,531 draws and 971 callback boundaries. Source tables
 are authored; allocation/children/callback execution and glyph integration remain
 unverified.
+
+The separate [56-byte child-record prefix](CHILD_RECORD_PREFIX.md) now models
+supplied-allocation copy and ordered raw-field/RNG adjustments before child-type
+dispatch. It does not yet resolve the parent factory's child-construction calls.
