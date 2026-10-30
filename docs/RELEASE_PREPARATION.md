@@ -115,3 +115,14 @@ Local unsigned APK/AAB collection passed on all four ABIs, identifying four
 runtime archives per ABI (libc++, libc++abi, libunwind, compiler-rt), with no Java
 runtime dependencies. Build-ID checks are useful correspondence evidence, not
 a cryptographic attestation of a trustworthy or reproducible build.
+
+## Verified component notice coverage
+
+The optional [NDK attribution guide](ANDROID_NDK_ATTRIBUTION.md) and
+`docs/android-ndk-attribution.json` bind the sixteen measured Android runtime
+archives to exact component identities and upstream notice hashes. Supply
+`--attribution-manifest` and `--ndk` together to verify installed archive/notice
+bytes, reject unknown or mismatched runtime coverage, and preserve both full
+upstream notices in the local review directory. SPDX comments retain component
+notice evidence; archive-wide licenses remain `NOASSERTION`. This is notice
+evidence, not completion of the license review or permission to distribute.
