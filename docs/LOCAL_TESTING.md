@@ -424,3 +424,20 @@ both optional external graphics decoders. Local CMake builds/CTest passed
 on a missing namespace qualifier; corrected binaries were rebuilt and passed.
 No Android/runtime/device checks, original boot, Actions run/upload or release
 was performed. Production Python tools are unchanged (last coverage 82%).
+
+## Common factory RNG tail checkpoint
+
+PR #39 was verified merged as `ad834447eafcdd283df7c4d275c32bee9e86f34b` before syncing the
+feature branch. Original CODE 9 tail/RNG instructions match the model on
+**2,002 records / 727 zero-result paths / 7,091 tail draws**, with full record
+bytes, complete RNG state, trace and guards checked. Five zero paths use original
+initialization plus authored warm-ups; 722 use authored table states. The 65,472
+warm-up draws are counted separately from the tail. The prior cold-initialization
+sweep matched but found no initialized zero path; warm-up coverage was added
+without relaxing checks. Reproduction and boundaries: RECORD_FACTORY_TAIL.md.
+
+`sh scripts/test_local.sh` passed **56 Python tests** and native regressions with
+both optional external graphics decoders. Configured/built CMake targets and ran
+CTest: **19/19 ASan/UBSan**, **20/20 SDL** passed. No failures/skips occurred; no
+Android/runtime/device checks, original game boot, Actions run/upload or release
+was performed. Production Python tools are unchanged (last coverage 82%).

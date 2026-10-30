@@ -442,3 +442,8 @@ on 30,552 authored cases, including 15,276 connected immediate removals. Header
 count/head, record coordinates/next and cell link match; original guards and
 all unrelated bytes remain intact. Factory allocation/template effects remain
 unmodeled, so this does not yet implement the generator's creation glyphs.
+
+The [common factory RNG tail](RECORD_FACTORY_TAIL.md) now matches original
+instructions on 2,002 records/7,091 tail draws, with 727 zero-result paths and
+complete RNG-state comparison. Input records and warm-up histories are authored;
+template/type effects and connected glyph creation remain incomplete.
