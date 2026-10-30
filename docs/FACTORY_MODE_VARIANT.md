@@ -70,3 +70,7 @@ and original gameplay validation remain unfinished.
 This branch starts from the integration repair #45 but targets `develop` directly.
 Its prerequisite commits disappear from the diff when #45 reaches `develop`;
 there is no need to wait for that merge before doing new work.
+
+The following [variant-specific draw increment](FACTORY_VARIANT_DRAWS.md) adds
+variants 60/67 and an explicit raw global long. It preserves the mode-7 result
+digest while expanding the supported factory set to 68 variants below 89.
