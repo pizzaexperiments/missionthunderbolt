@@ -9,7 +9,7 @@ import struct
 import subprocess
 from verify_factory_mode_variant import ModeExecution
 from verify_finalized_template_factory import ALL_SOURCES
-from verify_record_template_factory import original
+from verify_record_template_factory import original,PREFIX_BOUNDS
 from verify_rng_cpu import manifest_inputs
 
 
@@ -37,7 +37,7 @@ def cases():
                         index+=1
 
 
-def verify(manifest,driver):
+def verify(manifest,driver,case_stream=None):
     sources={r['id']:d for r,d in manifest_inputs(manifest,'CODE') if r['id'] in ALL_SOURCES}
     if set(sources)!=set(ALL_SOURCES) or any(hashlib.sha256(sources[s]).hexdigest()!=h for s,h in ALL_SOURCES.items()):raise ValueError('unsupported CODE')
     inputs=[];wanted=[];count=0;draws=0;callbacks=0;prefixes=0;digest=hashlib.sha256()
@@ -50,9 +50,9 @@ def verify(manifest,driver):
                 aa,bb=a.split(),b.split();token=next((j for j,(x,y) in enumerate(zip(aa,bb)) if x!=y),min(len(aa),len(bb)))
                 raise AssertionError(f'variant-prefix mismatch {count-len(wanted)+i}, token {token}')
         inputs.clear();wanted.clear()
-    for c in cases():
+    for c in (cases() if case_stream is None else case_stream):
         execution=ModeExecution(sources,c);line,z,n,f=original(sources,c,followup=execution)
-        wanted.append(line);count+=1;draws+=n;callbacks+=f;prefixes+=int(c['variant'] in (60,67));digest.update((line+'\n').encode())
+        wanted.append(line);count+=1;draws+=n;callbacks+=f;prefixes+=int(c['variant'] in PREFIX_BOUNDS);digest.update((line+'\n').encode())
         keys=('mode','seed','fallback','last','global','warmup','variant')
         text=' '.join(str(c[k]) for k in keys)+f' {c["level"]&65535} {c["flag39"]} {c["mode_word"]&65535} {c["base_long"]} '+c['record'].hex()+' '+c['table'].hex()
         text+=' '+b''.join(struct.pack('>h',v) for v in c['thresholds']).hex()+' '+str(len(c['children']))

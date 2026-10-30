@@ -14,6 +14,14 @@ int main() {
         if(mode==3)assert(out[2]==14 && out[8]==206 && out[14]==255 && out[15]==251);
         else assert(out[2]==250 && out[8]==10 && out[14]==255 && out[15]==255);
     }
+    for(int level:{-32768,-3277,-3,-1,0,1,32767}) {
+        t[36][11]=255;t[36][14]=255;t[36][15]=255;auto rng=mt::ShuffledLcgModel(s);
+        const auto result=M::prepare(out,t,d,{36,level,0,0},rng,{},thresholds);
+        const unsigned expected=static_cast<uint16_t>(65535+10*level);
+        assert(result.variant_draws.size()==1 && result.variant_draws[0][0]==20 && result.variant_draws[0][2]==2);
+        assert(out[11]==2 && (out[26]&1) && (out[21]&128) && ((out[14]<<8)|out[15])==int(expected));
+        assert(out[16]==out[14] && out[17]==out[15]);
+    }
     for(uint32_t base:{0u,1u,0xfffffff8u,0xffffffffu}) {
         auto rng=mt::ShuffledLcgModel(s);const auto result=M::prepare(out,t,d,{67,0,0,0,0,base},rng,{},thresholds);
         assert(result.variant_draws.size()==1 && result.variant_draws[0][0]==10 && result.variant_draws[0][2]==2);
