@@ -56,3 +56,8 @@ reviewed as a dependent PR without merging its predecessor first. Both need
 maintainer merge approval. Full glyph creation, original allocation/resources,
 child creation, unsupported variants, progression and gameplay validation remain
 unfinished. GitHub Actions stays disabled.
+
+The next [supplied-record placement increment](SUPPLIED_RECORD_PLACEMENT.md)
+connects factory output to original list/grid attachment on a dependent branch.
+It uses a separate authored ABI call after the factory stage and does not claim
+allocator or original glyph-caller execution.
