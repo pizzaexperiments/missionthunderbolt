@@ -88,7 +88,8 @@ def cases():
             yield make(template(kind=71,byte=255,flags=flags),values=values)
 
 
-def original(sources,c):
+def original(sources,c,*,factory=False):
+    """Default stops before dispatch; factory=True explicitly enables its oracle."""
     uc=Uc(UC_ARCH_M68K,UC_MODE_BIG_ENDIAN);uc.ctl_set_cpu_model(UC_CPU_M68K_M68000)
     uc.mem_map(0x10000,0x180000)
     for sid,base in ((1,0x10000),(12,0x20000),(5,0x30000),(9,BASE)):uc.mem_write(base,sources[sid])
@@ -111,23 +112,39 @@ def original(sources,c):
         if uc.reg_read(UC_M68K_REG_PC)!=STOP:raise AssertionError('warmup endpoint')
     selected=c['variant'] if c['variant']<=136 else 0
     table=bytearray((i*17+j*31)&255 for i in range(137) for j in range(56))
+    if factory:struct.pack_into('>H',table,42*56+14,c['factor'])
     table[selected*56:(selected+1)*56]=c['template'];table=bytes(table)
     guarded_table=b'\x5a'*16+table+b'\x5a'*16
     uc.mem_write(TABLE-16,guarded_table)
     pointer_context=b'\xa5'*8+struct.pack('>I',TABLE)+b'\xa5'*8
     uc.mem_write(A5-0x2626-8,pointer_context)
     uc.mem_write(CELL-16,b'\xcc'*16+c['record']+b'\xcc'*16)
-    frame=bytearray(b'\xa5'*64);struct.pack_into('>H',frame,26,c['variant']);frame=bytes(frame)
+    level=c['level']&65535 if factory else 0x1234
+    frame=bytearray(b'\xa5'*64);struct.pack_into('>H',frame,26,c['variant'])
+    if factory:struct.pack_into('>H',frame,24,level)
+    frame=bytes(frame)
     uc.mem_write(FRAME-16,frame)
     uc.mem_write(STACK-512,b'\x5a'*16);uc.mem_write(STACK+16,b'\x5a'*16)
     # Allocation has completed; its two pending long arguments are still on SP.
     uc.mem_write(STACK-8,struct.pack('>II',1,56))
     for reg,value in ((UC_M68K_REG_A4,CELL),(UC_M68K_REG_A5,A5),(UC_M68K_REG_A6,FRAME),
-                      (UC_M68K_REG_A7,STACK-8),(UC_M68K_REG_D6,0x1234)):
+                      (UC_M68K_REG_A7,STACK-8),(UC_M68K_REG_D6,level)):
         uc.reg_write(reg,value)
     for address,size in ((A5-0x5702,408),(A5-0xb26,4)):
         uc.mem_write(address-16,b'\x5a'*16);uc.mem_write(address+size,b'\x5a'*16)
     draws=[];pending=[];coverage=Counter();copied=[]
+    branches=dict(BRANCHES)
+    returns=list(RETURN_OFFSETS)
+    if factory:
+        branches.update({0x4aa6:'type39',0x4ab8:'type63',0x4aca:'type62',
+            0x4ae4:'type62_negative',0x4b04:'type62_high',0x4b0c:'type81_141',
+            0x4b1e:'type109',0x4b30:'type108',0x4b42:'type100',0x4b54:'type114_116',
+            0x4b66:'type25',0x4b76:'type25_low',0x4b84:'type25_middle',
+            0x4b92:'type25_other',0x4be4:'type127',0x4c06:'type129',
+            0x4c14:'type129_nonzero',0x4c1e:'type129_zero',0x4cc2:'flag24_bit3',
+            0x4cca:'byte13',0x4cd2:'flag25_bit2'})
+        returns.extend((0x4aae,0x4ac0,0x4ad2,0x4aec,0x4b14,0x4b26,
+                        0x4b38,0x4b4a,0x4b5c,0x4bec,0x4c0e))
     def service(machine,address,size,user):
         if address not in allowed:raise AssertionError('unmodeled child-prefix service')
         if address in (A5+0x68a,A5+0x692):
@@ -141,21 +158,22 @@ def original(sources,c):
         draws.append(pending.pop()+[machine.reg_read(UC_M68K_REG_D0)&65535])
     def observe(machine,address,size,user):
         offset=address-BASE
-        if offset in BRANCHES:coverage[BRANCHES[offset]]+=1
+        if offset in branches:coverage[branches[offset]]+=1
         if offset==0x487e:
             if bytes(machine.mem_read(CELL,56))!=c['template']:raise AssertionError('prefix template copy')
             end=machine.reg_read(UC_M68K_REG_A0)
             if end!=TABLE+(selected+1)*56:raise AssertionError('template selection')
             copied.append(selected)
     uc.hook_add(UC_HOOK_CODE,service,begin=A5+32,end=A5+6335)
-    for offset in RETURN_OFFSETS:uc.hook_add(UC_HOOK_CODE,returned,begin=BASE+offset,end=BASE+offset)
-    for offset in [0x487e,*BRANCHES]:uc.hook_add(UC_HOOK_CODE,observe,begin=BASE+offset,end=BASE+offset)
+    for offset in returns:uc.hook_add(UC_HOOK_CODE,returned,begin=BASE+offset,end=BASE+offset)
+    for offset in [0x487e,*branches]:uc.hook_add(UC_HOOK_CODE,observe,begin=BASE+offset,end=BASE+offset)
     # Initialization can compile helper blocks; invalidate them after adding hooks.
     uc.ctl_flush_tb()
-    uc.emu_start(BASE+0x484e,BASE+0x4974,count=100000)
-    if pending or uc.reg_read(UC_M68K_REG_PC)!=BASE+0x4974:raise AssertionError('prefix endpoint/draw balance')
+    stop=0x4cd8 if factory else 0x4974
+    uc.emu_start(BASE+0x484e,BASE+stop,count=100000)
+    if pending or uc.reg_read(UC_M68K_REG_PC)!=BASE+stop:raise AssertionError('prefix endpoint/draw balance')
     for reg,value in ((UC_M68K_REG_A4,CELL),(UC_M68K_REG_A5,A5),(UC_M68K_REG_A6,FRAME),
-                      (UC_M68K_REG_A7,STACK),(UC_M68K_REG_D6,0x1234)):
+                      (UC_M68K_REG_A7,STACK),(UC_M68K_REG_D6,level)):
         if uc.reg_read(reg)!=value:raise AssertionError('prefix register/stack preservation')
     if copied!=[selected]:raise AssertionError('copy boundary count')
     after=bytes(uc.mem_read(CELL-16,88))

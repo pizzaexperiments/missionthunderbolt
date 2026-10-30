@@ -65,3 +65,7 @@ Allocation, type dispatch, recursive child construction, parent integration,
 original table contents, inventory semantics and full-game comparisons remain
 unfinished. No original game boot, Android build/device run, Actions run or
 release publication is implied.
+
+The subsequent [supported child-factory body](CHILD_RECORD_FACTORY.md) now
+composes this prefix with pure type dispatch. This prefix oracle retains its
+original default endpoint and guards.

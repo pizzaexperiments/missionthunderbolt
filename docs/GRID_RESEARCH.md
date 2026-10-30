@@ -458,3 +458,7 @@ unverified.
 The separate [56-byte child-record prefix](CHILD_RECORD_PREFIX.md) now models
 supplied-allocation copy and ordered raw-field/RNG adjustments before child-type
 dispatch. It does not yet resolve the parent factory's child-construction calls.
+
+The [supported child-record factory body](CHILD_RECORD_FACTORY.md) extends that
+prefix through pure dispatch on authored tables; allocation and parent child-call
+integration remain separate.
