@@ -28,10 +28,10 @@ original-game fidelity or completion of other issues.
 
 ## Keep open
 
-- #1 needs the requested CI artifact evidence; Actions stays manual-only.
-- #14 needs native platform verification; #19/#20 need their actual OS builds.
+- #1 needs the requested CI artifact evidence; all Actions workflows stay disabled.
+- #19/#20 need their actual native OS builds and requested CI artifacts.
 - #2 was subsequently closed against its stated one-machine acceptance; see below.
-- #3 still lacks historical redistribution permission.
+- Historical redistribution permission remains unknown; the completed #3 workflow records that restriction.
 - #6/#16 need original reference evidence and faithful runtime resource/layout mapping.
 - #5 was subsequently closed against its decoder/catalog criteria; see below.
 - #7–#12 have research progress, including instruction-corroborated RNG routines,
@@ -41,13 +41,13 @@ original-game fidelity or completion of other issues.
   rendering, auditory equivalence and physical-device output remain open.
 - #15 covers current synthetic state and migration/corruption/storage tests; original
   entity/inventory/mission state does not yet exist and must not be called complete.
-- #17/#18 need physical accessibility/input and broader lifecycle/performance evidence.
+- #18 still needs measured performance evidence; physical accessibility/input testing remains a documented limitation of #17.
 - #22 now has a bounded 1.72M-execution coverage-guided parser campaign; original
-  differential fixtures and longer-running/scheduled campaigns remain.
+  differential and screenshot fixtures remain; scheduled campaigns are useful follow-up.
 - #23 needs signing/review/dependency inventory and target platform artifacts.
 
 #21 was also confirmed closed in the refreshed live issue list; it is tracked
-as a duplicate of #1. All other issues above except #2 and #5 remain open. Recheck live acceptance
+as a duplicate of #1. The follow-up reviews below supersede earlier closure assessments. Recheck live acceptance
 and comments before subsequent closures.
 
 ## Follow-up closeout — Android development instructions
@@ -81,8 +81,39 @@ visible; original-runtime verification is not inferred from decoder agreement.
 Four panel roles have direct visual attribution, while other sprites retain
 neutral resource-ID names. The five stated decoder/catalog criteria are met;
 faithful runtime screenshots, menu interaction and exhaustive role mapping remain
-#16 work. Historical redistribution permission remains #3.
+#16 work. Historical redistribution permission remains unresolved under the policy recorded by #3.
 
 [Closeout evidence](https://github.com/pizzaexperiments/missionthunderbolt/issues/5#issuecomment-6431905666).
 The live API confirmed `closed` with reason `completed`. This does not claim
 that PR #29 is merged or that the original game has been booted.
+
+## Follow-up review — provenance, portable core and modern controls
+
+On 2026-10-30, live issues and all merged implementation through PR #48 were
+reviewed against their written objectives and acceptance criteria. Three scopes
+are ready for closure, without treating unrelated future fidelity work as a new
+acceptance requirement:
+
+- **#3:** [rights and provenance](RIGHTS_AND_PROVENANCE.md) records confirmed/unknown
+  rights, private import/index guards and a synthetic-only distribution decision.
+  Unknown historical rights remain unknown; closure does not authorize publication.
+- **#14:** the portable CMake library, seeded deterministic core, Android-independent
+  modules and [documented C ABI](API.md) satisfy the prototype refactor scope.
+  Native Windows/macOS execution remains unverified under #19/#20. The criterion
+  says CI on those hosts “where available”; Actions remains disabled.
+- **#17:** shared-state synthetic skins, labeled 48 dp controls, measured 1.3× font
+  scaling, keyboard/joystick coverage and emulator instrumentation satisfy its
+  controls checks. See [controls](MODERN_CONTROLS.md) and [runtime evidence](ANDROID_RUNTIME.md).
+  Faithful Classic rendering remains #16; physical TalkBack/gamepad usability
+  and broader device coverage remain unverified.
+
+#15 remains open: its current synthetic save checks pass, but the objective also
+requires entity, mission-progress and inventory state that does not yet exist.
+#1 still explicitly requires CI artifacts; pausing Actions does not fulfill it.
+#6–#13, #16, #18–#20, #22 and #23 retain specific unfinished acceptance in the
+[roadmap](ROADMAP.md). No merge, Actions run or release is authorized by this review.
+
+A separate source-history audit examined 103 commits and 529 blobs across public
+branches and advertised PR heads. It found no matching credential patterns,
+original binary/resource hashes or raw disassembly dumps. This bounded scan
+does not prove legal clearance or inspect the five historical APK Actions artifacts.

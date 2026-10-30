@@ -59,5 +59,8 @@ Rights to analyze a private copy do not imply rights to publish it or to bundle
 it in an APK. Any change to this boundary requires maintainer review. Original inputs were later imported and extracted locally for research; none
 were added to public Git history or packages.
 
-Rights verification against an owner/source and permission for original content
-remain **unresolved**, so #3 is not represented as fully complete.
+Issue #3's workflow criteria are complete: confirmed and unknown rights are
+recorded, private import is guarded, and distribution is synthetic-only.
+Rights-holder verification and permission for historical content remain
+**unresolved**. Closing the workflow issue grants no redistribution permission;
+any future inclusion must pass the release review in #23.
