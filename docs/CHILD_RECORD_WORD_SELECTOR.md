@@ -49,8 +49,9 @@ python tests/research/verify_child_record_word_selector.py \
 Original bytes, instruction listings and detailed reports remain ignored. Native
 regressions use authored tables and cover table bounds without mutation, branch
 precedence, wrap and every non-descriptor raw type on the plain path. Per-PR local
-smoke results are recorded with the PR. Full local ASan/UBSan **28/28** and
-SDL **29/29** suites passed. No Android host behavior or
+smoke results are recorded with the PR. Independent checks passed **28/28 ASan/UBSan** and **29/29 SDL** tests. After
+stacking on the context increment, **29/29 ASan/UBSan**, **30/30 SDL**, and the
+84-test Python/native smoke suite passed. No Android host behavior or
 historical asset distribution changes. Inventory definitions/transitions,
 parent integration and original gameplay comparisons remain open; no original
 boot, Actions execution, signing, merge or publication is claimed.
