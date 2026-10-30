@@ -69,12 +69,17 @@ def execute(sources,c,prepare=None,inspect=None,start=0x1298,stop=0x1324,early_s
             if pending:raise AssertionError('nested wrapper')
             sp=machine.reg_read(UC_M68K_REG_A7);bound=struct.unpack('>H',bytes(machine.mem_read(sp+4,2)))[0]
             pending.append([bound,int(address==A5+0x692)])
-        elif not pending:raise AssertionError('RNG helper outside draw')
+        elif not pending:
+            if service_observer is None:raise AssertionError('RNG helper outside draw')
+            service_observer(machine,address)
     def returned(machine,address,size,user):
         if len(pending)!=1:raise AssertionError('unpaired RNG return')
         draws.append(pending.pop()+[machine.reg_read(UC_M68K_REG_D0)&65535])
     uc.hook_add(UC_HOOK_CODE,service,begin=A5+32,end=A5+6335)
     for offset in (0x12a0,0x12b6,0x12c2,0x12d6,0x12e2,0x12ee,0x12fa,0x130e):uc.hook_add(UC_HOOK_CODE,returned,begin=BASE+offset,end=BASE+offset)
+    # Initializer/warm-ups may have compiled helper blocks before hooks existed.
+    # Rebuild those blocks so the service/trace guards observe every call.
+    uc.ctl_flush_tb()
     uc.emu_start(BASE+start,BASE+stop,count=100000)
     endpoints={BASE+stop}
     if early_stop is not None:endpoints.add(BASE+early_stop)

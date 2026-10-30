@@ -514,3 +514,20 @@ ASan/UBSan and 24/24 SDL, with both optional picture decoders. No original
 instruction comparison was repeated: engine/test code is unchanged from the
 previously compared stack tip. No Actions, Android build/runtime or release
 was performed. New stacked PRs target `develop`; see STACKED_PR_WORKFLOW.md.
+
+## Signed mode-gated variant 7
+
+`feature/factory-mode-variant` branches from the #45 integration repair and
+targets `develop`. It adds variant 7's mode-gated arithmetic and a signed optional
+context word defaulting to zero. Original instructions match 648 cases, 225
+actual multiplies, 432 actual callbacks and 2,160 RNG draws. The initial helper
+call-count assertion exposed warmed Unicorn blocks missing newly added hooks;
+flushing translated blocks before the measured stage resolves observation with
+all checks intact. Details/commands: FACTORY_MODE_VARIANT.md.
+
+Prior comparisons passed again: 2,002 tail cases (identical result digest),
+32,768 copy probes + 1,988 factory cases, 1,020 finalized cases and 1,020 placements.
+The expanded suites include variant 7 at default mode zero. Local tests passed
+56 Python tests plus native regressions, 24/24 ASan/UBSan and 25/25 SDL with both
+optional decoders. No Android build/runtime, Actions, original boot, release or
+merge was performed. Production Python tools are unchanged (last coverage 82%).

@@ -99,3 +99,8 @@ separate dependent change; this checkpoint still stops before the call.
 The dependent [finalized factory composition](FINALIZED_TEMPLATE_FACTORY.md)
 now executes the recovered follow-up rather than stopping at its boundary.
 This earlier oracle retains its original default stop-before-call contract.
+
+[Variant 7's signed mode-gated arithmetic](FACTORY_MODE_VARIANT.md) extends the
+current supported set to 66 variants below 89. Historical 65-variant counts
+above remain the original checkpoint. The newer report also records the Unicorn
+translation-cache observation fix and repeated prior comparisons.
