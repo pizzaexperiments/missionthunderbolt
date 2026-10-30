@@ -14,6 +14,19 @@ public:
     struct Header {uint16_t count18;uint32_t head20;};
     struct Node {uint8_t row48,column49;uint32_t next56;};
     using Nodes=std::map<uint32_t,Node>;
+    // CODE 7 entry 3794: prepend supplied record and overwrite cell link +12.
+    // Allocation/ownership is supplied by the caller, not inferred here.
+    static void attach12(Header& header,GridFallbackSelector::Grid& grid,Nodes& nodes,
+                         uint32_t target,int row,int column) {
+        auto found=nodes.find(target);
+        if(target==0 || found==nodes.end())throw std::invalid_argument("missing target record");
+        if(row<0 || row>=19 || column<0 || column>=67)throw std::out_of_range("linked record coordinates");
+        auto& record=found->second;
+        header.count18=static_cast<uint16_t>(header.count18+1);
+        record.next56=header.head20;header.head20=target;
+        record.row48=static_cast<uint8_t>(row);record.column49=static_cast<uint8_t>(column);
+        grid[row*67+column].setLong(12,target);
+    }
     enum class Status {unlinked=0,budget_exhausted=1,missing_node=2};
     struct Result {Status status;uint32_t visits;};
     static Result unlink12(Header& header,GridFallbackSelector::Grid& grid,Nodes& nodes,
