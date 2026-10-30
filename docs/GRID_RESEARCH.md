@@ -434,3 +434,11 @@ the 43 supported direct branches and authored initial records.
 model to 49 glyphs. Original conversion and RNG match on 188 grids/239,324 cells
 and 57,618 draw events, including complete RNG state and all output record bytes.
 This does not identify terrain semantics or complete creation/progression paths.
+
+## Generator creation boundary: supplied-record prepend
+
+[Record attachment](RECORD_ATTACHMENT.md) now corroborates CODE 7 entry 3794
+on 30,552 authored cases, including 15,276 connected immediate removals. Header
+count/head, record coordinates/next and cell link match; original guards and
+all unrelated bytes remain intact. Factory allocation/template effects remain
+unmodeled, so this does not yet implement the generator's creation glyphs.

@@ -83,3 +83,10 @@ The six-branch level-word increment (2026-10-27) passed **18/18 ASan/UBSan**,
 matched 188 maps/239,324 cells and 57,618 original RNG events with complete state
 comparison. The default direct-only oracle also passed again. Commands/scope:
 LEVEL_GRID_CONVERSION.md. Actions remains disabled; evidence is posted in the PR.
+
+The supplied-record prepend increment expands the existing linked-record native
+test. Local checks passed 56 Python tests plus native regressions, **18/18
+ASan/UBSan** and **19/19 SDL**. The private original comparison matched **30,552
+attachments**, including **15,276 attach/head-removal sequences** and preserved
+bytes/guards. See RECORD_ATTACHMENT.md for commands, the corrected initial test
+compile failure and factory/ownership limitations. No Actions run was used.

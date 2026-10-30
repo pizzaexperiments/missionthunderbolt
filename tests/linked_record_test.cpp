@@ -16,6 +16,31 @@ struct RecoveredServices : mt::GridFallbackSelector::Services {
     void release12(uint32_t ref) override {assert(ref==100);++releases;}
 };
 int main() {
+    {
+        M::Header header{65535,0x2000};mt::GridFallbackSelector::Grid grid{};
+        M::Nodes nodes{{0x1000,{9,10,0x3000}},{0x2000,{1,2,0}}};
+        grid[18*67+66].setLong(12,0xdeadbeef);
+        M::attach12(header,grid,nodes,0x1000,18,66);
+        assert(header.count18==0 && header.head20==0x1000);
+        assert(nodes.at(0x1000).row48==18 && nodes.at(0x1000).column49==66 && nodes.at(0x1000).next56==0x2000);
+        assert(grid.back().longAt(12)==0x1000 && nodes.at(0x2000).next56==0);
+        const auto removed=M::unlink12(header,grid,nodes,0x1000,0);
+        assert(removed.status==M::Status::unlinked && header.count18==65535 && header.head20==0x2000);
+        assert(grid.back().longAt(12)==0 && nodes.at(0x1000).next56==0); // Old cell link is not restored.
+        M::attach12(header,grid,nodes,0x1000,0,0);M::attach12(header,grid,nodes,0x1000,0,0);
+        assert(nodes.at(0x1000).next56==0x1000 && header.count18==1); // Original permits self-links.
+        const auto before=header;const auto cell=grid[0].bytes;const auto node=nodes.at(0x1000);
+        for(auto coordinate:std::array<std::array<int,2>,4>{{{-1,0},{19,0},{0,-1},{0,67}}}) {
+            bool rejected=false;try {M::attach12(header,grid,nodes,0x1000,coordinate[0],coordinate[1]);}catch(const std::out_of_range&){rejected=true;}
+            assert(rejected && header.count18==before.count18 && header.head20==before.head20 && grid[0].bytes==cell);
+            assert(nodes.at(0x1000).next56==node.next56 && nodes.at(0x1000).row48==node.row48);
+        }
+        for(uint32_t target:{0u,0x9999u}) {
+            bool rejected=false;try {M::attach12(header,grid,nodes,target,0,0);}catch(const std::invalid_argument&){rejected=true;}
+            assert(rejected && header.count18==before.count18 && header.head20==before.head20 && grid[0].bytes==cell);
+        }
+    }
+
     // Frozen accepted values from the independently executed complete word sweep.
     const std::array<unsigned,18> accepted{0,29,30,56,57,58,65,66,67,68,69,81,107,108,109,119,141,175};
     for(unsigned word=0;word<65536;++word) {

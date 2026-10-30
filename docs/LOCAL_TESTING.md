@@ -405,3 +405,22 @@ CTest: **18/18 ASan/UBSan**, **19/19 SDL** passed. Native frozen regressions inc
 the original seed-42 two-draw results and final seed words. No failures/skips
 occurred; no Android build/runtime, original game boot, Actions run/upload or
 release was performed. Production Python tools are unchanged (last coverage 82%).
+
+## Supplied-record attachment checkpoint
+
+The cloud workspace became available again. GitHub reported no open PRs and
+PR #38 merged as `9f6f4c21487ad2ebb547c72f506080151729112d`; the feature branch was synced
+before editing. All five Actions workflows were verified `disabled_manually`.
+
+Original CODE 7 matched **30,552 attachment cases**, including **15,276 connected
+immediate removals**, across every grid coordinate, six count-word edges and
+four old-head profiles. Complete unrelated grid/header/record bytes and guards
+are checked. The supplied object is authored; no factory/allocator result is
+claimed. Commands and limits: RECORD_ATTACHMENT.md. Detailed outputs stay private.
+
+`sh scripts/test_local.sh` passed **56 Python tests** plus native regressions with
+both optional external graphics decoders. Local CMake builds/CTest passed
+**18/18 ASan/UBSan** and **19/19 SDL**. The initial native test compilation failed
+on a missing namespace qualifier; corrected binaries were rebuilt and passed.
+No Android/runtime/device checks, original boot, Actions run/upload or release
+was performed. Production Python tools are unchanged (last coverage 82%).
