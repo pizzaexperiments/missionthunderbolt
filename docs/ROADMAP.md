@@ -6,7 +6,7 @@ release-only. Dependent branches may stack without waiting for merges; every imp
 PR targets `develop`, with its prerequisite PRs/commits and local evidence recorded. Closures of #2, #4, #5, #24 and #25 were verified through the live GitHub API.
 The 2026-10-30 acceptance review closed #3, #14 and #17 as completed in
 their workflow/prototype scopes; see [closeout review](ISSUE_CLOSEOUT_REVIEW.md).
-The #45 integration repair and #46–#51 were verified merged into `develop`, including the formerly stranded #43/#44 changes. All five GitHub Actions workflows are disabled during the maintainer-requested
+The #45 integration repair and #46–#54 were verified merged into `develop`, including the formerly stranded #43/#44 changes. All five GitHub Actions workflows are disabled during the maintainer-requested
 pause. Local test results belong in PRs; no CI run/public release is claimed here.
 
 ## Dependency order
@@ -46,7 +46,7 @@ flowchart TD
 | [#8](https://github.com/pizzaexperiments/missionthunderbolt/issues/8) | RNG/grid/selector/fallback models; startup/lifecycle checks, 1,600 byte-preparation cases; 49 glyphs, connected 188-map/239,324-cell traversal with original RNG | Recover and implement original generator/progression with golden traces |
 | [#9](https://github.com/pizzaexperiments/missionthunderbolt/issues/9) | Manual-backed WAIT; signed-byte coordinate clip and candidate gate checked against original instructions | Original turn/FOV/collision/running implementation and differential tests |
 | [#10](https://github.com/pizzaexperiments/missionthunderbolt/issues/10) | Manual combat/wield/exchange evidence recorded | Damage/hit/RNG/weapon rules and original comparisons |
-| [#11](https://github.com/pizzaexperiments/missionthunderbolt/issues/11) | Manual quantity/container/equipment evidence; raw filter/list prepend/removal/release/prefix models, 69 supplied-allocation factory variants/RNG tail and connected selector checks corroborated; 56-byte child prefix and supported type dispatch corroborated on 2,096 cases/5,302 draws | Original schemas, constraints, effects and verified transitions |
+| [#11](https://github.com/pizzaexperiments/missionthunderbolt/issues/11) | Manual quantity/container/equipment evidence; raw filter/list prepend/removal/release/prefix models, 69 supplied-allocation factory variants/RNG tail and connected selector checks corroborated; 56-byte child prefix/type dispatch plus explicit context for types 37/77/137/138 corroborated on 1,725 additional cases/3,621 draws | Original schemas, constraints, effects and verified transitions |
 | [#12](https://github.com/pizzaexperiments/missionthunderbolt/issues/12) | AI/spawning evidence gaps documented | Controlled original traces, recovered entity/AI/pathfinding logic |
 | [#13](https://github.com/pizzaexperiments/missionthunderbolt/issues/13) | 137 single-buffer previews plus one sample-only; exact rational command-timing plans for bounded sampled voices; opt-in authored PCM controls | Opt-in authored Android PCM path added; historical sequence/cue fidelity and physical output remain open |
 | [#14](https://github.com/pizzaexperiments/missionthunderbolt/issues/14) | Separate bounded map/seeded RNG, portable CMake, stable C ABI errors/ownership and C-client test | Closed as completed for prototype refactor; native Windows/macOS execution remains #19/#20, future systems must preserve core independence |
