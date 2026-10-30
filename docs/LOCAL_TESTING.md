@@ -487,3 +487,17 @@ and 23/23 SDL with both optional graphics decoders. The initial research-driver
 compile rejected an unused argument; it was corrected with `-Werror` retained.
 No Android/runtime/device, Actions, original boot, release or merge was performed.
 Production Python tools are unchanged (last coverage 82%).
+
+## Stacked supplied-record placement
+
+`feature/supplied-record-placement` starts from PR #43 and targets that branch.
+Sequential original factory/follow-up and original attachment stages matched
+1,005 cases, 670 callbacks and 3,350 factory draws. Final record, world count/head,
+cell link and full RNG state match; unrelated world/source bytes and guards are
+preserved. The attachment ABI frame is authored; allocation and the original
+glyph caller remain excluded. Commands/domain: SUPPLIED_RECORD_PLACEMENT.md.
+
+Local suites passed 56 Python tests plus native regressions, 23/23 ASan/UBSan
+and 24/24 SDL with both optional graphics decoders. No failures/skips occurred.
+No Android/runtime/device, Actions, original boot, release or merge was performed.
+Production Python tools are unchanged (last coverage 82%).
