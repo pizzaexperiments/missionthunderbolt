@@ -35,7 +35,7 @@ def cases():
                 yield make(1,0,global_byte,record)
 
 
-def execute(sources,c):
+def execute(sources,c,prepare=None,inspect=None,start=0x1298,stop=0x1324,early_stop=None):
     uc=Uc(UC_ARCH_M68K,UC_MODE_BIG_ENDIAN);uc.ctl_set_cpu_model(UC_CPU_M68K_M68000);uc.mem_map(0x10000,0x180000)
     for s,b in ((1,0x10000),(12,0x20000),(5,0x30000),(9,BASE)):uc.mem_write(b,sources[s])
     allowed={0x42,0x62,0x136a,0x1372,0x68a,0x692}
@@ -58,6 +58,7 @@ def execute(sources,c):
     uc.mem_write(CELL-16,b'\xcc'*16+c['record']+b'\xcc'*16)
     uc.mem_write(FRAME-16,b'\xa5'*32);uc.mem_write(STACK-512,b'\x5a'*16);uc.mem_write(STACK+16,b'\x5a'*16)
     for reg,value in ((UC_M68K_REG_A4,CELL),(UC_M68K_REG_A5,A5),(UC_M68K_REG_A6,FRAME),(UC_M68K_REG_A7,STACK)):uc.reg_write(reg,value)
+    if prepare is not None:prepare(uc)
     pending=[];draws=[]
     def service(machine,address,size,user):
         if address-A5 not in allowed:raise AssertionError('unmodeled factory service')
@@ -71,8 +72,10 @@ def execute(sources,c):
         draws.append(pending.pop()+[machine.reg_read(UC_M68K_REG_D0)&65535])
     uc.hook_add(UC_HOOK_CODE,service,begin=A5+32,end=A5+6335)
     for offset in (0x12a0,0x12b6,0x12c2,0x12d6,0x12e2,0x12ee,0x12fa,0x130e):uc.hook_add(UC_HOOK_CODE,returned,begin=BASE+offset,end=BASE+offset)
-    uc.emu_start(BASE+0x1298,BASE+0x1324,count=100000)
-    if pending or uc.reg_read(UC_M68K_REG_PC)!=BASE+0x1324:raise AssertionError('tail endpoint/draw balance')
+    uc.emu_start(BASE+start,BASE+stop,count=100000)
+    endpoints={BASE+stop}
+    if early_stop is not None:endpoints.add(BASE+early_stop)
+    if pending or uc.reg_read(UC_M68K_REG_PC) not in endpoints:raise AssertionError('tail endpoint/draw balance')
     for reg,value in ((UC_M68K_REG_A4,CELL),(UC_M68K_REG_A5,A5),(UC_M68K_REG_A6,FRAME),(UC_M68K_REG_A7,STACK)):
         if uc.reg_read(reg)!=value:raise AssertionError('tail register/stack')
     after=bytes(uc.mem_read(CELL-16,144))
@@ -85,6 +88,7 @@ def execute(sources,c):
     zero=int(draws[0][2]==0)
     if len(draws)!=(8 if zero else 1):raise AssertionError('tail draw count')
     line=after[16:-16].hex()+' '+' '.join(map(str,numbers))+f' {zero} {len(draws)}'+''.join(' '+' '.join(map(str,d)) for d in draws)
+    if inspect is not None:inspect(uc)
     return line,zero,len(draws)
 
 

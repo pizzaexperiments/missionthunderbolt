@@ -447,3 +447,10 @@ The [common factory RNG tail](RECORD_FACTORY_TAIL.md) now matches original
 instructions on 2,002 records/7,091 tail draws, with 727 zero-result paths and
 complete RNG-state comparison. Input records and warm-up histories are authored;
 template/type effects and connected glyph creation remain incomplete.
+
+[Supplied-allocation template preparation](RECORD_TEMPLATE_FACTORY.md) now
+connects the prefix, 65 supported variants and RNG tail through the callback gate.
+All 32,768 nonnegative-word copy probes and 1,960 connected cases match original
+instructions, including 6,531 draws and 971 callback boundaries. Source tables
+are authored; allocation/children/callback execution and glyph integration remain
+unverified.

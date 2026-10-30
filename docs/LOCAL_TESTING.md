@@ -441,3 +441,21 @@ both optional external graphics decoders. Configured/built CMake targets and ran
 CTest: **19/19 ASan/UBSan**, **20/20 SDL** passed. No failures/skips occurred; no
 Android/runtime/device checks, original game boot, Actions run/upload or release
 was performed. Production Python tools are unchanged (last coverage 82%).
+
+## Supplied-allocation template-factory checkpoint
+
+PR #40 was verified merged as `0966467f56533ae00bf1eb1868dcbcc0e2f70219` before syncing the
+feature branch. Original CODE 9 matches all **32,768 nonnegative-word template
+copy probes** and **1,960 connected factory cases / 6,531 RNG draws / 971 callback
+boundaries**, including selected source, all output bytes, full RNG state and
+preserved context/guards. Callback execution and allocation are not shimmed: the
+comparison starts after allocation and stops before any callback call. Tables and
+input histories are authored. Commands/domain: RECORD_TEMPLATE_FACTORY.md.
+
+The preceding standalone tail oracle also passed again on **2,002 cases / 727
+zero paths / 7,091 tail draws** after adding optional setup/inspection boundaries.
+`sh scripts/test_local.sh` passed **56 Python tests** plus native regressions with
+both optional external graphics decoders. Local CMake builds/CTest passed
+**20/20 ASan/UBSan** and **21/21 SDL**. No failures/skips occurred; no Android
+build/runtime, original game boot, Actions run/upload or release was performed.
+Production Python tools are unchanged (last coverage 82%).

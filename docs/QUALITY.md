@@ -97,3 +97,9 @@ and 56 Python tests plus native checks. The private connected oracle matched
 bytes and complete RNG state. It also executed 65,472 authored warm-up draws
 outside the measured tail. Scope/commands: RECORD_FACTORY_TAIL.md. No Actions
 were used; whole-factory or gameplay fidelity is not established.
+
+The supplied-allocation template-factory increment passed **20/20 ASan/UBSan**,
+**21/21 SDL**, 56 Python tests and native regressions. Private original checks
+matched 32,768 copy probes plus 1,960 connected cases/6,531 draws/971 callback
+boundaries; the prior standalone tail oracle also passed again. Scope, commands
+and unrun factory stages: RECORD_TEMPLATE_FACTORY.md. No Actions were used.
