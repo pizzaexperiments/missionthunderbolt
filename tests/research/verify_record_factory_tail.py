@@ -35,7 +35,7 @@ def cases():
                 yield make(1,0,global_byte,record)
 
 
-def execute(sources,c,prepare=None,inspect=None,start=0x1298,stop=0x1324,early_stop=None):
+def execute(sources,c,prepare=None,inspect=None,start=0x1298,stop=0x1324,early_stop=None,service_observer=None):
     uc=Uc(UC_ARCH_M68K,UC_MODE_BIG_ENDIAN);uc.ctl_set_cpu_model(UC_CPU_M68K_M68000);uc.mem_map(0x10000,0x180000)
     for s,b in ((1,0x10000),(12,0x20000),(5,0x30000),(9,BASE)):uc.mem_write(b,sources[s])
     allowed={0x42,0x62,0x136a,0x1372,0x68a,0x692}
@@ -61,7 +61,10 @@ def execute(sources,c,prepare=None,inspect=None,start=0x1298,stop=0x1324,early_s
     if prepare is not None:prepare(uc)
     pending=[];draws=[]
     def service(machine,address,size,user):
-        if address-A5 not in allowed:raise AssertionError('unmodeled factory service')
+        if address-A5 not in allowed:
+            if service_observer is None:raise AssertionError('unmodeled factory service')
+            service_observer(machine,address)
+            return
         if address in (A5+0x68a,A5+0x692):
             if pending:raise AssertionError('nested wrapper')
             sp=machine.reg_read(UC_M68K_REG_A7);bound=struct.unpack('>H',bytes(machine.mem_read(sp+4,2)))[0]
