@@ -10,8 +10,8 @@ public:
     using Record=RecordFactoryTailModel::Record;
     using Templates=std::array<Record,76>;
     using DescriptorFlags=std::array<uint8_t,76>;
-    struct Context {int variant,level;uint8_t flag39,tail_global;int mode=0;};
-    struct Result {unsigned selected_template;bool requires_followup;RecordFactoryTailModel::Result tail;};
+    struct Context {int variant,level;uint8_t flag39,tail_global;int mode=0;uint32_t base_long=0;};
+    struct Result {unsigned selected_template;bool requires_followup;RecordFactoryTailModel::Result tail;std::vector<RecordFactoryTailModel::Draw> variant_draws{};};
     static bool supported(int variant) {
         if(variant<0 || variant>32767)return false;
         if(variant>=89)return true;
@@ -19,8 +19,8 @@ public:
         case 0:case 1:case 2:case 3:case 4:case 5:case 7:case 10:case 12:case 13:case 14:case 15:case 16:
         case 18:case 19:case 20:case 21:case 22:case 23:case 25:case 27:case 28:case 29:case 31:
         case 32:case 33:case 34:case 35:case 37:case 38:case 39:case 41:case 44:case 46:case 47:
-        case 50:case 51:case 52:case 53:case 54:case 55:case 56:case 58:case 62:case 63:case 64:
-        case 65:case 66:case 68:case 69:case 70:case 71:case 73:case 76:case 77:case 78:case 79:
+        case 50:case 51:case 52:case 53:case 54:case 55:case 56:case 58:case 60:case 62:case 63:case 64:
+        case 65:case 66:case 67:case 68:case 69:case 70:case 71:case 73:case 76:case 77:case 78:case 79:
         case 80:case 81:case 82:case 83:case 84:case 85:case 86:case 87:case 88:return true;
         default:return false;
         }
@@ -40,6 +40,12 @@ public:
         if(kind>=templates.size())throw std::out_of_range("factory template type");
         if(descriptors[kind])throw std::invalid_argument("unmodeled child creation");
         const bool followup=(templates[kind][20]&32)!=0;
+        auto staged_rng=rng;std::vector<RecordFactoryTailModel::Draw> variant_draws;
+        if(c.variant==60 || c.variant==67)variant_draws.reserve(1);
+        auto draw=[&](int bound) {
+            const auto value=staged_rng.oneBased(bound);variant_draws.push_back({static_cast<uint16_t>(bound),1,value});return value;
+        };
+        auto put_long=[&](unsigned p,uint32_t value) {for(unsigned i=0;i<4;++i)record[p+i]=static_cast<uint8_t>(value>>(24-8*i));};
         record[20]&=static_cast<uint8_t>(~32u);
         auto add_word=[&](int delta) {
             const auto value=static_cast<uint16_t>(((record[14]<<8)|record[15])+delta);
@@ -58,6 +64,20 @@ public:
             }
             [[fallthrough]];
         case 79:record[21]|=8;break;
+        case 60:
+            record[21]|=1;record[23]=static_cast<uint8_t>(draw(4));
+            if(c.mode==1)record[18]=0;
+            else if(c.mode==2)record[18]=16;
+            else if(c.mode==3) {
+                record[18]=117;record[2]=static_cast<uint8_t>(record[2]+20);
+                const auto word=static_cast<uint16_t>(((record[14]<<8)|record[15])*5);
+                record[14]=static_cast<uint8_t>(word>>8);record[15]=static_cast<uint8_t>(word);
+                record[8]=static_cast<uint8_t>(record[8]-60);
+            }
+            break;
+        case 67:
+            put_long(44,c.base_long+draw(10));put_long(28,c.base_long+15u);
+            record[20]|=1;record[21]|=16;break;
         case 31:record[26]|=1;add_word(10*c.level);record[21]|=128;break;
         case 39:if(c.flag39)record[21]|=128;break;
         case 65: {
@@ -76,8 +96,8 @@ public:
         case 38:add_word(c.level>=0?c.level/2:-((-c.level+1)/2));break;
         default:break;
         }
-        auto tail=RecordFactoryTailModel::apply(record,c.tail_global,rng);
-        output=record;return {index,followup,std::move(tail)};
+        auto tail=RecordFactoryTailModel::apply(record,c.tail_global,staged_rng);
+        output=record;rng=std::move(staged_rng);return {index,followup,std::move(tail),std::move(variant_draws)};
     }
 };
 }

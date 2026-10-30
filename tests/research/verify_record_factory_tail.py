@@ -35,7 +35,7 @@ def cases():
                 yield make(1,0,global_byte,record)
 
 
-def execute(sources,c,prepare=None,inspect=None,start=0x1298,stop=0x1324,early_stop=None,service_observer=None):
+def execute(sources,c,prepare=None,inspect=None,start=0x1298,stop=0x1324,early_stop=None,service_observer=None,prefix_bound=None):
     uc=Uc(UC_ARCH_M68K,UC_MODE_BIG_ENDIAN);uc.ctl_set_cpu_model(UC_CPU_M68K_M68000);uc.mem_map(0x10000,0x180000)
     for s,b in ((1,0x10000),(12,0x20000),(5,0x30000),(9,BASE)):uc.mem_write(b,sources[s])
     allowed={0x42,0x62,0x136a,0x1372,0x68a,0x692}
@@ -54,7 +54,9 @@ def execute(sources,c,prepare=None,inspect=None,start=0x1298,stop=0x1324,early_s
         if uc.reg_read(UC_M68K_REG_PC)!=STOP:raise AssertionError('warmup endpoint')
     for addr,size in ((A5-0x5702,408),(A5-0xb26,4)):
         uc.mem_write(addr-16,b'\x5a'*16);uc.mem_write(addr+size,b'\x5a'*16)
-    global_context=b'\xa5'*8+bytes([c['global']])+b'\xa5'*8;uc.mem_write(A5-0x7f1-8,global_context)
+    global_context=bytearray(b'\xa5'*8+bytes([c['global']])+b'\xa5'*8)
+    struct.pack_into('>I',global_context,3,c.get('base_long',0));global_context=bytes(global_context)
+    uc.mem_write(A5-0x7f1-8,global_context)
     uc.mem_write(CELL-16,b'\xcc'*16+c['record']+b'\xcc'*16)
     uc.mem_write(FRAME-16,b'\xa5'*32);uc.mem_write(STACK-512,b'\x5a'*16);uc.mem_write(STACK+16,b'\x5a'*16)
     for reg,value in ((UC_M68K_REG_A4,CELL),(UC_M68K_REG_A5,A5),(UC_M68K_REG_A6,FRAME),(UC_M68K_REG_A7,STACK)):uc.reg_write(reg,value)
@@ -76,7 +78,9 @@ def execute(sources,c,prepare=None,inspect=None,start=0x1298,stop=0x1324,early_s
         if len(pending)!=1:raise AssertionError('unpaired RNG return')
         draws.append(pending.pop()+[machine.reg_read(UC_M68K_REG_D0)&65535])
     uc.hook_add(UC_HOOK_CODE,service,begin=A5+32,end=A5+6335)
-    for offset in (0x12a0,0x12b6,0x12c2,0x12d6,0x12e2,0x12ee,0x12fa,0x130e):uc.hook_add(UC_HOOK_CODE,returned,begin=BASE+offset,end=BASE+offset)
+    offsets=[0x12a0,0x12b6,0x12c2,0x12d6,0x12e2,0x12ee,0x12fa,0x130e]
+    if prefix_bound is not None:offsets += [0xea4,0x100a]
+    for offset in offsets:uc.hook_add(UC_HOOK_CODE,returned,begin=BASE+offset,end=BASE+offset)
     # Initializer/warm-ups may have compiled helper blocks before hooks existed.
     # Rebuild those blocks so the service/trace guards observe every call.
     uc.ctl_flush_tb()
@@ -93,8 +97,11 @@ def execute(sources,c,prepare=None,inspect=None,start=0x1298,stop=0x1324,early_s
         if bytes(uc.mem_read(addr-16,16))!=b'\x5a'*16 or bytes(uc.mem_read(addr+size,16))!=b'\x5a'*16:raise AssertionError('RNG/stack guard')
     state=lambda offset:struct.unpack('>I',bytes(uc.mem_read(A5+offset,4)))[0]
     numbers=[state(-0x56fe),state(-0x5702),state(-0xb26),*struct.unpack('>100I',bytes(uc.mem_read(A5-0x56fa,400)))]
-    zero=int(draws[0][2]==0)
-    if len(draws)!=(8 if zero else 1):raise AssertionError('tail draw count')
+    prefix_count=int(prefix_bound is not None)
+    if prefix_count and draws[0][:2]!=[prefix_bound,1]:raise AssertionError('variant draw bound/mode')
+    if len(draws)<=prefix_count or draws[prefix_count][:2]!=[100,0]:raise AssertionError('tail entry draw')
+    zero=int(draws[prefix_count][2]==0)
+    if len(draws)!=prefix_count+(8 if zero else 1):raise AssertionError('tail draw count')
     line=after[16:-16].hex()+' '+' '.join(map(str,numbers))+f' {zero} {len(draws)}'+''.join(' '+' '.join(map(str,d)) for d in draws)
     if inspect is not None:inspect(uc)
     return line,zero,len(draws)

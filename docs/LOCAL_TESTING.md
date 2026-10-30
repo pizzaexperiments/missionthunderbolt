@@ -531,3 +531,19 @@ The expanded suites include variant 7 at default mode zero. Local tests passed
 56 Python tests plus native regressions, 24/24 ASan/UBSan and 25/25 SDL with both
 optional decoders. No Android build/runtime, Actions, original boot, release or
 merge was performed. Production Python tools are unchanged (last coverage 82%).
+
+## Factory variant-specific RNG prefixes
+
+PR #45 and #46 were verified merged into `develop`. Continued work branched from
+#46's head and targets `develop`. Original factory variants 60/67 and control 79
+matched 1,800 cases, 1,200 variant-specific draws, 7,200 total draws and 1,200
+actual callbacks. Prefix and common-tail traces stay separate in the native
+result and are compared in execution order. Raw global-long values are authored.
+Commands and scope: FACTORY_VARIANT_DRAWS.md.
+
+Prior oracles passed: 2,002 tail cases and 648 mode-7 cases retain their result
+digests; 32,768 copy probes + 2,044 factory cases, 1,050 finalized cases and 1,050
+placements also match. Local suites passed 56 Python tests plus native checks,
+25/25 ASan/UBSan and 26/26 SDL with both optional decoders. No failures/skips
+occurred. No Android build/runtime, Actions, original boot, merge or release was
+performed. Production Python tools are unchanged (last coverage 82%).

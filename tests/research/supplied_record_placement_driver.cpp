@@ -30,7 +30,7 @@ int main(int argc,char**) {
         std::cout<<std::hex<<std::setfill('0');for(auto b:record)std::cout<<std::setw(2)<<unsigned(b);
         const auto& s=rng.state();std::cout<<std::dec<<' '<<s.last_result<<' '<<s.local_seed<<' '<<s.selector_seed;
         for(auto v:s.table)std::cout<<' '<<v;
-        std::cout<<' '<<result.tail.took_zero_path<<' '<<result.tail.draws.size();for(const auto& d:result.tail.draws)for(auto v:d)std::cout<<' '<<v;
+        std::cout<<' '<<result.tail.took_zero_path<<' '<<(result.variant_draws.size()+result.tail.draws.size());for(const auto& d:result.variant_draws)for(auto v:d)std::cout<<' '<<v;for(const auto& d:result.tail.draws)for(auto v:d)std::cout<<' '<<v;
         for(unsigned i=0;i<grid.size();++i)for(unsigned j=0;j<20;++j)if((i!=row*67+column || j<12 || j>=16) && grid[i].bytes[j]!=before[i].bytes[j])return 3;
         std::cout<<' '<<result.selected_template<<' '<<result.requires_followup<<' '<<header.count18<<' '<<header.head20<<' '<<grid[row*67+column].longAt(12)<<'\n';
     }
