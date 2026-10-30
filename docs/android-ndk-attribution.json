@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "kind": "android-ndk-notice-attribution",
+  "ndk_version": "27.2.12479018",
+  "llvm_version": "18.0.3",
+  "review_scope": "Exact measured Linux-host NDK archives and notice evidence only; no archive-wide license conclusions or release permission.",
+  "notices": [
+    {
+      "name": "NOTICE",
+      "sha256": "4d5224d1c0b54ffa88b0dc0088191638fdbb7227835095dfb98f7f66b416a323"
+    },
+    {
+      "name": "NOTICE.toolchain",
+      "sha256": "cbe3237be53c0a819f8df6aac5358fdee848eee3b6571b4e2ca20767ebd7465e"
+    }
+  ],
+  "components": {
+    "libc++": {
+      "licenseDeclared": "NOASSERTION",
+      "notice_evidence": "NOTICE.toolchain lines 2426-2736 include the LLVM Apache 2.0 with LLVM Exceptions statement, third-party caveat, and explicitly named libc++ legacy NCSA/MIT terms. These aggregate notices do not resolve every contributed archive member."
+    },
+    "libc++abi": {
+      "licenseDeclared": "NOASSERTION",
+      "notice_evidence": "NOTICE.toolchain lines 2738-3048 include the LLVM Apache 2.0 with LLVM Exceptions statement, third-party caveat, and explicitly named libc++abi legacy NCSA/MIT terms. These aggregate notices do not resolve every contributed archive member."
+    },
+    "compiler-rt": {
+      "licenseDeclared": "NOASSERTION",
+      "notice_evidence": "NOTICE.toolchain lines 2114-2424 include the LLVM Apache 2.0 with LLVM Exceptions statement, third-party caveat, and explicitly named compiler_rt legacy NCSA/MIT terms. These aggregate notices do not resolve every contributed archive member."
+    },
+    "libunwind": {
+      "licenseDeclared": "NOASSERTION",
+      "notice_evidence": "Identified by the contributing archive path, not a named notice section: installed NOTICE.toolchain contains general LLVM licensing statements but no explicit libunwind label. Preserve both complete upstream notices; member/source attribution remains unresolved."
+    }
+  },
+  "archives": [
+    {
+      "abi": "arm64-v8a",
+      "component": "libunwind",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/aarch64/libunwind.a",
+      "sha256": "e18ac802388d5bbf5b0f7b348c38051c8b05ac7f50010bc6fa4f199a5c37618a"
+    },
+    {
+      "abi": "arm64-v8a",
+      "component": "compiler-rt",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/libclang_rt.builtins-aarch64-android.a",
+      "sha256": "5f47ac8575739ab247c4e2f18baa337ede12e9ea0fa634dd2d1496a18f3af510"
+    },
+    {
+      "abi": "arm64-v8a",
+      "component": "libc++",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_static.a",
+      "sha256": "eaf7cc854939f43f3003059c925c775eecf7c20a566b694a1feb470fe9f16c21"
+    },
+    {
+      "abi": "arm64-v8a",
+      "component": "libc++abi",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++abi.a",
+      "sha256": "4a80f9655c9072e8178193bc1cdd47e427db6a3d47bdd9ed67490ee521e0e110"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "component": "libunwind",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/arm/libunwind.a",
+      "sha256": "9be332a645582e469f9a028b90bd8187107bb0d8c25a6a97f3429e45e7692bbc"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "component": "compiler-rt",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/libclang_rt.builtins-arm-android.a",
+      "sha256": "2975ec43e852d983982b3255b44c8a4bc463eabb3579f63812e1e2da519d8879"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "component": "libc++",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_static.a",
+      "sha256": "0314d8d5490390be36dda90e4b320edfb7c54d0e6271442309d14ccbfa805136"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "component": "libc++abi",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++abi.a",
+      "sha256": "1762f98b4a4e5140630d3057419ee36962cc1ee907f739f03c84cd9c1bd0dc2a"
+    },
+    {
+      "abi": "x86",
+      "component": "libunwind",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/i386/libunwind.a",
+      "sha256": "0c55b63034b67059f0b538cb5edfc2f8bfaf709e70b3d6cfff6da039c5074b66"
+    },
+    {
+      "abi": "x86",
+      "component": "compiler-rt",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/libclang_rt.builtins-i686-android.a",
+      "sha256": "996e7dbe8d751fc270d117704923cd34a4321806227117b0b3d844b7614b39bf"
+    },
+    {
+      "abi": "x86",
+      "component": "libc++",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/i686-linux-android/libc++_static.a",
+      "sha256": "4aebc22c0642c994eaca59cd585b1a531f9bdac12da5bf774863af08e7b52c23"
+    },
+    {
+      "abi": "x86",
+      "component": "libc++abi",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/i686-linux-android/libc++abi.a",
+      "sha256": "fc66e93eb1670666eb32dd52584e8b2a9f80b0339c7fabd884875ea442139cc1"
+    },
+    {
+      "abi": "x86_64",
+      "component": "compiler-rt",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/libclang_rt.builtins-x86_64-android.a",
+      "sha256": "d944d66e5ffa0041b0dcf46de8459646c5185fb3b706f579c3d70dd421ad279a"
+    },
+    {
+      "abi": "x86_64",
+      "component": "libunwind",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/x86_64/libunwind.a",
+      "sha256": "f0faeec5191af58c435f9978d1cb9b38a6deeb3cdbf0c385949055dccc969040"
+    },
+    {
+      "abi": "x86_64",
+      "component": "libc++",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android/libc++_static.a",
+      "sha256": "8a725819749bdb76156fef3e4ca0aaf1ddea681d06995c4fa96de43d6cb8160b"
+    },
+    {
+      "abi": "x86_64",
+      "component": "libc++abi",
+      "path": "toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android/libc++abi.a",
+      "sha256": "132692659e673eeb755ce33927859bf8152aa61b7787babb0236b9c9d7a45e61"
+    }
+  ]
+}
