@@ -3,16 +3,27 @@
 GitHub Actions is currently [paused](../.github/ACTIONS_PAUSED.md), including
 manual dispatch. Use local commands and post results in the PR.
 
+## Current local validation
+
 ```sh
 sh scripts/test_local.sh
 cmake -S . -B dist/sanitizers -DCMAKE_BUILD_TYPE=Debug -DMT_ENABLE_SANITIZERS=ON
 cmake --build dist/sanitizers --parallel 4
 ctest --test-dir dist/sanitizers --output-on-failure
+cmake -S . -B dist/sdl -DCMAKE_BUILD_TYPE=Debug -DMT_BUILD_SDL_HOST=ON
+cmake --build dist/sdl --parallel 4
+ctest --test-dir dist/sdl --output-on-failure
 ```
 
-Local GCC ASan/UBSan: **sixteen native tests passed** (core, API, save, C ABI,
-seeded mutations, manual WAIT, and the separate RNG, grid-layout, selector, fallback, linked-record, release, connected lifecycle, A5 initialization, glyph preparation and basic cell conversion
-research models). The mutation test exercises 2,000 corrupt save inputs,
+The latest supplied-record copy-guard increment passed **30/30 ASan/UBSan** and
+**31/31 SDL** CTest checks locally. The preceding verified native baseline at
+**`f67e717`** was **29/29 ASan/UBSan** and **30/30 SDL**; see
+[word-selector validation](CHILD_RECORD_WORD_SELECTOR.md).
+The coverage refresh itself did not rerun CMake; these native counts come from
+the separately completed local native checks. Subsequent targets require their
+own build/test evidence; do not infer passed counts from the configured target
+list. SDL validation requires SDL2 development files. The mutation test exercises
+2,000 corrupt save inputs,
 extreme numeric API arguments and locale-independent serialization. All assertions
 remain active in Release test targets. No sanitizer assertions are disabled.
 
@@ -22,22 +33,53 @@ single-byte mutations in addition to format-specific malformed cases. Unexpected
 exceptions fail the tests. The corpus contains no original game bytes. ZIP
 traversal/failure cleanup and forced Git-index resource additions have regressions.
 
+## Python statement coverage
+
 The parser/tool coverage gate uses coverage.py 7.10.7, includes subprocesses and
-requires **80%** statement coverage over all Python scripts:
+requires **80%** statement coverage over Python scripts under `scripts/`, as configured in
+`.coveragerc`. Use Python 3.12 and an isolated environment with
+`python -m pip install coverage==7.10.7`. Install both ImageMagick (`convert`) and
+GraphicsMagick (`gm`) to execute the optional real-decoder tests; an environment
+that skips those tests does not have the same decoder coverage as this checkpoint.
+
+The **2026-10-30** baseline measurement at **`f67e717`** passed **84 Python tests,
+zero skips**, including both actual decoder checks. The combined report covers
+**1,065 of 1,276 statements** with **211 missing**: **83.4639498433%**, displayed
+as **83%** by the text report, above the unchanged 80% gate. Six parallel data
+files were combined. This is Python statement coverage, not native branch
+coverage, Android device coverage or a historical-game fidelity metric.
+
+The copy-guard increment leaves the production Python scripts and synthetic
+Python tests unchanged, so this measurement covers those same files on the
+current branch. Its new optional original-instruction research oracle lives
+outside the `scripts` coverage source and the synthetic test gate. Neither that
+oracle nor the original game instructions are measured by this percentage.
+
+Actual tools were **Python 3.12.14**, **coverage.py 7.10.7** with its C extension,
+**GraphicsMagick 1.4 snapshot-20250331 Q16**, and **ImageMagick 7.1.1-43 Q16
+x86_64**. The selected private QA environment already contained the pinned
+coverage version; no install was needed. Exact local reproduction commands for
+that environment are:
 
 ```sh
-python -m pip install coverage==7.10.7
-mkdir -p dist/coverage
-export COVERAGE_FILE="$PWD/dist/coverage/.coverage"
-python -m coverage run -m unittest discover -s tests -p 'test_*.py' -v
-python -m coverage combine
-python -m coverage report
+export GRAPHICSMAGICK_EXECUTABLE=/workspace/.cloud-setup/graphicsmagick/usr/bin/gm
+export LD_LIBRARY_PATH=/workspace/.cloud-setup/graphicsmagick/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+export COVERAGE_FILE="$PWD/dist/coverage/quality-baseline-f67e717/.coverage"
+mkdir -p dist/coverage/quality-baseline-f67e717
+/workspace/.cloud-setup/qa-python/bin/python -m coverage erase
+/workspace/.cloud-setup/qa-python/bin/python -m coverage run -m unittest discover -s tests -p 'test_*.py' -v
+/workspace/.cloud-setup/qa-python/bin/python -m coverage combine
+/workspace/.cloud-setup/qa-python/bin/python -m coverage report
+/workspace/.cloud-setup/qa-python/bin/python -m coverage json -o dist/coverage/quality-baseline-f67e717/coverage.json
+/workspace/.cloud-setup/qa-python/bin/python -m coverage xml -o dist/coverage/quality-baseline-f67e717/coverage.xml
 ```
 
-The current recorded checkpoint is **56 tests passed / 82% coverage**. This is measured Python
-statement coverage, not native branch coverage or a fidelity metric. The
-manual-only quality workflow runs the same gate and combined native sanitizers;
-it has not been triggered in this task. Existing deterministic seed/action/save
+The interpreter and decoder paths above are machine-specific; substitute your
+own isolated Python and installed GraphicsMagick paths on another host.
+`coverage erase` clears only the selected checkpoint's data, avoiding accidental
+mixing with previous measurements. Raw reports remain under ignored `dist/`.
+The disabled manual quality workflow describes the same gate and native
+sanitizers; it was not enabled or triggered. Existing deterministic seed/action/save
 checks are demo regressions. Original-vs-port differential traces, screenshot
 goldens and recovered gameplay coverage still require #6–#12 research. Standalone
 mutation runs are not a substitute for an ongoing coverage-guided fuzz campaign.
@@ -65,12 +107,24 @@ turn confirmed defects into small synthetic regression cases. This optional
 Linux/Python campaign does not replace the native ASan/UBSan suite, longer-running
 scheduled campaigns, large-input testing or original differential goldens.
 
-The 2026-10-26 local campaign completed **1,722,666 executions in 121 seconds**,
+### Historical campaign result — 2026-10-26
+
+That local campaign completed **1,722,666 executions in 121 seconds**,
 with no unexpected exception, failed invariant, crash/timeout artifact or memory-
 limit failure. Final libFuzzer feedback was `cov: 335`, `ft: 837`, 218 retained
 corpus units and **71 MB peak RSS**. These are campaign feedback counters, not
 percent statement coverage and not evidence of historical fidelity. The separate
 unit-test coverage figure above is measured independently.
+
+## Historical native and research checkpoints
+
+An earlier GCC ASan/UBSan checkpoint passed **sixteen native tests** (core, API,
+save, C ABI, seeded mutations, manual WAIT, and the separate RNG, grid-layout,
+selector, fallback, linked-record, release, connected lifecycle, A5 initialization,
+glyph preparation and basic cell conversion research models). The earlier
+**56 Python tests / 82% statement coverage** checkpoint is superseded by the
+dated measurement above. The increment-specific results below remain historical
+evidence, not current suite counts.
 
 The connected direct-grid increment (2026-10-27) passed **17/17 ASan/UBSan**
 and **18/18 SDL** CTest checks, plus 56 Python tests and native smoke tests.
