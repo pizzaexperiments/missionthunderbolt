@@ -77,3 +77,8 @@ The CODE 9 factory allocates/copies template records and performs additional
 conditional effects; it remains unmodeled here. Its resources, allocator behavior
 and special branches must be recovered before claiming connected glyph creation.
 Full generator/progression and original gameplay comparisons also remain open.
+
+The following [common factory-tail increment](RECORD_FACTORY_TAIL.md) recovers
+one bounded RNG postprocessing stage before the final template lookup/callback.
+It still takes authored record bytes and does not claim allocation or complete
+factory/attachment integration.

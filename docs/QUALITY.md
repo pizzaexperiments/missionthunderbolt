@@ -90,3 +90,10 @@ ASan/UBSan** and **19/19 SDL**. The private original comparison matched **30,552
 attachments**, including **15,276 attach/head-removal sequences** and preserved
 bytes/guards. See RECORD_ATTACHMENT.md for commands, the corrected initial test
 compile failure and factory/ownership limitations. No Actions run was used.
+
+The common factory-tail increment passed **19/19 ASan/UBSan**, **20/20 SDL**
+and 56 Python tests plus native checks. The private connected oracle matched
+2,002 records, 727 zero-result paths and 7,091 tail draws, comparing all output
+bytes and complete RNG state. It also executed 65,472 authored warm-up draws
+outside the measured tail. Scope/commands: RECORD_FACTORY_TAIL.md. No Actions
+were used; whole-factory or gameplay fidelity is not established.
