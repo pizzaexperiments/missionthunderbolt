@@ -55,3 +55,8 @@ Historical table values, allocation, remaining service-dependent types, parent
 integration, inventory semantics and original-game comparisons remain incomplete.
 The active demo and Android host are unchanged; no new Android verification,
 Actions execution, merge, signing or publication is claimed by this increment.
+
+The separate [five-child chain helper](CHILD_CHAIN.md) composes supported child
+factories with supplied records when the parent's old child pointer is null.
+It does not enable raw type 36 in this factory API: replacement/release and the
+outer factory composition remain outside that bounded helper.
