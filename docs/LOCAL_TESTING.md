@@ -473,3 +473,17 @@ Local suites passed 56 Python tests plus native regressions, 21/21 ASan/UBSan
 and 22/22 SDL. Both optional graphics decoders were present. No failures/skips
 occurred; no Android runtime/build, Actions, original boot or release was performed.
 Production Python tools are unchanged (last coverage 82%).
+
+## Stacked finalized factory composition
+
+`feature/factory-followup-stack` starts from PR #42's branch and is intended to
+target that branch, preserving a small dependent diff. Original CODE 9/7 matched
+1,005 factory cases with 670 executed follow-ups and 3,350 RNG draws. All final
+record bytes, complete RNG state, traces and preserved source/context guards
+match. Callback results are not injected. Commands: FINALIZED_TEMPLATE_FACTORY.md.
+
+Local suites passed 56 Python tests plus native regressions, 22/22 ASan/UBSan
+and 23/23 SDL with both optional graphics decoders. The initial research-driver
+compile rejected an unused argument; it was corrected with `-Werror` retained.
+No Android/runtime/device, Actions, original boot, release or merge was performed.
+Production Python tools are unchanged (last coverage 82%).
