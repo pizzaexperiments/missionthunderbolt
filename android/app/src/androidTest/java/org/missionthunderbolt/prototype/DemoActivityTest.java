@@ -1,6 +1,5 @@
 package org.missionthunderbolt.prototype;
 
-import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.TextView;
 import android.view.View;
@@ -13,16 +12,52 @@ public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActiv
   runTestOnUiThread(() -> activity.findViewById(id).performClick()); getInstrumentation().waitForIdleSync();
  }
  private String status(MainActivity activity) { return ((TextView)activity.findViewById(R.id.status)).getText().toString(); }
- private MainActivity awaitRecreated(MainActivity previous,Instrumentation.ActivityMonitor monitor) throws Throwable {
-  long deadline=android.os.SystemClock.uptimeMillis()+20000;
-  while(android.os.SystemClock.uptimeMillis()<deadline) {
-   MainActivity candidate=(MainActivity)monitor.waitForActivityWithTimeout(Math.max(1,deadline-android.os.SystemClock.uptimeMillis()));
-   if(candidate==null)break;
-   getInstrumentation().waitForIdleSync();boolean[] live={false};
-   runTestOnUiThread(() -> {live[0]=candidate!=previous && !candidate.isDestroyed() && !candidate.isFinishing();});
-   if(live[0])return candidate;
-  }
-  fail("A distinct live activity was not recreated");return null;
+ private void logRecreationActivity(String stage,MainActivity activity) {
+  android.util.Log.i("MTRecreation",stage+" identity="+System.identityHashCode(activity)+
+   " taskId="+activity.getTaskId()+
+   " destroyed="+activity.isDestroyed()+" finishing="+activity.isFinishing()+
+   " windowFocus="+activity.hasWindowFocus()+" attached="+activity.getWindow().getDecorView().isAttachedToWindow());
+ }
+ private MainActivity recreateAndAwait(MainActivity previous) throws Throwable {
+  final int[] targetTask={-1};runTestOnUiThread(() -> targetTask[0]=previous.getTaskId());
+  final java.util.concurrent.ArrayBlockingQueue<MainActivity> resumed=new java.util.concurrent.ArrayBlockingQueue<>(16);
+  final java.util.concurrent.atomic.AtomicBoolean overflow=new java.util.concurrent.atomic.AtomicBoolean();
+  android.app.Application application=previous.getApplication();
+  android.app.Application.ActivityLifecycleCallbacks callbacks=new android.app.Application.ActivityLifecycleCallbacks() {
+   public void onActivityCreated(android.app.Activity activity,android.os.Bundle state) {}
+   public void onActivityStarted(android.app.Activity activity) {}
+   public void onActivityResumed(android.app.Activity activity) {
+    if(activity instanceof MainActivity && activity!=previous && activity.getTaskId()==targetTask[0]) {
+     logRecreationActivity("resumed target",(MainActivity)activity);
+     if(!resumed.offer((MainActivity)activity))overflow.set(true);
+    }
+   }
+   public void onActivityPaused(android.app.Activity activity) {}
+   public void onActivityStopped(android.app.Activity activity) {}
+   public void onActivitySaveInstanceState(android.app.Activity activity,android.os.Bundle state) {}
+   public void onActivityDestroyed(android.app.Activity activity) {}
+  };
+  try {
+   runTestOnUiThread(() -> {
+    application.registerActivityLifecycleCallbacks(callbacks);
+    logRecreationActivity("request",previous);previous.recreate();
+   });
+   long deadline=android.os.SystemClock.uptimeMillis()+20000;
+   while(android.os.SystemClock.uptimeMillis()<deadline) {
+    assertFalse("Recreation resume queue overflow",overflow.get());
+    MainActivity candidate=resumed.poll(Math.max(1,deadline-android.os.SystemClock.uptimeMillis()),java.util.concurrent.TimeUnit.MILLISECONDS);
+    if(candidate==null)break;
+    getInstrumentation().waitForIdleSync();boolean[] live={false};
+    runTestOnUiThread(() -> {
+     logRecreationActivity("previous",previous);logRecreationActivity("candidate",candidate);
+     live[0]=candidate!=previous && !candidate.isDestroyed() && !candidate.isFinishing() && candidate.getTaskId()==targetTask[0];
+    });
+    assertFalse("Recreation resume queue overflow",overflow.get());
+    if(live[0]) {setActivity(candidate);return candidate;}
+   }
+   assertFalse("Recreation resume queue overflow",overflow.get());
+   fail("A distinct live activity was not recreated");return null;
+  } finally {runTestOnUiThread(() -> application.unregisterActivityLifecycleCallbacks(callbacks));}
  }
  private void automaticPlacement(MainActivity activity) throws Throwable {
   for(int n=0;n<3 && !((android.widget.Button)activity.findViewById(R.id.controls_position)).getText().toString().equals("Controls: Auto");++n)click(activity,R.id.controls_position);
@@ -75,13 +110,10 @@ public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActiv
  public void testControlPlacementSurvivesRecreation() throws Throwable {
   MainActivity a=getActivity();click(a,R.id.restart);click(a,R.id.move_right);automaticPlacement(a);click(a,R.id.controls_position);
   if(a.findViewById(R.id.dpad).getVisibility()!=View.VISIBLE)click(a,R.id.controls);
-  String before=status(a);Instrumentation.ActivityMonitor monitor=getInstrumentation().addMonitor(MainActivity.class.getName(),null,false);
-  try {
-   runTestOnUiThread(() -> a.recreate());MainActivity recreated=awaitRecreated(a,monitor);
-   assertNotNull(recreated);getInstrumentation().waitForIdleSync();assertEquals(before,status(recreated));
-   assertEquals("Controls: Left",((android.widget.Button)recreated.findViewById(R.id.controls_position)).getText().toString());
-   assertPlacement(recreated,1);automaticPlacement(recreated);
-  } finally {getInstrumentation().removeMonitor(monitor);}
+  String before=status(a);MainActivity recreated=recreateAndAwait(a);
+  assertNotNull(recreated);getInstrumentation().waitForIdleSync();assertEquals(before,status(recreated));
+  assertEquals("Controls: Left",((android.widget.Button)recreated.findViewById(R.id.controls_position)).getText().toString());
+  assertPlacement(recreated,1);automaticPlacement(recreated);
  }
  public void testModeKeepsTurnsAndRestartIsExplicit() throws Throwable {
   MainActivity a=getActivity(); click(a,R.id.restart); click(a,R.id.move_right);
@@ -100,13 +132,9 @@ public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActiv
  public void testStateSurvivesRecreation() throws Throwable {
   MainActivity a=getActivity();click(a,R.id.restart);click(a,R.id.move_right);
   String before=status(a);
-  Instrumentation.ActivityMonitor monitor=getInstrumentation().addMonitor(MainActivity.class.getName(),null,false);
-  try {
-   runTestOnUiThread(() -> a.recreate());
-   MainActivity recreated=awaitRecreated(a,monitor);
-   assertNotNull(recreated);getInstrumentation().waitForIdleSync();
-   assertEquals(before,status(recreated));
-  } finally { getInstrumentation().removeMonitor(monitor); }
+  MainActivity recreated=recreateAndAwait(a);
+  assertNotNull(recreated);getInstrumentation().waitForIdleSync();
+  assertEquals(before,status(recreated));
  }
  public void testKeyboardMovementWhenAButtonHasFocus() throws Throwable {
   MainActivity a=getActivity(); click(a,R.id.restart);
@@ -355,8 +383,16 @@ public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActiv
    assertTrue(volume.getContentDescription().toString().contains("30 percent"));
   });
   getInstrumentation().setInTouchMode(false);
-  runTestOnUiThread(() -> {assertTrue(a.findViewById(R.id.sound_volume).requestFocus());});
+  runTestOnUiThread(() -> {
+   assertTrue("Activity window must receive the volume key",a.hasWindowFocus());
+   assertTrue(a.findViewById(R.id.sound_volume).requestFocus());
+   assertTrue("Volume slider must have focus before the key",a.findViewById(R.id.sound_volume).hasFocus());
+  });
   getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_DPAD_RIGHT);getInstrumentation().waitForIdleSync();
+  runTestOnUiThread(() -> {
+   assertTrue("Activity window lost focus during the volume key",a.hasWindowFocus());
+   assertTrue("Volume slider lost focus during the key",a.findViewById(R.id.sound_volume).hasFocus());
+  });
   assertTrue(((android.widget.SeekBar)a.findViewById(R.id.sound_volume)).getProgress()>30);
   assertTrue(status(a).contains("Turns: 1"));
   runTestOnUiThread(() -> {((android.widget.SeekBar)a.findViewById(R.id.sound_volume)).setProgress(30);a.findViewById(R.id.board).requestFocus();});
@@ -368,16 +404,12 @@ public class DemoActivityTest extends ActivityInstrumentationTestCase2<MainActiv
    if(toggle.getText().toString().equals("Sound: Off"))toggle.performClick();
    ((android.widget.SeekBar)a.findViewById(R.id.sound_volume)).setProgress(37);
   });
-  Instrumentation.ActivityMonitor monitor=getInstrumentation().addMonitor(MainActivity.class.getName(),null,false);
-  try {
-   runTestOnUiThread(() -> a.recreate());
-   MainActivity recreated=awaitRecreated(a,monitor);
-   assertNotNull(recreated);getInstrumentation().waitForIdleSync();
-   assertEquals("Sound: On",((android.widget.Button)recreated.findViewById(R.id.sound_toggle)).getText().toString());
-   assertEquals(37,((android.widget.SeekBar)recreated.findViewById(R.id.sound_volume)).getProgress());
-   assertTrue(status(recreated).contains("Turns: 0"));
-   runTestOnUiThread(() -> {recreated.findViewById(R.id.sound_toggle).performClick();((android.widget.SeekBar)recreated.findViewById(R.id.sound_volume)).setProgress(30);});
-  } finally {getInstrumentation().removeMonitor(monitor);}
+  MainActivity recreated=recreateAndAwait(a);
+  assertNotNull(recreated);getInstrumentation().waitForIdleSync();
+  assertEquals("Sound: On",((android.widget.Button)recreated.findViewById(R.id.sound_toggle)).getText().toString());
+  assertEquals(37,((android.widget.SeekBar)recreated.findViewById(R.id.sound_volume)).getProgress());
+  assertTrue(status(recreated).contains("Turns: 0"));
+  runTestOnUiThread(() -> {recreated.findViewById(R.id.sound_toggle).performClick();((android.widget.SeekBar)recreated.findViewById(R.id.sound_volume)).setProgress(30);});
  }
 
 }

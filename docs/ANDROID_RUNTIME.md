@@ -216,3 +216,11 @@ process-cold launches, frame timing and PSS for the existing debug APK on API 23
 x86_64 software emulation. It replaces the earlier blanket unmeasured-performance
 status for that configuration only. Physical ARM64, current-target-API runtime,
 battery/thermal behavior and production performance remain unverified.
+
+## API 35 runtime qualification
+
+[API 35 qualification evidence](ANDROID_API35.md) records the selected image,
+existing APK identities, readiness checks and exact launch/test outcomes. It
+keeps framework startup failures separate from app results; the SDK target or
+completed package installation alone is not runtime verification. Physical ARM64
+acceptance remains separate.
