@@ -63,3 +63,11 @@ Eight synthetic sound tests pass, including exact sample bytes, retained command
 order/parameters, signed param1, sample-only status, malformed offsets and unknown
 commands. Native scheduling, pitch/loop semantics, audio focus, cue mapping and
 auditory/device comparisons still block completion of #13.
+
+## Exact command-processing timing
+
+The separate [timing-plan analyzer](SOUND_SEQUENCE.md) now calculates exact
+rational processing intervals for a deliberately bounded sampled-voice dialect.
+It produces no audio and does not infer audible note endings; the existing WAV
+decoder remains strict by default. Historical pitched/loop playback and audible
+Android hardware verification remain unfinished.

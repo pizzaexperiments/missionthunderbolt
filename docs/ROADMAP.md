@@ -6,7 +6,7 @@ release-only. Dependent branches may stack without waiting for merges; every imp
 PR targets `develop`, with its prerequisite PRs/commits and local evidence recorded. Closures of #2, #4, #5, #24 and #25 were verified through the live GitHub API.
 The 2026-10-30 acceptance review closed #3, #14 and #17 as completed in
 their workflow/prototype scopes; see [closeout review](ISSUE_CLOSEOUT_REVIEW.md).
-The #45 integration repair and #46–#48 were verified merged into `develop`, including the formerly stranded #43/#44 changes. All five GitHub Actions workflows are disabled during the maintainer-requested
+The #45 integration repair and #46–#51 were verified merged into `develop`, including the formerly stranded #43/#44 changes. All five GitHub Actions workflows are disabled during the maintainer-requested
 pause. Local test results belong in PRs; no CI run/public release is claimed here.
 
 ## Dependency order
@@ -48,7 +48,7 @@ flowchart TD
 | [#10](https://github.com/pizzaexperiments/missionthunderbolt/issues/10) | Manual combat/wield/exchange evidence recorded | Damage/hit/RNG/weapon rules and original comparisons |
 | [#11](https://github.com/pizzaexperiments/missionthunderbolt/issues/11) | Manual quantity/container/equipment evidence; raw filter/list prepend/removal/release/prefix models, 69 supplied-allocation factory variants/RNG tail and connected selector checks corroborated; separate 56-byte child prefix corroborated on 1,458 cases/4,368 draws | Original schemas, constraints, effects and verified transitions |
 | [#12](https://github.com/pizzaexperiments/missionthunderbolt/issues/12) | AI/spawning evidence gaps documented | Controlled original traces, recovered entity/AI/pathfinding logic |
-| [#13](https://github.com/pizzaexperiments/missionthunderbolt/issues/13) | 137 single-buffer previews plus one sample-only; timed commands preserved; opt-in authored PCM controls | Opt-in authored Android PCM path added; historical sequence/cue fidelity and physical output remain open |
+| [#13](https://github.com/pizzaexperiments/missionthunderbolt/issues/13) | 137 single-buffer previews plus one sample-only; exact rational command-timing plans for bounded sampled voices; opt-in authored PCM controls | Opt-in authored Android PCM path added; historical sequence/cue fidelity and physical output remain open |
 | [#14](https://github.com/pizzaexperiments/missionthunderbolt/issues/14) | Separate bounded map/seeded RNG, portable CMake, stable C ABI errors/ownership and C-client test | Closed as completed for prototype refactor; native Windows/macOS execution remains #19/#20, future systems must preserve core independence |
 | [#15](https://github.com/pizzaexperiments/missionthunderbolt/issues/15) | Versioned synthetic state, CRC32, migration/corruption/continuation tests and app-private atomic storage | Extend format only as real gameplay systems exist; no proprietary-save compatibility claim |
 | [#16](https://github.com/pizzaexperiments/missionthunderbolt/issues/16) | Original graphics available privately for research; reference requirements identified | Faithful Classic layout/menus/fonts/resource mapping and screenshot comparisons; current skins are demo-only |
